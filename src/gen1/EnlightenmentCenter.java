@@ -6,16 +6,13 @@ import static gen1.RobotPlayer.*;
 
 
 public strictfp class EnlightenmentCenter {
-
     static final RobotType[] spawnableRobot = {
-        RobotType.POLITICIAN,
-        RobotType.SLANDERER,
+        //RobotType.POLITICIAN,
+        //RobotType.SLANDERER,
         RobotType.MUCKRAKER,
     };
 
-    static Direction randomDirection() {
-        return directions[(int) (Math.random() * directions.length)];
-    }
+    static int lastDirectionInd = 0;
 
     static RobotType randomSpawnableRobotType() {
         return spawnableRobot[(int) (Math.random() * spawnableRobot.length)];
@@ -24,11 +21,15 @@ public strictfp class EnlightenmentCenter {
     static void move() throws GameActionException {
         RobotType toBuild = randomSpawnableRobotType();
         int influence = 1;
-        for (Direction dir : directions) {
-            if (rc.canBuildRobot(toBuild, dir, influence)) {
-                rc.buildRobot(toBuild, dir, influence);
-            } else {
-                 break;
+
+        Direction dir = directions[lastDirectionInd];
+
+        if (rc.canBuildRobot(toBuild, dir, influence)) {
+            rc.buildRobot(toBuild, dir, influence);
+
+            lastDirectionInd += 2;
+            if (lastDirectionInd >= directions.length) {
+                lastDirectionInd = (lastDirectionInd+1)%2;
             }
         }
     }

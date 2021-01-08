@@ -2,9 +2,6 @@ package gen1;
 
 import battlecode.common.*;
 
-import java.util.*;
-
-
 @SuppressWarnings("unused")
 public strictfp class RobotPlayer {
     static RobotController rc;
@@ -29,11 +26,18 @@ public strictfp class RobotPlayer {
         return col[(int) (Math.random() * col.length)];
     }
 
-    static Direction randomDirection() {
+    static Direction getRandomDirection() {
         return (Direction) getRandom(directions);
     }
 
-
+    static boolean tryMove(Direction dir) throws GameActionException {
+        if (rc.canMove(dir)) {
+            rc.move(dir);
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     public static void run (RobotController robotController) {
         rc = robotController;
