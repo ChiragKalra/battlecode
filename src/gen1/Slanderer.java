@@ -2,11 +2,10 @@ package gen1;
 
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
-import battlecode.common.RobotInfo;
-import battlecode.common.Team;
 
 import static gen1.RobotPlayer.directions;
 import static gen1.RobotPlayer.rc;
+
 
 public strictfp class Slanderer {
 

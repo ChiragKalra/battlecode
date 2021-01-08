@@ -5,6 +5,7 @@ import battlecode.common.*;
 import static gen1.RobotPlayer.directions;
 import static gen1.RobotPlayer.rc;
 
+
 public strictfp class Politician {
 
     static Direction randomDirection() {

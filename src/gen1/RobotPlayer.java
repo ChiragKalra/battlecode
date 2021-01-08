@@ -2,9 +2,17 @@ package gen1;
 
 import battlecode.common.*;
 
+import java.util.*;
+
+
 @SuppressWarnings("unused")
 public strictfp class RobotPlayer {
     static RobotController rc;
+    static int round;
+    static Team mTeam, enemyTeam;
+    static int actionRadius, sensorRadius;
+
+    static MapLocation spawnLocation;
 
     static final Direction[] directions = {
         Direction.NORTH,
@@ -17,18 +25,30 @@ public strictfp class RobotPlayer {
         Direction.NORTHWEST,
     };
 
-    static int turnCount;
+    static Object getRandom(Object[] col) {
+        return col[(int) (Math.random() * col.length)];
+    }
 
-    public static void run(RobotController rc) throws GameActionException {
-        RobotPlayer.rc = rc;
+    static Direction randomDirection() {
+        return (Direction) getRandom(directions);
+    }
 
-        turnCount = 0;
 
-        System.out.println("I'm a " + rc.getType() + " and I just got created!");
+
+    public static void run (RobotController robotController) {
+        rc = robotController;
+        round = rc.getRoundNum();
+        mTeam = rc.getTeam();
+        enemyTeam = mTeam.opponent();
+        actionRadius = rc.getType().actionRadiusSquared;
+        sensorRadius = rc.getType().sensorRadiusSquared;
+
+        // store spawn/ switch location
+        spawnLocation = rc.getLocation();
+
         while (true) {
-            turnCount += 1;
+            round++;
             try {
-                System.out.println("I'm a " + rc.getType() + "! Location " + rc.getLocation());
                 switch (rc.getType()) {
                     case ENLIGHTENMENT_CENTER:
                         EnlightenmentCenter.move();
@@ -45,7 +65,6 @@ public strictfp class RobotPlayer {
                 }
                 Clock.yield();
             } catch (Exception e) {
-                System.out.println(rc.getType() + " Exception");
                 e.printStackTrace();
             }
         }
