@@ -260,7 +260,6 @@ public strictfp class Muckraker {
         int prevFlag = rc.getFlag(rc.getID()), newFlag = placed ? 1 : 0;
         if (placed) {
             int threeBit = Arrays.asList(directions).indexOf(getVacantDirection(afterMoveNearby));
-            System.out.println(threeBit);
             newFlag += threeBit << 5;
         }
 

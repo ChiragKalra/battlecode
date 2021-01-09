@@ -22,6 +22,7 @@ public strictfp class EnlightenmentCenter {
         RobotType toBuild = randomSpawnableRobotType();
         int influence = (int) (2 * MAX_GENERATED_INFLUENCE / (GameConstants.GAME_MAX_NUMBER_OF_ROUNDS * rc.sensePassability(rc.getLocation())));
 
+        // TODO select direction based on adjacent muckraker directions and pass-ability
         Direction dir = directions[lastDirectionInd];
 
         if (rc.canBuildRobot(toBuild, dir, influence)) {
