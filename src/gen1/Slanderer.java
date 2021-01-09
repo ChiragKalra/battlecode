@@ -3,6 +3,7 @@ package gen1;
 import battlecode.common.*;
 
 import static gen1.RobotPlayer.*;
+import static gen1.helpers.MovementHelper.*;
 
 
 public strictfp class Slanderer {
