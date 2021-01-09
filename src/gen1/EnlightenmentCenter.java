@@ -20,7 +20,7 @@ public strictfp class EnlightenmentCenter {
 
     static void move() throws GameActionException {
         RobotType toBuild = randomSpawnableRobotType();
-        int influence = 1;
+        int influence = (int) (2 * MAX_GENERATED_INFLUENCE / (GameConstants.GAME_MAX_NUMBER_OF_ROUNDS * rc.sensePassability(rc.getLocation())));
 
         Direction dir = directions[lastDirectionInd];
 
