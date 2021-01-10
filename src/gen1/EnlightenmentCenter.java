@@ -53,7 +53,7 @@ public strictfp class EnlightenmentCenter {
 
     static void move() throws GameActionException {
         if (DEBUG) {
-            if (round % 100 == 0) {
+            if (round % 500 == 0) {
                 System.out.println("Round number:- " + round);
             }
         }
@@ -63,7 +63,7 @@ public strictfp class EnlightenmentCenter {
 
         Direction dir = getOptimalDirection();
 
-        if (rc.canBuildRobot(toBuild, dir, influence) && muckrakersBuilt <= 100) {
+        if (rc.canBuildRobot(toBuild, dir, influence) && muckrakersBuilt <= 250) {
             rc.buildRobot(toBuild, dir, influence);
             muckrakersBuilt++;
         }

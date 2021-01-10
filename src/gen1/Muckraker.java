@@ -95,7 +95,7 @@ public strictfp class Muckraker {
         // check for flag changes and set flag
         int prevFlag = rc.getFlag(rc.getID()), newFlag = placed ? 1 : 0;
         if (placed) {
-            int threeBit = directionList.indexOf(getVacantDirection());
+            int threeBit = directionList.indexOf(getGridDirectionForFlag());
             newFlag += threeBit << 5;
         }
 
@@ -104,7 +104,7 @@ public strictfp class Muckraker {
         }
 
         if (DEBUG) {
-            float k = 5;
+            float k = 7;
             if (Clock.getBytecodeNum() > 1000*k) {
                 System.out.println("ByteCodes Used over " + k + "k: " + Clock.getBytecodeNum());
             }

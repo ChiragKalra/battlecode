@@ -51,38 +51,14 @@ public class GridHelper {
      * direction which needs to be stored in the flag after the bot is placed
      *
      * Direction finding priorities:
-     *      1. corner muckraker (direct towards opposite direction) // TODO save statically for optimisation
-     *      2. edge muckraker (forbid edge direction) // TODO save statically for optimisation
-     *      3. avoid crowds by detecting ratio of occupied cells in each direction
-     *      4. vacant position in adjacent grid (direct toward vacancy)
-     *      5. no vacancies (select one random direction out of adjacent muckrakers)
+     *      1. vacant position in adjacent grid (direct toward vacancy)
+     *      2. avoid crowds by detecting ratio of occupied cells in each direction
+     *              (should take care of map edges and corners since it considers cells outside the map as occupied)
+     *      3. no vacancies (select one random direction out of adjacent muckrakers)
      *
      */
-    public static Direction getVacantDirection() throws GameActionException {
-        //check for map edges/corners
-        boolean[] edges = new boolean[8];
+    public static Direction getGridDirectionForFlag() throws GameActionException {
         MapLocation current = rc.getLocation();
-        for (int i = 0; i < 8; i += 2) {
-            MapLocation directed = multiply(current, directions[i], MUCKRAKER_GRID_WIDTH);
-            edges[i] = !rc.onTheMap(directed);
-            if (edges[i]) {
-                edges[Math.floorMod(i-1, 8)] = edges[Math.floorMod(i+1, 8)] = true;
-            }
-        }
-
-        //check if corner muckraker
-        int free = 0;
-        for (boolean b: edges) {
-            free += b ? 0: 1;
-        }
-        // corner muckraker, send towards opposite direction
-        if (free == 3) {
-            for (int i = 1; i < 8; i+=2) {
-                if (!edges[i]) {
-                    return directions[i];
-                }
-            }
-        }
 
         // find adjacent vacancies
         Direction vacancy = checkVacantSpot();
@@ -90,9 +66,11 @@ public class GridHelper {
             return vacancy;
         }
 
-        // TODO avoid crowding if any
+        // avoid crowding if any
         Direction antiCrowd = getAntiCrowdingDirection(current);
-        if (antiCrowd != null) return antiCrowd;
+        if (antiCrowd != null) {
+            return antiCrowd;
+        }
 
         // select random direction out of adjacent muckrakers
         ArrayList<Direction> selected = new ArrayList<>();
@@ -101,23 +79,11 @@ public class GridHelper {
             int flag = rc.getFlag(ri.getID());
             if (ri.type == RobotType.MUCKRAKER && isPlaced(flag)) {
                 Direction dir = getDirection(rc.getFlag(rc.getID()));
-                int dirInd = directionList.indexOf(dir);
-                // forbid edge direction
-                if (!edges[dirInd]) {
-                    selected.add(dir);
-                }
+                selected.add(dir);
             }
         }
 
-        // forbid edge direction
-        if (selected.isEmpty()) {
-            for (int i = 0; i < 8; i++) {
-                if (!edges[i]) {
-                    selected.add(directions[i]);
-                }
-            }
-        }
-        return (Direction) getRandom(selected.toArray());
+        return selected.isEmpty() ? getRandomDirection() : (Direction) getRandom(selected.toArray());
     }
 
     private static Boolean isAdjacentTo(MapLocation a, MapLocation b) {

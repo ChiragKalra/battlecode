@@ -6,13 +6,15 @@ import java.util.*;
 
 import static gen1.RobotPlayer.*;
 
-
 public class MovementHelper {
+
+    // max acceptable crowding ratio in a direction
+    public static final double RATIO_CROWDING = 0.33;
+
+    // movement precision
     public static final int PRECISION_MAX = 422;
     public static final int PRECISION_MID = 325;
     public static final int PRECISION_LOW = 334;
-
-    public static final double RATIO_CROWDING = 0.33;
 
     public static final Direction[] directions = {
             Direction.NORTH,
@@ -52,7 +54,10 @@ public class MovementHelper {
             for (int y = -limY; y <= limY; y++) {
                 ml = new MapLocation(x+current.x, y+current.y);
                 dirInd = directionList.indexOf(current.directionTo(ml));
-                if (dirInd == -1) continue;
+                if (dirInd == -1) {
+                    // x = y = 0 condition, don't evaluate
+                    continue;
+                }
                 total[dirInd]++;
                 try {
                     occupied[dirInd] += rc.isLocationOccupied(ml) ? 1 : 0;
@@ -71,7 +76,7 @@ public class MovementHelper {
                 maxInd = i;
             }
         }
-        if (maxRatio < RATIO_CROWDING) {
+        if (maxRatio <= RATIO_CROWDING) {
             return null;
         }
         return directions[(maxInd+4)%8];
