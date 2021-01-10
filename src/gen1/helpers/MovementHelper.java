@@ -2,7 +2,6 @@ package gen1.helpers;
 
 import battlecode.common.*;
 
-
 import java.util.*;
 
 import static gen1.RobotPlayer.*;
@@ -15,8 +14,9 @@ public class MovementHelper {
 
     // movement precision
     public static final int PRECISION_MAX = 422;
+    @SuppressWarnings("unused")
     public static final int PRECISION_MID = 325;
-    public static final int PRECISION_LOW = 334;
+    public static final int PRECISION_MIN = 334;
   
     public static final double INFINITY = 10000;
 
@@ -127,15 +127,15 @@ public class MovementHelper {
     /*
      * returns null if there's no possible path to the destination
      *
-     * passability = 0 for
+     * pass-ability = 0 for
      * - locations not on the map
      * - locations having robots
      * - locations outside of radius
      */
-    public static ArrayList<Direction> getShortestRoute(RobotType robot, MapLocation destination, double[][] passability) {
+    public static ArrayList<Direction> getShortestRoute(MapLocation current, MapLocation destination, double[][] passability) {
         int size = passability.length;
         MapLocation source = new MapLocation(size / 2, size / 2);
-        destination = new MapLocation(destination.x + size / 2, destination.y + size / 2);
+        destination = new MapLocation(destination.x + size / 2 - current.x, destination.y + size / 2 - current.y);
 
         double[][] distance = new double[size][size];
         for (int x = 0; x < size; ++x) {
@@ -152,9 +152,9 @@ public class MovementHelper {
             }
         }
 
-        boolean visited[][] = new boolean[size][size];
-        PriorityQueue<Pair<Double, MapLocation>> pq = new PriorityQueue<>((x, y) -> Double.compare(x.key, y.key));
-        pq.add(new Pair(0, source));
+        boolean[][] visited = new boolean[size][size];
+        PriorityQueue<Pair<Double, MapLocation>> pq = new PriorityQueue<>(Comparator.comparingDouble(x -> x.key));
+        pq.add(new Pair<>(0d, source));
 
         int[] dx = {0, 0, 1, 1, 1, -1, -1, -1};
         int[] dy = {1, -1, 0, 1, -1, 0, 1, -1};
@@ -171,28 +171,30 @@ public class MovementHelper {
                 if (loc.x < 0 || loc.x >= size || loc.y < 0 || loc.y >= size) {
                     continue;
                 }
-                if (visited[loc.x][loc.y]) {
+                if (visited[loc.x][loc.y] || passability[loc.x][loc.y] == 0) {
                     continue;
                 }
 
-                // TODO: handle passability = 0
-                double edgeWeight = robot.actionCooldown / passability[cur.x][cur.y];
+                double edgeWeight = rc.getType().actionCooldown / passability[cur.x][cur.y];
                 if (distance[cur.x][cur.y] + edgeWeight < distance[loc.x][loc.y]) {
                     distance[loc.x][loc.y] = distance[cur.x][cur.y] + edgeWeight;
-                    pq.add(new Pair(distance[loc.x][loc.y], new MapLocation(loc.x, loc.y)));
+                    pq.add(new Pair<>(distance[loc.x][loc.y], new MapLocation(loc.x, loc.y)));
                     parent[loc.x][loc.y] = cur;
                 }
             }
         }
 
-        if (distance[destination.x][destination.y] >= INFINITY)
+        if (distance[destination.x][destination.y] >= INFINITY) {
+            if (DEBUG) {
+                System.out.println("returned null");
+            }
             return null;
+        }
 
         // build path
         ArrayList<Direction> route = new ArrayList<>();
         MapLocation loc = destination;
-        while (loc != source)
-        {
+        while (loc != source) {
             route.add(parent[loc.x][loc.y].directionTo(loc));
             loc = parent[loc.x][loc.y];
         }

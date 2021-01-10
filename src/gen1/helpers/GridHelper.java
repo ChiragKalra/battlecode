@@ -7,6 +7,7 @@ import java.util.*;
 import static gen1.Muckraker.*;
 import static gen1.RobotPlayer.*;
 import static gen1.helpers.MovementHelper.*;
+import static gen1.helpers.TerrainHelper.*;
 
 
 // muckraker info grid formation helper
@@ -23,28 +24,23 @@ public class GridHelper {
         return directions[(flag >> 5) % 8];
     }
 
-    public static Direction getInitDirection(RobotInfo[] nearby) throws GameActionException {
-        Direction ret = null;
-        for (RobotInfo ri: nearby) {
-            if (ri.team == mTeam && ri.type == RobotType.ENLIGHTENMENT_CENTER) {
-                MapLocation loc = ri.location;
-                Direction dir = loc.directionTo(rc.getLocation());
-                loc = multiply(loc, dir, MUCKRAKER_GRID_WIDTH);
+    private static Direction getAdjacentVacant(MapLocation current) throws GameActionException {
+        int mx = current.x, my = current.y;
+        MapLocation north = new MapLocation(mx, my + MUCKRAKER_GRID_WIDTH),
+            east = new MapLocation(mx + MUCKRAKER_GRID_WIDTH, my),
+            south = new MapLocation(mx, my - MUCKRAKER_GRID_WIDTH),
+            west = new MapLocation(mx - MUCKRAKER_GRID_WIDTH, my);
 
-                // check if to be placed at spot is vacant, otherwise return null
-                if (rc.canSenseLocation(loc)) {
-                    RobotInfo found = rc.senseRobotAtLocation(loc);
-                    if (
-                            found == null || found.team != mTeam ||
-                                    found.type != RobotType.MUCKRAKER ||
-                                    !isPlaced(rc.getFlag(found.getID()))
-                    ) {
-                        ret = ri.location.directionTo(rc.getLocation());
-                    }
-                }
+        Direction selected = null;
+
+        //check in all 4 directions
+        MapLocation[] possible = {north, east, south, west};
+        for (MapLocation mp: possible) {
+            if (rc.canSenseLocation(mp) && !rc.isLocationOccupied(mp)) {
+                selected = current.directionTo(mp);
             }
         }
-        return ret;
+        return selected;
     }
 
     /*
@@ -61,7 +57,7 @@ public class GridHelper {
         MapLocation current = rc.getLocation();
 
         // find adjacent vacancies
-        Direction vacancy = checkVacantSpot();
+        Direction vacancy = getAdjacentVacant(current);
         if (vacancy != null) {
             return vacancy;
         }
@@ -157,8 +153,7 @@ public class GridHelper {
     }
 
     // check for vacant grid spot in the sensor radius
-    public static Direction checkVacantSpot() throws GameActionException {
-        MapLocation mLoc = rc.getLocation();
+    private static MapLocation checkVacantSpot(MapLocation mLoc) throws GameActionException {
         int sx = gridReferenceLocation.x, sy = gridReferenceLocation.y,
                 mx = mLoc.x, my = mLoc.y;
 
@@ -166,30 +161,61 @@ public class GridHelper {
                 modY = Math.floorMod(sy-my, MUCKRAKER_GRID_WIDTH),
                 remX = (sx-mx) % MUCKRAKER_GRID_WIDTH,
                 remY = (sy-my) % MUCKRAKER_GRID_WIDTH;
-        Direction selected = null;
 
-        MapLocation north, east, south, west;
-
-        // placed muckraker condition
-        if (modX == 0 && modY == 0) {
-            north = new MapLocation(mx, my + MUCKRAKER_GRID_WIDTH);
-            east = new MapLocation(mx + MUCKRAKER_GRID_WIDTH, my);
-            south = new MapLocation(mx, my - MUCKRAKER_GRID_WIDTH);
-            west = new MapLocation(mx - MUCKRAKER_GRID_WIDTH, my);
-        } else { // muckraker not placed
-            north = new MapLocation(mx + remX, my + modY);
-            east = new MapLocation(mx + modX, my + remY);
-            south = new MapLocation(mx + remX, my - MUCKRAKER_GRID_WIDTH + modY);
-            west = new MapLocation(mx - MUCKRAKER_GRID_WIDTH + modX, my + remY);
-        }
+        MapLocation north = new MapLocation(mx + remX, my + modY),
+                east = new MapLocation(mx + modX, my + remY),
+                south = new MapLocation(mx + remX, my - MUCKRAKER_GRID_WIDTH + modY),
+                west = new MapLocation(mx - MUCKRAKER_GRID_WIDTH + modX, my + remY);
 
         //check in all 4 directions
         MapLocation[] possible = {north, east, south, west};
         for (MapLocation mp: possible) {
             if (rc.canSenseLocation(mp) && !rc.isLocationOccupied(mp)) {
-                selected = mLoc.directionTo(mp);
+                return mp;
             }
         }
-        return selected;
+        return null;
+    }
+
+    private static ArrayList<Direction> movesToVacant = null;
+    // get direction to move to or null
+    public static Direction getVacantDirection(MapLocation mLoc) throws GameActionException {
+        // if movesToVacant is not empty return next move
+        if (movesToVacant != null) {
+            if (movesToVacant.isEmpty()) {
+                movesToVacant = null;
+            } else {
+                Direction ret = movesToVacant.get(movesToVacant.size() - 1);
+                // if blockage in path, re-compute path
+                if (rc.canMove(ret)) {
+                    movesToVacant.remove(movesToVacant.size() - 1);
+                    return ret;
+                }
+            }
+        }
+
+        MapLocation selected = checkVacantSpot(mLoc);
+        if (selected == null) {
+            return null;
+        }
+
+        if (DEBUG) {
+            System.out.println(selected);
+        }
+
+        movesToVacant = getShortestRoute(mLoc, selected, getPassabilityGrid(mLoc));
+        if (movesToVacant == null) {
+            return null;
+        }
+
+        if (DEBUG) {
+            for (Direction d: movesToVacant) {
+                System.out.print(d + " -> ");
+            }
+            System.out.println();
+        }
+
+        Collections.reverse(movesToVacant);
+        return getVacantDirection(mLoc);
     }
 }

@@ -18,8 +18,6 @@ import static gen1.helpers.MovementHelper.*;
 
  */
 
-
-
 public strictfp class EnlightenmentCenter {
     static final RobotType[] spawnableRobot = {
         //RobotType.POLITICIAN,

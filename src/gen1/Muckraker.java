@@ -34,10 +34,11 @@ public strictfp class Muckraker {
     public static boolean placed = false;
     public static MapLocation gridReferenceLocation = null;
 
-    static void setEnlightenmentCenterLocation(RobotInfo[] nearby) {
+    static void setEnlightenmentCenterLocation() {
+        RobotInfo[] nearby = rc.senseNearbyRobots(sensorRadius, mTeam);
         if (gridReferenceLocation == null) {
             for (RobotInfo ri: nearby) {
-                if (ri.team == mTeam && ri.type == RobotType.ENLIGHTENMENT_CENTER) {
+                if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
                     gridReferenceLocation = ri.location;
                     break;
                 }
@@ -46,48 +47,46 @@ public strictfp class Muckraker {
     }
 
     static void move() throws GameActionException {
-        // occupy a grid spot if not unplaced
-        RobotInfo[] afterMoveNearby = null;
-        if (!placed) {
-            RobotInfo[] fellow = rc.senseNearbyRobots(sensorRadius, mTeam);
-            setEnlightenmentCenterLocation(fellow);
-            Direction init = getInitDirection(fellow), decided;
-            if (init == null) {
-                Direction vacant = checkVacantSpot();
-                if (vacant != null) {
-                    decided = vacant;
-                } else {
+        // dont compute movement/ability if cooldown active
+        if (rc.getCooldownTurns() < 1) {
+            // occupy a grid spot if not unplaced
+            RobotInfo[] afterMoveNearby = null;
+            if (!placed) {
+                setEnlightenmentCenterLocation();
+                Direction decided = getVacantDirection(rc.getLocation());
+                if (decided == null) {
+                    RobotInfo[] fellow = rc.senseNearbyRobots(sensorRadius, mTeam);
                     ArrayList<Direction> selected = new ArrayList<>();
                     for (RobotInfo ri : fellow) {
-                        int flag = rc.getFlag(ri.getID());
-                        if (ri.type == RobotType.MUCKRAKER && isPlaced(flag)) {
-                            selected.add(getDirection(flag));
+                        if (rc.canSenseLocation(ri.getLocation())) {
+                            int flag = rc.getFlag(ri.getID());
+                            if (ri.type == RobotType.MUCKRAKER && isPlaced(flag)) {
+                                selected.add(getDirection(flag));
+                            }
                         }
                     }
-                    decided = selected.isEmpty() ? getRandomDirection() : //replace with better algo
-                    (Direction) getRandom(selected.toArray());
+                    decided = selected.isEmpty() ? getRandomDirection() : // TODO replace with better algo
+                            (Direction) getRandom(selected.toArray());
                 }
-            } else {
-                decided = init;
+                if (tryMove(decided, PRECISION_MIN)) {
+                    afterMoveNearby = rc.senseNearbyRobots(sensorRadius, mTeam);
+                    placed = formsGrid(afterMoveNearby);
+                }
             }
 
-            if (tryMove(decided, PRECISION_LOW)) {
+            // save bytecode with re-usage
+            if (afterMoveNearby == null) {
                 afterMoveNearby = rc.senseNearbyRobots(sensorRadius, mTeam);
-                placed = formsGrid(afterMoveNearby);
             }
-        }
-        // save bytecode with re-usage
-        if (afterMoveNearby == null) {
-            afterMoveNearby = rc.senseNearbyRobots(sensorRadius, mTeam);
-        }
 
-        // check for slanderers
-        for (RobotInfo robot: afterMoveNearby) {
-            if (robot.location.isWithinDistanceSquared(rc.getLocation(), actionRadius) && robot.type.canBeExposed()) {
-                // expose the slanderer
-                if (rc.canExpose(robot.location)) {
-                    rc.expose(robot.location);
-                    return;
+            // check for slanderers
+            for (RobotInfo robot : afterMoveNearby) {
+                if (robot.location.isWithinDistanceSquared(rc.getLocation(), actionRadius) && robot.type.canBeExposed()) {
+                    // expose the slanderer
+                    if (rc.canExpose(robot.location)) {
+                        rc.expose(robot.location);
+                        return;
+                    }
                 }
             }
         }
@@ -104,7 +103,7 @@ public strictfp class Muckraker {
         }
 
         if (DEBUG) {
-            float k = 7;
+            float k = 10;
             if (Clock.getBytecodeNum() > 1000*k) {
                 System.out.println("ByteCodes Used over " + k + "k: " + Clock.getBytecodeNum());
             }
