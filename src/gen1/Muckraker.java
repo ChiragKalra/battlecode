@@ -49,7 +49,7 @@ public strictfp class Muckraker {
         // occupy a grid spot if not unplaced
         RobotInfo[] afterMoveNearby = null;
         if (!placed) {
-            RobotInfo[] fellow = rc.senseNearbyRobots(sensorRadius);
+            RobotInfo[] fellow = rc.senseNearbyRobots(sensorRadius, mTeam);
             setEnlightenmentCenterLocation(fellow);
             Direction init = getInitDirection(fellow), decided;
             if (init == null) {
@@ -60,8 +60,8 @@ public strictfp class Muckraker {
                     ArrayList<Direction> selected = new ArrayList<>();
                     for (RobotInfo ri : fellow) {
                         int flag = rc.getFlag(ri.getID());
-                        if (ri.team == mTeam && ri.type == RobotType.MUCKRAKER && isPlaced(flag)) {
-                        selected.add(getDirection(flag));
+                        if (ri.type == RobotType.MUCKRAKER && isPlaced(flag)) {
+                            selected.add(getDirection(flag));
                         }
                     }
                     decided = selected.isEmpty() ? getRandomDirection() : //replace with better algo
@@ -72,13 +72,13 @@ public strictfp class Muckraker {
             }
 
             if (tryMove(decided, PRECISION_LOW)) {
-                afterMoveNearby = rc.senseNearbyRobots(sensorRadius);
+                afterMoveNearby = rc.senseNearbyRobots(sensorRadius, mTeam);
                 placed = formsGrid(afterMoveNearby);
             }
         }
         // save bytecode with re-usage
         if (afterMoveNearby == null) {
-            afterMoveNearby = rc.senseNearbyRobots(sensorRadius);
+            afterMoveNearby = rc.senseNearbyRobots(sensorRadius, mTeam);
         }
 
         // check for slanderers
@@ -95,12 +95,19 @@ public strictfp class Muckraker {
         // check for flag changes and set flag
         int prevFlag = rc.getFlag(rc.getID()), newFlag = placed ? 1 : 0;
         if (placed) {
-            int threeBit = Arrays.asList(directions).indexOf(getVacantDirection(afterMoveNearby));
+            int threeBit = directionList.indexOf(getVacantDirection());
             newFlag += threeBit << 5;
         }
 
         if (newFlag != prevFlag) {
             rc.setFlag(newFlag);
+        }
+
+        if (DEBUG) {
+            float k = 5;
+            if (Clock.getBytecodeNum() > 1000*k) {
+                System.out.println("ByteCodes Used over " + k + "k: " + Clock.getBytecodeNum());
+            }
         }
     }
 }

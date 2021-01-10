@@ -58,7 +58,7 @@ public class GridHelper {
      *      5. no vacancies (select one random direction out of adjacent muckrakers)
      *
      */
-    public static Direction getVacantDirection(RobotInfo[] nearby) throws GameActionException {
+    public static Direction getVacantDirection() throws GameActionException {
         //check for map edges/corners
         boolean[] edges = new boolean[8];
         MapLocation current = rc.getLocation();
@@ -91,14 +91,15 @@ public class GridHelper {
         }
 
         // TODO avoid crowding if any
-
+        Direction antiCrowd = getAntiCrowdingDirection(current);
+        if (antiCrowd != null) return antiCrowd;
 
         // select random direction out of adjacent muckrakers
         ArrayList<Direction> selected = new ArrayList<>();
-        List<Direction> directionList = Arrays.asList(directions);
+        RobotInfo[] nearby = rc.senseNearbyRobots(sensorRadius, mTeam);
         for (RobotInfo ri: nearby) {
             int flag = rc.getFlag(ri.getID());
-            if (ri.team == mTeam && ri.type == RobotType.MUCKRAKER && isPlaced(flag)) {
+            if (ri.type == RobotType.MUCKRAKER && isPlaced(flag)) {
                 Direction dir = getDirection(rc.getFlag(rc.getID()));
                 int dirInd = directionList.indexOf(dir);
                 // forbid edge direction
@@ -119,12 +120,12 @@ public class GridHelper {
         return (Direction) getRandom(selected.toArray());
     }
 
-    private static Boolean isAdjacentTo(MapLocation mLocation, MapLocation placedLocation) {
-        boolean yDif = Math.abs(placedLocation.y - mLocation.y) == MUCKRAKER_GRID_WIDTH,
-                xDif = Math.abs(placedLocation.x - mLocation.x) == MUCKRAKER_GRID_WIDTH;
-        if (placedLocation.x == mLocation.x) {
+    private static Boolean isAdjacentTo(MapLocation a, MapLocation b) {
+        boolean yDif = Math.abs(a.y - b.y) == MUCKRAKER_GRID_WIDTH,
+                xDif = Math.abs(a.x - b.x) == MUCKRAKER_GRID_WIDTH;
+        if (a.x == b.x) {
             return yDif;
-        } else if (placedLocation.y == mLocation.y) {
+        } else if (a.y == b.y) {
             return xDif;
         } else {
             return yDif && xDif;
@@ -174,9 +175,7 @@ public class GridHelper {
         ArrayList<MapLocation> placedLocations = new ArrayList<>();
         for (RobotInfo ri: afterMoveNearby) {
             int flag = rc.getFlag(ri.getID());
-            if (ri.team == mTeam &&
-                    (ri.type == RobotType.MUCKRAKER && isPlaced(flag) || ri.type == RobotType.ENLIGHTENMENT_CENTER)
-            ) {
+            if (ri.type == RobotType.MUCKRAKER && isPlaced(flag) || ri.type == RobotType.ENLIGHTENMENT_CENTER) {
                 if (isAdjacentTo(mapLocation, ri.location)) {
                     validPos = true;
                 }

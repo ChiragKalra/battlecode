@@ -9,7 +9,6 @@ import static gen1.helpers.MovementHelper.*;
 public strictfp class Slanderer {
 
     static boolean tryMove(Direction dir) throws GameActionException {
-        System.out.println("I am trying to move " + dir + "; " + rc.isReady() + " " + rc.getCooldownTurns() + " " + rc.canMove(dir));
         if (rc.canMove(dir)) {
             rc.move(dir);
             return true;
@@ -17,7 +16,6 @@ public strictfp class Slanderer {
     }
 
      static void move() throws GameActionException {
-         if (tryMove(getRandomDirection()))
-             System.out.println("I moved!");
+         tryMove(getRandomDirection());
     }
 }

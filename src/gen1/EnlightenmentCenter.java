@@ -28,6 +28,7 @@ public strictfp class EnlightenmentCenter {
     };
 
     static int lastDirectionInd = 7;
+    static int muckrakersBuilt = 0;
 
     static RobotType randomSpawnableRobotType() {
         return spawnableRobot[(int) (Math.random() * spawnableRobot.length)];
@@ -51,13 +52,20 @@ public strictfp class EnlightenmentCenter {
     }
 
     static void move() throws GameActionException {
+        if (DEBUG) {
+            if (round % 100 == 0) {
+                System.out.println("Round number:- " + round);
+            }
+        }
+
         RobotType toBuild = randomSpawnableRobotType();
-        int influence = 1;//(int) (2 * MAX_GENERATED_INFLUENCE / (GameConstants.GAME_MAX_NUMBER_OF_ROUNDS * rc.sensePassability(rc.getLocation())));
+        int influence = (int) (2 * MAX_GENERATED_INFLUENCE / (GameConstants.GAME_MAX_NUMBER_OF_ROUNDS * rc.sensePassability(rc.getLocation())));
 
         Direction dir = getOptimalDirection();
 
-        if (rc.canBuildRobot(toBuild, dir, influence)) {
+        if (rc.canBuildRobot(toBuild, dir, influence) && muckrakersBuilt <= 100) {
             rc.buildRobot(toBuild, dir, influence);
+            muckrakersBuilt++;
         }
     }
 }

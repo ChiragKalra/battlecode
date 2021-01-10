@@ -5,13 +5,14 @@ import battlecode.common.*;
 
 @SuppressWarnings("unused")
 public strictfp class RobotPlayer {
+    public static final boolean DEBUG = true;
 
     public static final int MAX_GENERATED_INFLUENCE = 22364;
 
     public static RobotController rc;
     public static int round;
     public static Team mTeam, enemyTeam;
-    public static int actionRadius, sensorRadius;
+    public static int actionRadius, sensorRadius, detectionRadius;
 
     public static Object getRandom(Object[] col) {
         return col[(int) (Math.random() * col.length)];
@@ -24,6 +25,7 @@ public strictfp class RobotPlayer {
         enemyTeam = mTeam.opponent();
         actionRadius = rc.getType().actionRadiusSquared;
         sensorRadius = rc.getType().sensorRadiusSquared;
+        detectionRadius = rc.getType().detectionRadiusSquared;
 
         while (true) {
             round++;
