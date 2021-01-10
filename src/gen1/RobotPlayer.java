@@ -2,7 +2,6 @@ package gen1;
 
 import battlecode.common.*;
 
-import java.util.*;
 
 @SuppressWarnings("unused")
 public strictfp class RobotPlayer {

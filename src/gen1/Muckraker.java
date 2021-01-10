@@ -32,13 +32,13 @@ import static gen1.helpers.MovementHelper.*;
 
 public strictfp class Muckraker {
     public static boolean placed = false;
-    public static MapLocation enlightenmentCenterLocation = null;
+    public static MapLocation gridReferenceLocation = null;
 
     static void setEnlightenmentCenterLocation(RobotInfo[] nearby) {
-        if (enlightenmentCenterLocation == null) {
+        if (gridReferenceLocation == null) {
             for (RobotInfo ri: nearby) {
                 if (ri.team == mTeam && ri.type == RobotType.ENLIGHTENMENT_CENTER) {
-                    enlightenmentCenterLocation = ri.location;
+                    gridReferenceLocation = ri.location;
                     break;
                 }
             }
@@ -73,16 +73,7 @@ public strictfp class Muckraker {
 
             if (tryMove(decided, PRECISION_LOW)) {
                 afterMoveNearby = rc.senseNearbyRobots(sensorRadius);
-                for (RobotInfo ri: afterMoveNearby) {
-                    int flag = rc.getFlag(ri.getID());
-                    if (ri.team == mTeam &&
-                        (ri.type == RobotType.MUCKRAKER && isPlaced(flag) || ri.type == RobotType.ENLIGHTENMENT_CENTER)) {
-                        if (formsGrid(ri)) {
-                            placed = true;
-                            break;
-                        }
-                    }
-                }
+                placed = formsGrid(afterMoveNearby);
             }
         }
         // save bytecode with re-usage
@@ -111,7 +102,5 @@ public strictfp class Muckraker {
         if (newFlag != prevFlag) {
             rc.setFlag(newFlag);
         }
-
-        System.out.println(Clock.getBytecodeNum());
     }
 }
