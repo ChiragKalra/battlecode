@@ -1,21 +1,14 @@
 package gen1;
 
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
-import battlecode.common.RobotInfo;
-import battlecode.common.Team;
+import battlecode.common.*;
 
-import static gen1.RobotPlayer.directions;
-import static gen1.RobotPlayer.rc;
+import static gen1.RobotPlayer.*;
+import static gen1.helpers.MovementHelper.*;
+
 
 public strictfp class Slanderer {
 
-    static Direction randomDirection() {
-        return directions[(int) (Math.random() * directions.length)];
-    }
-
     static boolean tryMove(Direction dir) throws GameActionException {
-        System.out.println("I am trying to move " + dir + "; " + rc.isReady() + " " + rc.getCooldownTurns() + " " + rc.canMove(dir));
         if (rc.canMove(dir)) {
             rc.move(dir);
             return true;
@@ -23,7 +16,6 @@ public strictfp class Slanderer {
     }
 
      static void move() throws GameActionException {
-         if (tryMove(randomDirection()))
-             System.out.println("I moved!");
+         tryMove(getRandomDirection());
     }
 }

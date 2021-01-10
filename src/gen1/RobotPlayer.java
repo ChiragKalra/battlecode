@@ -2,33 +2,34 @@ package gen1;
 
 import battlecode.common.*;
 
+
 @SuppressWarnings("unused")
 public strictfp class RobotPlayer {
-    static RobotController rc;
+    public static final boolean DEBUG = true;
 
-    static final Direction[] directions = {
-        Direction.NORTH,
-        Direction.NORTHEAST,
-        Direction.EAST,
-        Direction.SOUTHEAST,
-        Direction.SOUTH,
-        Direction.SOUTHWEST,
-        Direction.WEST,
-        Direction.NORTHWEST,
-    };
+    public static final int MAX_GENERATED_INFLUENCE = 22364;
 
-    static int turnCount;
+    public static RobotController rc;
+    public static int round;
+    public static Team mTeam, enemyTeam;
+    public static int actionRadius, sensorRadius, detectionRadius;
 
-    public static void run(RobotController rc) throws GameActionException {
-        RobotPlayer.rc = rc;
+    public static Object getRandom(Object[] col) {
+        return col[(int) (Math.random() * col.length)];
+    }
 
-        turnCount = 0;
+    public static void run (RobotController robotController) {
+        rc = robotController;
+        round = rc.getRoundNum();
+        mTeam = rc.getTeam();
+        enemyTeam = mTeam.opponent();
+        actionRadius = rc.getType().actionRadiusSquared;
+        sensorRadius = rc.getType().sensorRadiusSquared;
+        detectionRadius = rc.getType().detectionRadiusSquared;
 
-        System.out.println("I'm a " + rc.getType() + " and I just got created!");
         while (true) {
-            turnCount += 1;
+            round++;
             try {
-                System.out.println("I'm a " + rc.getType() + "! Location " + rc.getLocation());
                 switch (rc.getType()) {
                     case ENLIGHTENMENT_CENTER:
                         EnlightenmentCenter.move();
@@ -45,7 +46,6 @@ public strictfp class RobotPlayer {
                 }
                 Clock.yield();
             } catch (Exception e) {
-                System.out.println(rc.getType() + " Exception");
                 e.printStackTrace();
             }
         }
