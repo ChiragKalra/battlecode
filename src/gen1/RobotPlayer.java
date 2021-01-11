@@ -3,7 +3,6 @@ package gen1;
 import battlecode.common.*;
 
 
-@SuppressWarnings("unused")
 public strictfp class RobotPlayer {
     public static final boolean DEBUG = true;
 
@@ -18,6 +17,7 @@ public strictfp class RobotPlayer {
         return col[(int) (Math.random() * col.length)];
     }
 
+    @SuppressWarnings("unused")
     public static void run (RobotController robotController) {
         rc = robotController;
         round = rc.getRoundNum();
@@ -27,8 +27,7 @@ public strictfp class RobotPlayer {
         sensorRadius = rc.getType().sensorRadiusSquared;
         detectionRadius = rc.getType().detectionRadiusSquared;
 
-        while (true) {
-            round++;
+        while (round<GameConstants.GAME_MAX_NUMBER_OF_ROUNDS) {
             try {
                 // dont compute movement/ability if cooldown active
                 if (rc.getCooldownTurns() < 1) {
@@ -47,6 +46,8 @@ public strictfp class RobotPlayer {
                             break;
                     }
                 }
+
+                // update flag at the end of each round
                 switch (rc.getType()) {
                     case ENLIGHTENMENT_CENTER:
                         EnlightenmentCenter.updateFlag();
@@ -61,6 +62,8 @@ public strictfp class RobotPlayer {
                         Muckraker.updateFlag();
                         break;
                 }
+
+                round++;
                 Clock.yield();
             } catch (Exception e) {
                 e.printStackTrace();

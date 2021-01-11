@@ -2,8 +2,6 @@ package gen1;
 
 import battlecode.common.*;
 
-import java.util.*;
-
 import static gen1.RobotPlayer.*;
 import static gen1.helpers.GridHelper.*;
 import static gen1.helpers.MovementHelper.*;
@@ -48,35 +46,14 @@ public strictfp class Muckraker {
 
     public static void move() throws GameActionException {
         // occupy a grid spot if not unplaced
-        RobotInfo[] afterMoveNearby = null;
-        Precision precision = Precision.MAX;
         if (!placed) {
             setEnlightenmentCenterLocation();
-            Direction decided = getVacantDirection(rc.getLocation());
-            if (decided == null) {
-                RobotInfo[] fellow = rc.senseNearbyRobots(sensorRadius, mTeam);
-                ArrayList<Direction> selected = new ArrayList<>();
-                for (RobotInfo ri : fellow) {
-                    if (rc.canSenseLocation(ri.getLocation())) {
-                        int flag = rc.getFlag(ri.getID());
-                        if (ri.type == RobotType.MUCKRAKER && isPlaced(flag)) {
-                            selected.add(getDirection(flag));
-                        }
-                    }
-                }
-                decided = selected.isEmpty() ? getRandomDirection() : // TODO replace with better algo
-                        (Direction) getRandom(selected.toArray());
-            }
-            if (tryMove(decided, Precision.MAX)) {
-                afterMoveNearby = rc.senseNearbyRobots(sensorRadius, mTeam);
-                placed = formsGrid(afterMoveNearby);
+            if (tryMove(getNextDirection(rc.getLocation()), Precision.MAX)) {
+                placed = formsGrid();
             }
         }
 
-        // save bytecode with re-usage
-        if (afterMoveNearby == null) {
-            afterMoveNearby = rc.senseNearbyRobots(sensorRadius, mTeam);
-        }
+        RobotInfo[] afterMoveNearby = rc.senseNearbyRobots(sensorRadius, mTeam);
 
         // check for slanderers
         for (RobotInfo robot : afterMoveNearby) {
@@ -103,7 +80,7 @@ public strictfp class Muckraker {
         }
 
         if (DEBUG) {
-            float k = 10;
+            float k = 14.5f;
             if (Clock.getBytecodeNum() > 1000*k) {
                 System.out.println("ByteCodes Used over " + k + "k: " + Clock.getBytecodeNum());
             }

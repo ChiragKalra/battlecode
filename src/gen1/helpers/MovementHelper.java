@@ -5,7 +5,9 @@ import battlecode.common.*;
 import java.util.*;
 
 import static gen1.RobotPlayer.*;
+
 import gen1.dataclasses.Pair;
+import gen1.dataclasses.PassabilityGrid;
 
 public class MovementHelper {
 
@@ -13,6 +15,7 @@ public class MovementHelper {
     public static final double RATIO_CROWDING = 0.33;
 
     // movement precision
+    @SuppressWarnings("unused")
     public enum  Precision {
         MAX,
         MID,
@@ -125,15 +128,22 @@ public class MovementHelper {
             }
         }
     }
+
+
     /*
-     * returns null if there's no possible path to the destination
+     * @param
+     *      current: source coordinates
+     *      destination: destination coordinates
+     *      passability: grid of passability values around the robot
      *
-     * pass-ability = 0 for
-     * - locations not on the map
-     * - locations having robots
-     * - locations outside of radius
+     * @return
+     *      ArrayList where Direction order is reversed,
+     *      null if there's no possible path to the destination
      */
-    public static ArrayList<Direction> getShortestRoute(MapLocation current, MapLocation destination, double[][] passability) {
+    public static ArrayList<Direction> getShortestRoute(
+            MapLocation current, MapLocation destination, PassabilityGrid grid
+    ) {
+        double[][] passability = grid.grid;
         int size = passability.length;
         MapLocation source = new MapLocation(size / 2, size / 2);
         destination = new MapLocation(destination.x + size / 2 - current.x, destination.y + size / 2 - current.y);
@@ -176,7 +186,7 @@ public class MovementHelper {
                     continue;
                 }
 
-                double edgeWeight = rc.getType().actionCooldown / passability[loc.x][loc.y];
+                double edgeWeight = rc.getType().actionCooldown / passability[cur.x][cur.y];
                 if (distance[cur.x][cur.y] + edgeWeight < distance[loc.x][loc.y]) {
                     distance[loc.x][loc.y] = distance[cur.x][cur.y] + edgeWeight;
                     pq.add(new Pair<>(distance[loc.x][loc.y], new MapLocation(loc.x, loc.y)));
@@ -186,9 +196,6 @@ public class MovementHelper {
         }
 
         if (distance[destination.x][destination.y] >= INFINITY) {
-            if (DEBUG) {
-                System.out.println("returned null");
-            }
             return null;
         }
 
@@ -199,7 +206,6 @@ public class MovementHelper {
             route.add(parent[loc.x][loc.y].directionTo(loc));
             loc = parent[loc.x][loc.y];
         }
-        Collections.reverse(route);
         return route;
     }
 

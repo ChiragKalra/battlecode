@@ -1,6 +1,7 @@
 package gen1.helpers;
 
 import battlecode.common.*;
+import gen1.dataclasses.PassabilityGrid;
 
 import java.util.*;
 
@@ -94,10 +95,21 @@ public class GridHelper {
         }
     }
 
-    private static Boolean isGridOverlapping(
-            MapLocation mapLocation,
-            ArrayList<MapLocation> placedLocations
-    ) throws GameActionException {
+    private static Boolean isGridOverlapping(MapLocation mapLocation) throws GameActionException {
+        ArrayList<MapLocation> placedLocations = new ArrayList<>();
+        for (RobotInfo ri: rc.senseNearbyRobots(sensorRadius, mTeam)) {
+            if (ri.type == RobotType.MUCKRAKER) {
+                try {
+                    int flag = rc.getFlag(ri.getID());
+                    if (isPlaced(flag)) {
+                        placedLocations.add(ri.location);
+                    }
+                } catch (GameActionException ignored) { }
+            } else if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
+                placedLocations.add(ri.location);
+            }
+        }
+
         boolean overlapping = false;
         for (int i = 0; i < placedLocations.size(); i++) {
             if (!isAdjacentTo(mapLocation, placedLocations.get(i))) {
@@ -131,17 +143,26 @@ public class GridHelper {
 
 
     // check if current position is valid for grid formation
-    public static Boolean formsGrid (RobotInfo[] afterMoveNearby) throws GameActionException {
+    public static Boolean formsGrid () throws GameActionException {
         MapLocation mapLocation = rc.getLocation();
         boolean validPos = false;
-        ArrayList<MapLocation> placedLocations = new ArrayList<>();
-        for (RobotInfo ri: afterMoveNearby) {
-            int flag = rc.getFlag(ri.getID());
-            if (ri.type == RobotType.MUCKRAKER && isPlaced(flag) || ri.type == RobotType.ENLIGHTENMENT_CENTER) {
-                if (isAdjacentTo(mapLocation, ri.location)) {
-                    validPos = true;
+        for (int i = 0; i < 8; i += 2) {
+            Direction dir = directions[i];
+            MapLocation ml = multiply(mapLocation, dir, MUCKRAKER_GRID_WIDTH);
+            if (rc.onTheMap(ml) && rc.isLocationOccupied(ml)) {
+                RobotInfo ri = rc.senseRobotAtLocation(ml);
+                if (ri != null && ri.team == mTeam) {
+                    if (ri.type == RobotType.MUCKRAKER) {
+                        try {
+                            int flag = rc.getFlag(ri.getID());
+                            if (isPlaced(flag)) {
+                                validPos = true;
+                            }
+                        } catch (GameActionException ignored) { }
+                    } else if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
+                        validPos = true;
+                    }
                 }
-                placedLocations.add(ri.location);
             }
         }
 
@@ -149,7 +170,7 @@ public class GridHelper {
         if (!validPos) return false;
 
         // valid, check for overlapping grids
-        return !isGridOverlapping(mapLocation, placedLocations);
+        return !isGridOverlapping(mapLocation);
     }
 
     // check for vacant grid spot in the sensor radius
@@ -177,9 +198,17 @@ public class GridHelper {
         return null;
     }
 
+
     private static ArrayList<Direction> movesToVacant = null;
-    // get direction to move to or null
-    public static Direction getVacantDirection(MapLocation mLoc) throws GameActionException {
+
+    /*
+     * @return
+     *      1. next direction to move to if vacancy detected nearby
+     *      2. next direction to move to if directed by other muckrakers
+     *      3. next random direction to move to
+     *
+     */
+    public static Direction getNextDirection(MapLocation mLoc) throws GameActionException {
         // if movesToVacant is not empty return next move
         if (movesToVacant != null) {
             if (movesToVacant.isEmpty()) {
@@ -194,28 +223,41 @@ public class GridHelper {
             }
         }
 
-        MapLocation selected = checkVacantSpot(mLoc);
-        if (selected == null) {
-            return null;
-        }
-
-        if (DEBUG) {
-            System.out.println(selected);
-        }
-
-        movesToVacant = getShortestRoute(mLoc, selected, getPassabilityGrid(mLoc));
-        if (movesToVacant == null) {
-            return null;
-        }
-
-        if (DEBUG) {
-            for (Direction d: movesToVacant) {
-                System.out.print(d + " -> ");
+        PassabilityGrid passability = getPassabilityGrid(mLoc);
+        MapLocation vacantSpot = checkVacantSpot(mLoc);
+        if (vacantSpot != null) {
+            movesToVacant = getShortestRoute(mLoc, vacantSpot, passability);
+            if (movesToVacant != null) {
+                return getNextDirection(mLoc);
             }
-            System.out.println();
         }
 
-        Collections.reverse(movesToVacant);
-        return getVacantDirection(mLoc);
+        ArrayList<Direction> selected = new ArrayList<>();
+        RobotInfo[] fellow = rc.senseNearbyRobots(sensorRadius, mTeam);
+        for (RobotInfo ri : fellow) {
+            if (ri.type == RobotType.MUCKRAKER) {
+                try {
+                    int flag = rc.getFlag(ri.getID());
+                    if (isPlaced(flag)) {
+                        selected.add(getDirection(flag));
+                    }
+                } catch (GameActionException e) {
+                    // robot has moved out of sensor range in this time
+                    // e.printStackTrace();
+                }
+            }
+        }
+
+        Direction decided = selected.isEmpty() ? getRandomDirection() : (Direction) getRandom(selected.toArray());
+        /*
+        TODO : REPLACE
+        vacantSpot = getOptimalLocationInDirection(mLoc, decided, passability);
+        if (vacantSpot != null) {
+            movesToVacant = getShortestRoute(mLoc, vacantSpot, passability);
+            if (movesToVacant != null) {
+                return getNextDirection(mLoc);
+            }
+        }*/
+        return decided;
     }
 }
