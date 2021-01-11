@@ -9,14 +9,14 @@ import static gen1.helpers.MovementHelper.*;
 /*
  # Muckraker Flag
 
- 0-2, 3 - 0-7, 1   -> placed with direction;
-          1  , 0   -> placed without direction;
-          0  , 0   -> searching;
- 4-7    - politician approaching direction
- 8-14   - enemy/neutral enlightenment center x
- 15-21  - enemy/neutral enlightenment center y
- 22     - attack/gird muckraker
- 23     - undecided
+ 0-2,3   - 0-7, 1   -> placed with direction;
+           1  , 0   -> placed without direction;
+           0  , 0   -> searching;
+ 4-7     - politician approaching direction
+ 8-14    - enemy/neutral enlightenment center x
+ 15-21   - enemy/neutral enlightenment center y
+ 22      - attack/gird muckraker
+ 23      - undecided
 
  # 3-Bit Direction
     RobotPlayer.Directions 3-Bit integer indexed
@@ -34,13 +34,10 @@ public strictfp class Muckraker {
     public static MapLocation gridReferenceLocation = null;
 
     private static void setEnlightenmentCenterLocation() {
-        RobotInfo[] nearby = rc.senseNearbyRobots(sensorRadius, mTeam);
-        if (gridReferenceLocation == null) {
-            for (RobotInfo ri: nearby) {
-                if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
-                    gridReferenceLocation = ri.location;
-                    break;
-                }
+        for (RobotInfo ri: rc.senseNearbyRobots(sensorRadius, mTeam)) {
+            if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
+                spawnerLocation = gridReferenceLocation = ri.location;
+                break;
             }
         }
     }
@@ -71,11 +68,10 @@ public strictfp class Muckraker {
     // check for flag changes and set flag
     public static void updateFlag() throws GameActionException {
         int prevFlag = rc.getFlag(rc.getID()), newFlag = 0;
+
+        // set vacant grid location direction
         if (placed) {
             Direction direction = getGridDirectionForFlag();
-            if (DEBUG) {
-                System.out.println(direction != null ? direction.name(): "null direction");
-            }
             if (direction == null) {
                 newFlag += 1;
             } else {
@@ -84,12 +80,25 @@ public strictfp class Muckraker {
             }
         }
 
+        // set enemy/neutral enlightenment center location
+        if (spawnerLocation != null && checkForEnemyEnlightenmentCenter() != null) {
+            int relX = enemyEnlightenmentCenter.x - spawnerLocation.x + 63,
+                    relY = enemyEnlightenmentCenter.y - spawnerLocation.y + 63;
+
+            newFlag += relX << 8;
+            newFlag += relY << 15;
+        } else {
+            // set location to 0,0
+            newFlag += (63 << 8) + (63 << 15);
+        }
+
+        // update
         if (newFlag != prevFlag) {
             rc.setFlag(newFlag);
         }
 
         if (DEBUG) {
-            float k = 5f;
+            float k = 1f;
             if (Clock.getBytecodeNum() > 1000*k) {
                 System.out.println("ByteCodes Used over " + k + "k: " + Clock.getBytecodeNum());
             }

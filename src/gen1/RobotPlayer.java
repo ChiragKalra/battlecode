@@ -13,6 +13,7 @@ public strictfp class RobotPlayer {
     public static Team mTeam, enemyTeam;
     public static int actionRadius, sensorRadius, detectionRadius;
     public static RobotType mType;
+    public static MapLocation spawnerLocation;
 
     public static Object getRandom(Object[] col) {
         return col[(int) (Math.random() * col.length)];
@@ -29,7 +30,7 @@ public strictfp class RobotPlayer {
         sensorRadius = rc.getType().sensorRadiusSquared;
         detectionRadius = rc.getType().detectionRadiusSquared;
 
-        while (round<GameConstants.GAME_MAX_NUMBER_OF_ROUNDS) {
+        while (round < GameConstants.GAME_MAX_NUMBER_OF_ROUNDS) {
             try {
                 // dont compute movement/ability if cooldown active
                 if (rc.getCooldownTurns() < 1) {

@@ -16,6 +16,8 @@ public class GridHelper {
     public static final int MUCKRAKER_DIRECTION_COOLDOWN = 5;
 
 
+    public static MapLocation enemyEnlightenmentCenter;
+
     public static boolean isPlaced (int flag) {
         return (flag % 16) != 0;
     }
@@ -25,6 +27,50 @@ public class GridHelper {
             return null;
         }
         return directions[flag % 8];
+    }
+
+    private static MapLocation getCoordinatesFromFlag(int flag) {
+        int relX = (flag >> 8) % 128 - 63,
+                relY = (flag >> 15) % 128 - 63;
+        if (relX == 0 && relY == 0) {
+            return null;
+        }
+        return new MapLocation(relX + spawnerLocation.x, relY + spawnerLocation.y);
+    }
+
+    public static MapLocation checkForEnemyEnlightenmentCenter () throws GameActionException {
+        // check nearby
+        RobotInfo[] nearby = rc.senseNearbyRobots();
+        for (RobotInfo ri: nearby) {
+            if (ri.team != mTeam && ri.type == RobotType.ENLIGHTENMENT_CENTER) {
+                enemyEnlightenmentCenter = ri.location;
+                break;
+            }
+        }
+        if (enemyEnlightenmentCenter != null) {
+            return enemyEnlightenmentCenter;
+        }
+
+        // check for info in grid flags
+        nearby = rc.senseNearbyRobots();
+        ArrayList<MapLocation> found = new ArrayList<>();
+        MapLocation current = rc.getLocation();
+        for (RobotInfo ri: nearby) {
+            if (ri.team == mTeam && ri.type == RobotType.MUCKRAKER) {
+                int flag = rc.getFlag(ri.getID());
+                if (isPlaced(flag)) {
+                    MapLocation ml = getCoordinatesFromFlag(flag);
+                    if (ml != null) {
+                        found.add(ml);
+                    }
+                }
+            }
+        }
+        if (!found.isEmpty()) {
+            found.sort(Comparator.comparingInt(a -> a.distanceSquaredTo(current)));
+            enemyEnlightenmentCenter = found.get(0);
+        }
+        return enemyEnlightenmentCenter;
     }
 
     private static Direction getAdjacentVacant(MapLocation current) throws GameActionException {
