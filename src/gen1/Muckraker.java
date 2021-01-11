@@ -33,19 +33,9 @@ public strictfp class Muckraker {
     public static boolean placed = false;
     public static MapLocation gridReferenceLocation = null;
 
-    private static void setEnlightenmentCenterLocation() {
-        for (RobotInfo ri: rc.senseNearbyRobots(sensorRadius, mTeam)) {
-            if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
-                spawnerLocation = gridReferenceLocation = ri.location;
-                break;
-            }
-        }
-    }
-
     public static void move() throws GameActionException {
         // occupy a grid spot if not unplaced
         if (!placed) {
-            setEnlightenmentCenterLocation();
             if (tryMove(getNextDirection(rc.getLocation()), Precision.MIN)) {
                 placed = formsGrid();
             }

@@ -7,6 +7,7 @@ import java.util.*;
 
 import static gen1.Muckraker.*;
 import static gen1.RobotPlayer.*;
+import static gen1.helpers.AttackHelper.checkNearby;
 import static gen1.helpers.MovementHelper.*;
 
 
@@ -29,7 +30,7 @@ public class GridHelper {
         return directions[flag % 8];
     }
 
-    private static MapLocation getCoordinatesFromFlag(int flag) {
+    public static MapLocation getCoordinatesFromFlag(int flag) {
         int relX = (flag >> 8) % 128 - 63,
                 relY = (flag >> 15) % 128 - 63;
         if (relX == 0 && relY == 0) {
@@ -40,19 +41,13 @@ public class GridHelper {
 
     public static MapLocation checkForEnemyEnlightenmentCenter () throws GameActionException {
         // check nearby
-        RobotInfo[] nearby = rc.senseNearbyRobots();
-        for (RobotInfo ri: nearby) {
-            if (ri.team != mTeam && ri.type == RobotType.ENLIGHTENMENT_CENTER) {
-                enemyEnlightenmentCenter = ri.location;
-                break;
-            }
-        }
+        enemyEnlightenmentCenter = checkNearby();
         if (enemyEnlightenmentCenter != null) {
             return enemyEnlightenmentCenter;
         }
 
         // check for info in grid flags
-        nearby = rc.senseNearbyRobots();
+        RobotInfo[] nearby = rc.senseNearbyRobots();
         ArrayList<MapLocation> found = new ArrayList<>();
         MapLocation current = rc.getLocation();
         for (RobotInfo ri: nearby) {
@@ -315,7 +310,6 @@ public class GridHelper {
             }
         }
 
-        Direction decided = selected.isEmpty() ? getRandomDirection() : (Direction) getRandom(selected.toArray());
         /*
         TODO : REPLACE
         vacantSpot = getOptimalLocationInDirection(mLoc, decided, passability);
@@ -325,6 +319,6 @@ public class GridHelper {
                 return getNextDirection(mLoc);
             }
         }*/
-        return decided;
+        return selected.isEmpty() ? getRandomDirection() : (Direction) getRandom(selected.toArray());
     }
 }

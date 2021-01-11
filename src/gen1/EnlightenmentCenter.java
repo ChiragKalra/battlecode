@@ -20,8 +20,11 @@ import static gen1.helpers.MovementHelper.*;
 
 public strictfp class EnlightenmentCenter {
     static final RobotType[] spawnableRobot = {
-        //RobotType.POLITICIAN,
+        RobotType.POLITICIAN,
         //RobotType.SLANDERER,
+        RobotType.MUCKRAKER,
+        RobotType.MUCKRAKER,
+        RobotType.MUCKRAKER,
         RobotType.MUCKRAKER,
     };
 
@@ -61,7 +64,7 @@ public strictfp class EnlightenmentCenter {
 
         Direction dir = getOptimalDirection();
 
-        if (rc.canBuildRobot(toBuild, dir, influence) && muckrakersBuilt <= 250) {
+        if (rc.canBuildRobot(toBuild, dir, influence) && muckrakersBuilt <= 300) {
             rc.buildRobot(toBuild, dir, influence);
             muckrakersBuilt++;
         }

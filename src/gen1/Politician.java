@@ -4,26 +4,19 @@ import battlecode.common.*;
 
 import static gen1.RobotPlayer.*;
 import static gen1.helpers.MovementHelper.*;
+import static gen1.helpers.AttackHelper.*;
 
 
 public strictfp class Politician {
 
-    static boolean tryMove(Direction dir) throws GameActionException {
-        if (rc.canMove(dir)) {
-            rc.move(dir);
-            return true;
-        } else return false;
-    }
-
     public static void move() throws GameActionException {
-        Team enemy = rc.getTeam().opponent();
-        int actionRadius = rc.getType().actionRadiusSquared;
-        RobotInfo[] attackable = rc.senseNearbyRobots(actionRadius, enemy);
-        if (attackable.length != 0 && rc.canEmpower(actionRadius)) {
+        if (shouldAttack()) {
             rc.empower(actionRadius);
-            return;
         }
-        tryMove(getRandomDirection());
+
+        if (rc.getCooldownTurns() < 1) {
+            tryMove(getNextDirection(rc.getLocation()), Precision.MIN);
+        }
     }
 
     // check for flag changes and set flag

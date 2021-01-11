@@ -3,17 +3,12 @@ package gen1.helpers;
 import battlecode.common.*;
 import gen1.dataclasses.PassabilityGrid;
 
-import java.util.ArrayList;
+import java.util.*;
 
 import static gen1.RobotPlayer.*;
 
 
 public class TerrainHelper {
-
-    // distance to the the chosen optimal location in the given direction
-    private static final int RADIUS_OPTIMAL_LOCATION = Math.min(sensorRadius, 9);
-
-
     private static int minX = 0, maxX = Integer.MAX_VALUE, minY = 0, maxY = Integer.MAX_VALUE;
 
     public static void markOutsideMap(MapLocation current, MapLocation got) throws GameActionException {
@@ -68,66 +63,55 @@ public class TerrainHelper {
         }
         return new PassabilityGrid(current, sensorRadius, grid);
     }
+ */
+    private static ArrayList<MapLocation> relativeLocations;
+
+    private static MapLocation[] getCircumferencePoints(MapLocation center) {
+        int rad = (int) Math.sqrt(sensorRadius);
+        if (relativeLocations == null) {
+            relativeLocations = new ArrayList<>();
+            for (int x = -rad; x <= rad; x++) {
+                int limY = (int) Math.sqrt(sensorRadius - x*x);
+                if (Math.abs(x) == rad) {
+                    for (int y = -limY; y <= limY; y++) {
+                        relativeLocations.add(new MapLocation(x, y));
+                    }
+                } else {
+                    relativeLocations.add(new MapLocation(x, limY));
+                    relativeLocations.add(new MapLocation(x, -limY));
+                }
+            }
+        }
+        MapLocation[] ret = new MapLocation[relativeLocations.size()];
+        for (int i = 0; i < relativeLocations.size(); i++) {
+            ret[i] = new MapLocation(
+                    center.x + relativeLocations.get(i).x,
+                    center.y + relativeLocations.get(i).y
+            );
+        }
+        return ret;
+    }
 
 
     /*
      * @return
-     *      optimal location to move to in given direction
+     *      optimal location to move to get to location
      */
-    public static MapLocation getOptimalLocationInDirection(
-            MapLocation current, Direction dir, PassabilityGrid grid
+    public static MapLocation getOptimalLocation(
+            MapLocation current, MapLocation destination, PassabilityGrid grid
     ) throws GameActionException {
-        int lim = (int) Math.sqrt(RADIUS_OPTIMAL_LOCATION), x, y, limX, limY;
-        ArrayList<MapLocation> possible = new ArrayList<>();
-
-        switch (dir) {
-            case NORTH:
-            case SOUTH:
-                x = dir==Direction.NORTH ? lim : -lim;
-                limY = (int) Math.sqrt(RADIUS_OPTIMAL_LOCATION - x*x);
-                for (y = -limY; y <= limY; y++) {
-                    MapLocation ml = new MapLocation(lim+current.x, y+current.y);
-                    if (rc.onTheMap(ml) && !rc.isLocationOccupied(ml)) {
-                        possible.add(ml);
-                    }
-                }
-                break;
-
-            case EAST:
-            case WEST:
-                y = dir==Direction.WEST ? lim : -lim;
-                limX = (int) Math.sqrt(RADIUS_OPTIMAL_LOCATION - y*y);
-                for (x = -limX; x <= limX; x++) {
-                    MapLocation ml = new MapLocation(x+current.x, lim+current.y);
-                    if (rc.onTheMap(ml) && !rc.isLocationOccupied(ml)) {
-                        possible.add(ml);
-                    }
-                }
-                break;
-
-            case NORTHEAST:
-            case SOUTHWEST:
-            case SOUTHEAST:
-            case NORTHWEST:
-                for (x = 1; x < lim; x++) {
-                    y = (int) Math.sqrt(RADIUS_OPTIMAL_LOCATION - x*x);
-                    int fx = dir.dx*x , fy = dir.dy*y;
-                    MapLocation ml = new MapLocation(fx+current.x, fy+current.y);
-                    if (rc.onTheMap(ml) && !rc.isLocationOccupied(ml) && current.directionTo(ml) == dir) {
-                        possible.add(ml);
-                    }
-                }
-        }
-
+        MapLocation[] circumference = getCircumferencePoints(current);
+        double radians = Math.atan((destination.y-current.y) / Math.max(destination.x - current.x, 0.1));
         MapLocation minima = null;
-        double minPass = 0;
-        for (MapLocation ml: possible) {
-            if (grid.get(ml) > minPass) {
-                minima = ml;
-                minPass = grid.get(ml);
+        double maxFac = 0;
+        for (MapLocation x: circumference) {
+            double factor = Math.pow(grid.get(x), 0.1) /
+                    Math.abs(radians - Math.atan((x.y-current.y) / Math.max(x.x - current.x, 0.1)));
+            if (factor > maxFac) {
+                minima = x;
+                maxFac = factor;
             }
         }
-
         return minima;
     }
 }

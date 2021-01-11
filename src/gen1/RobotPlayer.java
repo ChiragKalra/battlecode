@@ -2,6 +2,7 @@ package gen1;
 
 import battlecode.common.*;
 
+import static gen1.Muckraker.*;
 
 public strictfp class RobotPlayer {
     public static final boolean DEBUG = true;
@@ -19,6 +20,19 @@ public strictfp class RobotPlayer {
         return col[(int) (Math.random() * col.length)];
     }
 
+    private static void setEnlightenmentCenterLocation() {
+        if (mType == RobotType.ENLIGHTENMENT_CENTER) {
+            spawnerLocation = rc.getLocation();
+        } else {
+            for (RobotInfo ri : rc.senseNearbyRobots(sensorRadius, mTeam)) {
+                if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
+                    spawnerLocation = gridReferenceLocation = ri.location;
+                    break;
+                }
+            }
+        }
+    }
+
     @SuppressWarnings("unused")
     public static void run (RobotController robotController) {
         rc = robotController;
@@ -32,6 +46,8 @@ public strictfp class RobotPlayer {
 
         while (round < GameConstants.GAME_MAX_NUMBER_OF_ROUNDS) {
             try {
+                setEnlightenmentCenterLocation();
+
                 // dont compute movement/ability if cooldown active
                 if (rc.getCooldownTurns() < 1) {
                     switch (mType) {
