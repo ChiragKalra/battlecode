@@ -4,34 +4,15 @@ import battlecode.common.*;
 
 
 import static gen1.RobotPlayer.*;
+import static gen1.helpers.TerrainHelper.*;
 
 
 public class PassabilityGrid {
-
 
     public final int radiusSquared, radius, diameter;
     public final MapLocation center;
 
     private final Boolean[][] occupied;
-
-    private static int minX = 0, maxX = Integer.MAX_VALUE, minY = 0, maxY = Integer.MAX_VALUE;
-
-    private void addOutsideMap(MapLocation got) {
-        if (got.x < center.x) {
-            minX = Math.max(got.x, minX);
-        } else if (center.x < got.x) {
-            maxX = Math.min(got.x, maxX);
-        }
-        if (got.y < center.y) {
-            minY = Math.max(got.y, minY);
-        } else if (center.y < got.y) {
-            maxY = Math.min(got.y, maxY);
-        }
-    }
-
-    private boolean isOutsideMap(MapLocation ml) {
-        return maxX <= ml.x || ml.x <= minX || maxY <= ml.y || ml.y <= minY;
-    }
 
     public PassabilityGrid (MapLocation center, int radiusSquared) {
         this.radiusSquared = radiusSquared;
@@ -70,7 +51,7 @@ public class PassabilityGrid {
                     return 0;
                 }
             } catch (GameActionException e) {
-                addOutsideMap(ml);
+                markOutsideMap(center, ml);
                 return 0;
             }
         }

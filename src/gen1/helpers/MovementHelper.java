@@ -6,6 +6,8 @@ import java.util.*;
 
 import static gen1.RobotPlayer.*;
 
+import static gen1.helpers.TerrainHelper.*;
+
 import gen1.dataclasses.Pair;
 import gen1.dataclasses.PassabilityGrid;
 
@@ -53,7 +55,18 @@ public class MovementHelper {
         return loc;
     }
 
-    public static Direction getAntiCrowdingDirection(MapLocation current) {
+    private static float[] convolveCircularly (float[] array, float[] filter) {
+        int sz = array.length, fsz = filter.length;
+        float[] out = new float[sz];
+        for (int i = 0; i < sz; i++) {
+            for (int j = 0; j < fsz; j++) {
+                out[i] += filter[j] * array[Math.floorMod(j-fsz/2+i, sz)];
+            }
+        }
+        return out;
+    }
+
+    public static Direction getAntiCrowdingDirection(MapLocation current) throws GameActionException {
         byte[] occupied = new byte[8], total = new byte[8];
         int limX = (int) Math.sqrt(detectionRadius), dirInd;
         MapLocation ml;
@@ -67,20 +80,33 @@ public class MovementHelper {
                     continue;
                 }
                 total[dirInd]++;
-                try {
-                    occupied[dirInd] += rc.isLocationOccupied(ml) ? 1 : 0;
-                } catch (GameActionException e) {
-                    // location is outside the map, count as occupied
+
+                if (!isOutsideMap(ml)) {
+                    try {
+                        occupied[dirInd] += rc.isLocationOccupied(ml) ? 1 : 0;
+                    } catch (GameActionException e) {
+                        // location is outside the map, count as occupied
+                        markOutsideMap(current, ml);
+                        occupied[dirInd] += 1;
+                    }
+                } else {
                     occupied[dirInd] += 1;
                 }
             }
         }
-        float maxRatio = 0, ratio;
-        int maxInd = -1;
+
+
+        float[] ratios = new float[8], filter = {0.05f, .2f, .5f, .2f, .05f};
         for (int i = 0; i < 8; i++) {
-            ratio = occupied[i] / (float) total[i];
-            if (ratio > maxRatio) {
-                maxRatio = ratio;
+            ratios[i] = occupied[i] / (float) total[i];
+        }
+        ratios = convolveCircularly(ratios, filter);
+
+        int maxInd = -1;
+        float maxRatio = 0;
+        for (int i = 0; i < 8; i++) {
+            if (ratios[i] > maxRatio) {
+                maxRatio = ratios[i];
                 maxInd = i;
             }
         }

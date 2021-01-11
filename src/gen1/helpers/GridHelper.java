@@ -12,16 +12,19 @@ import static gen1.helpers.MovementHelper.*;
 
 // muckraker info grid formation helper
 public class GridHelper {
-    public static final int MUCKRAKER_PLACED = 1;
     public static final int MUCKRAKER_GRID_WIDTH = 5;
+    public static final int MUCKRAKER_DIRECTION_COOLDOWN = 5;
 
 
     public static boolean isPlaced (int flag) {
-        return (flag & MUCKRAKER_PLACED) > 0;
+        return (flag % 16) != 0;
     }
 
     public static Direction getDirection(int flag) {
-        return directions[(flag >> 5) % 8];
+        if ((flag % 16) == 1) {
+            return null;
+        }
+        return directions[flag % 8];
     }
 
     private static Direction getAdjacentVacant(MapLocation current) throws GameActionException {
@@ -43,6 +46,9 @@ public class GridHelper {
         return selected;
     }
 
+    private static Direction lastEmpty;
+    private static int directionCooldown;
+
     /*
      * direction which needs to be stored in the flag after the bot is placed
      *
@@ -59,13 +65,22 @@ public class GridHelper {
         // find adjacent vacancies
         Direction vacancy = getAdjacentVacant(current);
         if (vacancy != null) {
-            return vacancy;
+            return lastEmpty = vacancy;
         }
 
         // avoid crowding if any
         Direction antiCrowd = getAntiCrowdingDirection(current);
         if (antiCrowd != null) {
             return antiCrowd;
+        }
+
+        if (lastEmpty != null) {
+            lastEmpty = null;
+            directionCooldown += MUCKRAKER_DIRECTION_COOLDOWN;
+        }
+
+        if (--directionCooldown > 0) {
+            return null;
         }
 
         // select random direction out of adjacent muckrakers
@@ -75,11 +90,13 @@ public class GridHelper {
             int flag = rc.getFlag(ri.getID());
             if (ri.type == RobotType.MUCKRAKER && isPlaced(flag)) {
                 Direction dir = getDirection(rc.getFlag(rc.getID()));
-                selected.add(dir);
+                if (dir != null) {
+                    selected.add(dir);
+                }
             }
         }
 
-        return selected.isEmpty() ? getRandomDirection() : (Direction) getRandom(selected.toArray());
+        return selected.isEmpty() ? null : (Direction) getRandom(selected.toArray());
     }
 
     private static Boolean isAdjacentTo(MapLocation a, MapLocation b) {
@@ -240,7 +257,10 @@ public class GridHelper {
                 try {
                     int flag = rc.getFlag(ri.getID());
                     if (isPlaced(flag)) {
-                        selected.add(getDirection(flag));
+                        Direction dir = getDirection(flag);
+                        if (dir != null) {
+                            selected.add(dir);
+                        }
                     }
                 } catch (GameActionException e) {
                     // robot has moved out of sensor range in this time

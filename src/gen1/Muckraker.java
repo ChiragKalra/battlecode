@@ -9,9 +9,10 @@ import static gen1.helpers.MovementHelper.*;
 /*
  # Muckraker Flag
 
- 0      - searching/placed
- 1-4    - politician approaching direction
- 5-7    - vacant muckraker spot direction
+ 0-2, 3 - 0-7, 1   -> placed with direction;
+          1  , 0   -> placed without direction;
+          0  , 0   -> searching;
+ 4-7    - politician approaching direction
  8-14   - enemy/neutral enlightenment center x
  15-21  - enemy/neutral enlightenment center y
  22     - attack/gird muckraker
@@ -69,10 +70,18 @@ public strictfp class Muckraker {
 
     // check for flag changes and set flag
     public static void updateFlag() throws GameActionException {
-        int prevFlag = rc.getFlag(rc.getID()), newFlag = placed ? 1 : 0;
+        int prevFlag = rc.getFlag(rc.getID()), newFlag = 0;
         if (placed) {
-            int threeBit = directionList.indexOf(getGridDirectionForFlag());
-            newFlag += threeBit << 5;
+            Direction direction = getGridDirectionForFlag();
+            if (DEBUG) {
+                System.out.println(direction != null ? direction.name(): "null direction");
+            }
+            if (direction == null) {
+                newFlag += 1;
+            } else {
+                int threeBit = directionList.indexOf(direction);
+                newFlag += threeBit + 8;
+            }
         }
 
         if (newFlag != prevFlag) {
@@ -80,7 +89,7 @@ public strictfp class Muckraker {
         }
 
         if (DEBUG) {
-            float k = 1f;
+            float k = 5f;
             if (Clock.getBytecodeNum() > 1000*k) {
                 System.out.println("ByteCodes Used over " + k + "k: " + Clock.getBytecodeNum());
             }

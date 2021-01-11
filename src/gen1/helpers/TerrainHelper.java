@@ -10,7 +10,35 @@ import static gen1.RobotPlayer.*;
 
 public class TerrainHelper {
 
+    // distance to the the chosen optimal location in the given direction
     private static final int RADIUS_OPTIMAL_LOCATION = Math.min(sensorRadius, 9);
+
+
+    private static int minX = 0, maxX = Integer.MAX_VALUE, minY = 0, maxY = Integer.MAX_VALUE;
+
+    public static void markOutsideMap(MapLocation current, MapLocation got) throws GameActionException {
+        MapLocation parX = new MapLocation(got.x, current.y), parY = new MapLocation(current.x, got.y);
+        if (current.isWithinDistanceSquared(parX, sensorRadius) && !rc.onTheMap(parX)) {
+            if (got.x < current.x) {
+                minX = Math.max(got.x, minX);
+            } else if (current.x < got.x) {
+                maxX = Math.min(got.x, maxX);
+            }
+        }
+        if (current.isWithinDistanceSquared(parY, sensorRadius) && !rc.onTheMap(parY)) {
+            if (got.y < current.y) {
+                minY = Math.max(got.y, minY);
+            } else if (current.y < got.y) {
+                maxY = Math.min(got.y, maxY);
+            }
+        }
+    }
+
+    public static boolean isOutsideMap (MapLocation ml) {
+        return maxX <= ml.x || ml.x <= minX || maxY <= ml.y || ml.y <= minY;
+    }
+
+
 /*
 
      *
