@@ -21,8 +21,8 @@ import static gen1.helpers.MovementHelper.*;
 public strictfp class EnlightenmentCenter {
     static final RobotType[] spawnableRobot = {
         RobotType.POLITICIAN,
-        //RobotType.SLANDERER,
-        RobotType.MUCKRAKER,
+        RobotType.POLITICIAN,
+        RobotType.SLANDERER,
         RobotType.MUCKRAKER,
         RobotType.MUCKRAKER,
         RobotType.MUCKRAKER,
@@ -60,13 +60,27 @@ public strictfp class EnlightenmentCenter {
         }
 
         RobotType toBuild = randomSpawnableRobotType();
-        int influence = (int) (2 * MAX_GENERATED_INFLUENCE / (GameConstants.GAME_MAX_NUMBER_OF_ROUNDS * rc.sensePassability(rc.getLocation())));
+        float influenceFac = 0, multiplier = mType.actionCooldown / (float) rc.sensePassability(rc.getLocation());
+        switch (toBuild) {
+            case MUCKRAKER:
+                influenceFac = 1f;
+                break;
+            case POLITICIAN:
+                influenceFac = 3f;
+                break;
+            case SLANDERER:
+                influenceFac = 1.5f;
+        }
 
         Direction dir = getOptimalDirection();
 
-        if (rc.canBuildRobot(toBuild, dir, influence) && muckrakersBuilt <= 300) {
-            rc.buildRobot(toBuild, dir, influence);
-            muckrakersBuilt++;
+        if (rc.canBuildRobot(toBuild, dir, (int) (multiplier*influenceFac))) {
+            rc.buildRobot(toBuild, dir, (int) (multiplier*influenceFac));
+        }
+
+        int totalInfluence = rc.getInfluence();
+        if (rc.canBid(totalInfluence/2) && rc.getTeamVotes() <= 1500) {
+            rc.bid(totalInfluence/2);
         }
     }
 

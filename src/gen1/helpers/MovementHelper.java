@@ -38,7 +38,6 @@ public class MovementHelper {
     };
     public static final List<Direction> directionList = Arrays.asList(directions);
 
-
     public static Direction getRandomDirection() {
         return (Direction) getRandom(directions);
     }

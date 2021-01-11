@@ -5,7 +5,7 @@ import battlecode.common.*;
 import static gen1.Muckraker.*;
 
 public strictfp class RobotPlayer {
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
 
     public static final int MAX_GENERATED_INFLUENCE = 22364;
 

@@ -24,7 +24,7 @@ public class AttackHelper {
                 hp += ri.conviction;
             }
         }
-        return hp/((rc.getConviction()-10)*rc.getEmpowerFactor(mTeam, 0)) > ATTACK_THRESHOLD_RATIO;
+        return hp/(rc.getConviction()*rc.getEmpowerFactor(mTeam, 0)-10) > ATTACK_THRESHOLD_RATIO;
     }
 
     public static MapLocation checkNearby() {
