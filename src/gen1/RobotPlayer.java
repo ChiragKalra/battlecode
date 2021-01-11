@@ -12,6 +12,7 @@ public strictfp class RobotPlayer {
     public static int round;
     public static Team mTeam, enemyTeam;
     public static int actionRadius, sensorRadius, detectionRadius;
+    public static RobotType mType;
 
     public static Object getRandom(Object[] col) {
         return col[(int) (Math.random() * col.length)];
@@ -21,6 +22,7 @@ public strictfp class RobotPlayer {
     public static void run (RobotController robotController) {
         rc = robotController;
         round = rc.getRoundNum();
+        mType = rc.getType();
         mTeam = rc.getTeam();
         enemyTeam = mTeam.opponent();
         actionRadius = rc.getType().actionRadiusSquared;
@@ -31,7 +33,7 @@ public strictfp class RobotPlayer {
             try {
                 // dont compute movement/ability if cooldown active
                 if (rc.getCooldownTurns() < 1) {
-                    switch (rc.getType()) {
+                    switch (mType) {
                         case ENLIGHTENMENT_CENTER:
                             EnlightenmentCenter.move();
                             break;
@@ -48,7 +50,7 @@ public strictfp class RobotPlayer {
                 }
 
                 // update flag at the end of each round
-                switch (rc.getType()) {
+                switch (mType) {
                     case ENLIGHTENMENT_CENTER:
                         EnlightenmentCenter.updateFlag();
                         break;

@@ -141,10 +141,9 @@ public class MovementHelper {
      *      null if there's no possible path to the destination
      */
     public static ArrayList<Direction> getShortestRoute(
-            MapLocation current, MapLocation destination, PassabilityGrid grid
-    ) {
-        double[][] passability = grid.grid;
-        int size = passability.length;
+            MapLocation current, MapLocation destination, PassabilityGrid passability
+    ) throws GameActionException {
+        int size = passability.diameter;
         MapLocation source = new MapLocation(size / 2, size / 2);
         destination = new MapLocation(destination.x + size / 2 - current.x, destination.y + size / 2 - current.y);
 
@@ -182,11 +181,11 @@ public class MovementHelper {
                 if (loc.x < 0 || loc.x >= size || loc.y < 0 || loc.y >= size) {
                     continue;
                 }
-                if (visited[loc.x][loc.y] || passability[loc.x][loc.y] == 0) {
+                if (visited[loc.x][loc.y] || passability.getIndexed(loc.x, loc.y) == 0) {
                     continue;
                 }
 
-                double edgeWeight = rc.getType().actionCooldown / passability[cur.x][cur.y];
+                double edgeWeight = mType.actionCooldown / passability.getIndexed(cur.x, cur.y);
                 if (distance[cur.x][cur.y] + edgeWeight < distance[loc.x][loc.y]) {
                     distance[loc.x][loc.y] = distance[cur.x][cur.y] + edgeWeight;
                     pq.add(new Pair<>(distance[loc.x][loc.y], new MapLocation(loc.x, loc.y)));

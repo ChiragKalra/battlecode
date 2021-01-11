@@ -11,8 +11,8 @@ import static gen1.RobotPlayer.*;
 public class TerrainHelper {
 
     private static final int RADIUS_OPTIMAL_LOCATION = Math.min(sensorRadius, 9);
+/*
 
-    /*
      *
      * @return
      *      a grid with passability values around the given map location
@@ -21,19 +21,21 @@ public class TerrainHelper {
      *          - locations not on the map
      *          - locations having robots
      *          - locations outside of radius
-     */
+     *
     public static PassabilityGrid getPassabilityGrid (MapLocation current) throws GameActionException {
-        int limX = (int) Math.sqrt(sensorRadius);
-        double[][] grid = new double[2*limX+1][2*limX+1];
+        int limX = (int) Math.sqrt(sensorRadius), sz = 2*limX+1, bt = 0;
+        double[] grid = new double[sz*sz];
         MapLocation ml;
-        grid[limX][limX] = rc.sensePassability(current);
+        grid[sz*limX + limX] = rc.sensePassability(current);
         for (int x = -limX; x <= limX; x++) {
             int limY = (int) Math.sqrt(sensorRadius - x*x);
             for (int y = -limY; y <= limY; y++) {
                 ml = new MapLocation(x+current.x, y+current.y);
-                if (rc.onTheMap(ml) && !rc.isLocationOccupied(ml)) {
-                    grid[x+limX][y+limX] = rc.sensePassability(ml);
-                }
+                try {
+                    if (!rc.isLocationOccupied(ml)) {
+                        grid[sz*(x + limX) + (y + limX)] = rc.sensePassability(ml);
+                    }
+                } catch (GameActionException ignored) {}
             }
         }
         return new PassabilityGrid(current, sensorRadius, grid);

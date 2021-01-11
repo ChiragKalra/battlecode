@@ -48,7 +48,7 @@ public strictfp class Muckraker {
         // occupy a grid spot if not unplaced
         if (!placed) {
             setEnlightenmentCenterLocation();
-            if (tryMove(getNextDirection(rc.getLocation()), Precision.MAX)) {
+            if (tryMove(getNextDirection(rc.getLocation()), Precision.MIN)) {
                 placed = formsGrid();
             }
         }
@@ -80,7 +80,7 @@ public strictfp class Muckraker {
         }
 
         if (DEBUG) {
-            float k = 14.5f;
+            float k = 1f;
             if (Clock.getBytecodeNum() > 1000*k) {
                 System.out.println("ByteCodes Used over " + k + "k: " + Clock.getBytecodeNum());
             }

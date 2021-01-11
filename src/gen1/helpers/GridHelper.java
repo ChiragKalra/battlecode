@@ -8,7 +8,6 @@ import java.util.*;
 import static gen1.Muckraker.*;
 import static gen1.RobotPlayer.*;
 import static gen1.helpers.MovementHelper.*;
-import static gen1.helpers.TerrainHelper.*;
 
 
 // muckraker info grid formation helper
@@ -223,7 +222,9 @@ public class GridHelper {
             }
         }
 
-        PassabilityGrid passability = getPassabilityGrid(mLoc);
+
+        PassabilityGrid passability = new PassabilityGrid(mLoc, sensorRadius);
+
         MapLocation vacantSpot = checkVacantSpot(mLoc);
         if (vacantSpot != null) {
             movesToVacant = getShortestRoute(mLoc, vacantSpot, passability);
