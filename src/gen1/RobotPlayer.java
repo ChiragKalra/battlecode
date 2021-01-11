@@ -30,18 +30,35 @@ public strictfp class RobotPlayer {
         while (true) {
             round++;
             try {
+                // dont compute movement/ability if cooldown active
+                if (rc.getCooldownTurns() < 1) {
+                    switch (rc.getType()) {
+                        case ENLIGHTENMENT_CENTER:
+                            EnlightenmentCenter.move();
+                            break;
+                        case POLITICIAN:
+                            Politician.move();
+                            break;
+                        case SLANDERER:
+                            Slanderer.move();
+                            break;
+                        case MUCKRAKER:
+                            Muckraker.move();
+                            break;
+                    }
+                }
                 switch (rc.getType()) {
                     case ENLIGHTENMENT_CENTER:
-                        EnlightenmentCenter.move();
+                        EnlightenmentCenter.updateFlag();
                         break;
                     case POLITICIAN:
-                        Politician.move();
+                        Politician.updateFlag();
                         break;
                     case SLANDERER:
-                        Slanderer.move();
+                        Slanderer.updateFlag();
                         break;
                     case MUCKRAKER:
-                        Muckraker.move();
+                        Muckraker.updateFlag();
                         break;
                 }
                 Clock.yield();

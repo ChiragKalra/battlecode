@@ -41,7 +41,7 @@ public strictfp class EnlightenmentCenter {
      *      4) Rotation to free up squares
      */
     // TODO select direction based on adjacent muckraker directions and pass-ability
-    static Direction getOptimalDirection() {
+    private static Direction getOptimalDirection() {
         lastDirectionInd += 2;
         if (lastDirectionInd >= directions.length) {
             lastDirectionInd = (lastDirectionInd+1)%2;
@@ -49,7 +49,7 @@ public strictfp class EnlightenmentCenter {
         return directions[lastDirectionInd];
     }
 
-    static void move() throws GameActionException {
+    public static void move() throws GameActionException {
         if (DEBUG) {
             if (round % 500 == 0) {
                 System.out.println("Round number:- " + round);
@@ -65,5 +65,11 @@ public strictfp class EnlightenmentCenter {
             rc.buildRobot(toBuild, dir, influence);
             muckrakersBuilt++;
         }
+    }
+
+
+    // check for flag changes and set flag
+    public static void updateFlag() throws GameActionException {
+
     }
 }

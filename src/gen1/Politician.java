@@ -15,7 +15,7 @@ public strictfp class Politician {
         } else return false;
     }
 
-     static void move() throws GameActionException {
+    public static void move() throws GameActionException {
         Team enemy = rc.getTeam().opponent();
         int actionRadius = rc.getType().actionRadiusSquared;
         RobotInfo[] attackable = rc.senseNearbyRobots(actionRadius, enemy);
@@ -24,5 +24,10 @@ public strictfp class Politician {
             return;
         }
         tryMove(getRandomDirection());
+    }
+
+    // check for flag changes and set flag
+    public static void updateFlag() throws GameActionException {
+
     }
 }

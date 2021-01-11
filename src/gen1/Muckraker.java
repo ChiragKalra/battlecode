@@ -34,7 +34,7 @@ public strictfp class Muckraker {
     public static boolean placed = false;
     public static MapLocation gridReferenceLocation = null;
 
-    static void setEnlightenmentCenterLocation() {
+    private static void setEnlightenmentCenterLocation() {
         RobotInfo[] nearby = rc.senseNearbyRobots(sensorRadius, mTeam);
         if (gridReferenceLocation == null) {
             for (RobotInfo ri: nearby) {
@@ -46,52 +46,52 @@ public strictfp class Muckraker {
         }
     }
 
-    static void move() throws GameActionException {
-        // dont compute movement/ability if cooldown active
-        if (rc.getCooldownTurns() < 1) {
-            // occupy a grid spot if not unplaced
-            RobotInfo[] afterMoveNearby = null;
-            if (!placed) {
-                setEnlightenmentCenterLocation();
-                Direction decided = getVacantDirection(rc.getLocation());
-                if (decided == null) {
-                    RobotInfo[] fellow = rc.senseNearbyRobots(sensorRadius, mTeam);
-                    ArrayList<Direction> selected = new ArrayList<>();
-                    for (RobotInfo ri : fellow) {
-                        if (rc.canSenseLocation(ri.getLocation())) {
-                            int flag = rc.getFlag(ri.getID());
-                            if (ri.type == RobotType.MUCKRAKER && isPlaced(flag)) {
-                                selected.add(getDirection(flag));
-                            }
+    public static void move() throws GameActionException {
+        // occupy a grid spot if not unplaced
+        RobotInfo[] afterMoveNearby = null;
+        Precision precision = Precision.MAX;
+        if (!placed) {
+            setEnlightenmentCenterLocation();
+            Direction decided = getVacantDirection(rc.getLocation());
+            if (decided == null) {
+                RobotInfo[] fellow = rc.senseNearbyRobots(sensorRadius, mTeam);
+                ArrayList<Direction> selected = new ArrayList<>();
+                for (RobotInfo ri : fellow) {
+                    if (rc.canSenseLocation(ri.getLocation())) {
+                        int flag = rc.getFlag(ri.getID());
+                        if (ri.type == RobotType.MUCKRAKER && isPlaced(flag)) {
+                            selected.add(getDirection(flag));
                         }
                     }
-                    decided = selected.isEmpty() ? getRandomDirection() : // TODO replace with better algo
-                            (Direction) getRandom(selected.toArray());
                 }
-                if (tryMove(decided, PRECISION_MIN)) {
-                    afterMoveNearby = rc.senseNearbyRobots(sensorRadius, mTeam);
-                    placed = formsGrid(afterMoveNearby);
-                }
+                decided = selected.isEmpty() ? getRandomDirection() : // TODO replace with better algo
+                        (Direction) getRandom(selected.toArray());
             }
-
-            // save bytecode with re-usage
-            if (afterMoveNearby == null) {
+            if (tryMove(decided, Precision.MAX)) {
                 afterMoveNearby = rc.senseNearbyRobots(sensorRadius, mTeam);
-            }
-
-            // check for slanderers
-            for (RobotInfo robot : afterMoveNearby) {
-                if (robot.location.isWithinDistanceSquared(rc.getLocation(), actionRadius) && robot.type.canBeExposed()) {
-                    // expose the slanderer
-                    if (rc.canExpose(robot.location)) {
-                        rc.expose(robot.location);
-                        return;
-                    }
-                }
+                placed = formsGrid(afterMoveNearby);
             }
         }
 
-        // check for flag changes and set flag
+        // save bytecode with re-usage
+        if (afterMoveNearby == null) {
+            afterMoveNearby = rc.senseNearbyRobots(sensorRadius, mTeam);
+        }
+
+        // check for slanderers
+        for (RobotInfo robot : afterMoveNearby) {
+            if (robot.location.isWithinDistanceSquared(rc.getLocation(), actionRadius) && robot.type.canBeExposed()) {
+                // expose the slanderer
+                if (rc.canExpose(robot.location)) {
+                    rc.expose(robot.location);
+                    return;
+                }
+            }
+        }
+    }
+
+    // check for flag changes and set flag
+    public static void updateFlag() throws GameActionException {
         int prevFlag = rc.getFlag(rc.getID()), newFlag = placed ? 1 : 0;
         if (placed) {
             int threeBit = directionList.indexOf(getGridDirectionForFlag());

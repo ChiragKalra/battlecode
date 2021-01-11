@@ -13,10 +13,11 @@ public class MovementHelper {
     public static final double RATIO_CROWDING = 0.33;
 
     // movement precision
-    public static final int PRECISION_MAX = 422;
-    @SuppressWarnings("unused")
-    public static final int PRECISION_MID = 325;
-    public static final int PRECISION_MIN = 334;
+    public enum  Precision {
+        MAX,
+        MID,
+        MIN
+    }
   
     public static final double INFINITY = 10000;
 
@@ -86,9 +87,9 @@ public class MovementHelper {
         return directions[(maxInd+4)%8];
     }
 
-    public static boolean tryMove (Direction dir, int precision) throws GameActionException {
+    public static boolean tryMove (Direction dir, Precision precision) throws GameActionException {
         // ideal for only precise movement
-        if (precision == PRECISION_MAX) {
+        if (precision == Precision.MAX) {
             if (rc.canMove(dir)) {
                 rc.move(dir);
                 return true;
@@ -175,7 +176,7 @@ public class MovementHelper {
                     continue;
                 }
 
-                double edgeWeight = rc.getType().actionCooldown / passability[cur.x][cur.y];
+                double edgeWeight = rc.getType().actionCooldown / passability[loc.x][loc.y];
                 if (distance[cur.x][cur.y] + edgeWeight < distance[loc.x][loc.y]) {
                     distance[loc.x][loc.y] = distance[cur.x][cur.y] + edgeWeight;
                     pq.add(new Pair<>(distance[loc.x][loc.y], new MapLocation(loc.x, loc.y)));
@@ -201,4 +202,6 @@ public class MovementHelper {
         Collections.reverse(route);
         return route;
     }
+
+
 }

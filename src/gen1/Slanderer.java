@@ -15,7 +15,13 @@ public strictfp class Slanderer {
         } else return false;
     }
 
-     static void move() throws GameActionException {
-         tryMove(getRandomDirection());
+    public static void move() throws GameActionException {
+        tryMove(getRandomDirection());
+    }
+
+
+    // check for flag changes and set flag
+    public static void updateFlag() throws GameActionException {
+
     }
 }
