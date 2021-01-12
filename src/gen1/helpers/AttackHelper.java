@@ -7,24 +7,27 @@ import gen1.dataclasses.PassabilityGrid;
 import java.util.*;
 
 import static gen1.RobotPlayer.*;
-import static gen1.helpers.GridHelper.getCoordinatesFromFlag;
-import static gen1.helpers.GridHelper.isPlaced;
+import static gen1.helpers.GridHelper.*;
 import static gen1.helpers.MovementHelper.*;
 import static gen1.helpers.TerrainHelper.getOptimalLocation;
 
 public class AttackHelper {
 
-    private static final double ATTACK_THRESHOLD_RATIO = 0.8;
+    private static final double ATTACK_THRESHOLD_RATIO = 4;
 
     public static boolean shouldAttack() {
-        RobotInfo[] nearby = rc.senseNearbyRobots(actionRadius);
         int hp = 0;
-        for (RobotInfo ri: nearby) {
+        for (RobotInfo ri: rc.senseNearbyRobots(actionRadius)) {
             if (ri.team != mTeam) {
+                if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
+                    log("attack!");
+                    return true;
+                }
                 hp += ri.conviction;
             }
         }
-        return hp/(rc.getConviction()*rc.getEmpowerFactor(mTeam, 0)-10) > ATTACK_THRESHOLD_RATIO;
+        double hmm = hp/(rc.getConviction()*rc.getEmpowerFactor(mTeam, 0)-10);
+        return hmm > ATTACK_THRESHOLD_RATIO;
     }
 
     public static MapLocation checkNearby() {
@@ -63,14 +66,12 @@ public class AttackHelper {
             }
         }
 
+
         // check nearby
         MapLocation found = checkNearby();
-        PassabilityGrid passability = new PassabilityGrid(mLoc, sensorRadius);
         if (found != null) {
-            movesToVacant = getShortestRoute(mLoc, found, passability);
-            if (movesToVacant != null) {
-                return getNextDirection(mLoc);
-            }
+            // TODO maybe replace with better empty spot finding closes to spawner + short algo
+            return mLoc.directionTo(found);
         }
 
         // check for info in grid flags
@@ -88,6 +89,7 @@ public class AttackHelper {
             }
         }
         if (found != null) {
+            PassabilityGrid passability = new PassabilityGrid(mLoc, sensorRadius);
             MapLocation ideal = getOptimalLocation(current, found, passability);
             movesToVacant = getShortestRoute(mLoc, ideal, passability);
             if (movesToVacant != null) {
