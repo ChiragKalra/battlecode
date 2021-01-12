@@ -10,11 +10,10 @@ import static gen1.helpers.AttackHelper.*;
 public strictfp class Politician {
 
     public static void move() throws GameActionException {
-        if (shouldAttack()) {
-            rc.empower(actionRadius);
-        }
-
-        if (rc.getCooldownTurns() < 1) {
+        if (rc.isReady()) {
+            if (shouldAttack()) {
+                rc.empower(actionRadius);
+            }
             tryMove(getNextDirection(rc.getLocation()), Precision.MIN);
         }
     }

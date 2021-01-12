@@ -1,0 +1,64 @@
+package gen2.helpers;
+
+import battlecode.common.*;
+import gen2.util.PassabilityGrid;
+
+import java.util.*;
+
+import static gen2.RobotPlayer.*;
+
+
+public class TerrainHelper {
+
+    private static ArrayList<MapLocation> relativeLocations;
+
+    private static MapLocation[] getCircumferencePoints(MapLocation center) {
+        int rad = (int) Math.sqrt(sensorRadius);
+        if (relativeLocations == null) {
+            relativeLocations = new ArrayList<>();
+            for (int x = -rad; x <= rad; x++) {
+                int limY = (int) Math.sqrt(sensorRadius - x*x);
+                if (Math.abs(x) == rad) {
+                    for (int y = -limY; y <= limY; y++) {
+                        relativeLocations.add(new MapLocation(x, y));
+                    }
+                } else {
+                    relativeLocations.add(new MapLocation(x, limY));
+                    relativeLocations.add(new MapLocation(x, -limY));
+                }
+            }
+        }
+        MapLocation[] ret = new MapLocation[relativeLocations.size()];
+        for (int i = 0; i < relativeLocations.size(); i++) {
+            ret[i] = new MapLocation(
+                    center.x + relativeLocations.get(i).x,
+                    center.y + relativeLocations.get(i).y
+            );
+        }
+        return ret;
+    }
+
+
+    /*
+     * @return
+     *      optimal location to move to get to location
+     */
+    public static MapLocation getOptimalLocation (
+            MapLocation current, MapLocation destination, PassabilityGrid grid
+    ) throws GameActionException {
+        // TODO find high passability location if destination inside sensor radius
+        MapLocation[] circumference = getCircumferencePoints(current);
+        double radians = Math.atan((destination.y-current.y) / Math.max(destination.x - current.x, 0.1));
+        MapLocation minima = null;
+        double maxFac = 0;
+        for (MapLocation x: circumference) {
+            double factor = Math.pow(grid.get(x), 0.1) /
+                    Math.abs(radians - Math.atan((x.y-current.y) / Math.max(x.x - current.x, 0.1)));
+            if (factor > maxFac) {
+                minima = x;
+                maxFac = factor;
+            }
+        }
+        return minima;
+    }
+}

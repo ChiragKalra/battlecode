@@ -6,7 +6,6 @@ import java.util.*;
 
 import static gen1.RobotPlayer.*;
 
-import static gen1.helpers.TerrainHelper.*;
 
 import gen1.dataclasses.Pair;
 import gen1.dataclasses.PassabilityGrid;
@@ -67,33 +66,20 @@ public class MovementHelper {
 
     public static Direction getAntiCrowdingDirection(MapLocation current) throws GameActionException {
         byte[] occupied = new byte[8], total = new byte[8];
-        int limX = (int) Math.sqrt(detectionRadius), dirInd;
-        MapLocation ml;
+        int limX = (int) Math.sqrt(detectionRadius);
+        PassabilityGrid grid = new PassabilityGrid(current, detectionRadius);
         for (int x = -limX; x <= limX; x++) {
             int limY = (int) Math.sqrt(detectionRadius - x*x);
             for (int y = -limY; y <= limY; y++) {
-                ml = new MapLocation(x+current.x, y+current.y);
-                dirInd = directionList.indexOf(current.directionTo(ml));
-                if (dirInd == -1) {
-                    // x = y = 0 condition, don't evaluate
-                    continue;
-                }
-                total[dirInd]++;
-
-                if (!isOutsideMap(ml)) {
-                    try {
-                        occupied[dirInd] += rc.isLocationOccupied(ml) ? 1 : 0;
-                    } catch (GameActionException e) {
-                        // location is outside the map, count as occupied
-                        markOutsideMap(current, ml);
-                        occupied[dirInd] += 1;
-                    }
-                } else {
-                    occupied[dirInd] += 1;
+                MapLocation ml = new MapLocation(x+current.x, y+current.y);
+                int dirInd = directionList.indexOf(current.directionTo(ml));
+                //  don't evaluate x = y = 0 condition
+                if (dirInd != -1) {
+                    total[dirInd]++;
+                    occupied[dirInd] += grid.isBlockedOrOutside(ml) ? 1 : 0;
                 }
             }
         }
-
 
         float[] ratios = new float[8], filter = {0.05f, .2f, .5f, .2f, .05f};
         for (int i = 0; i < 8; i++) {
@@ -112,6 +98,7 @@ public class MovementHelper {
         if (maxRatio <= RATIO_CROWDING) {
             return null;
         }
+
         return directions[(maxInd+4)%8];
     }
 

@@ -51,7 +51,7 @@ public class GridHelper {
         ArrayList<MapLocation> found = new ArrayList<>();
         MapLocation current = rc.getLocation();
         for (RobotInfo ri: nearby) {
-            if (ri.team == mTeam && ri.type == RobotType.MUCKRAKER) {
+            if (ri.team == mTeam && ri.type == RobotType.MUCKRAKER && rc.canGetFlag(ri.getID())) {
                 int flag = rc.getFlag(ri.getID());
                 if (isPlaced(flag)) {
                     MapLocation ml = getCoordinatesFromFlag(flag);
@@ -279,7 +279,6 @@ public class GridHelper {
                 }
             }
         }
-
 
         PassabilityGrid passability = new PassabilityGrid(mLoc, sensorRadius);
 

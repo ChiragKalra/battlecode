@@ -19,17 +19,21 @@ import static gen1.helpers.MovementHelper.*;
  */
 
 public strictfp class EnlightenmentCenter {
+    private static final double RATIO_BET = 0.1f;
+
     static final RobotType[] spawnableRobot = {
         RobotType.POLITICIAN,
         RobotType.POLITICIAN,
+        RobotType.SLANDERER,
         RobotType.SLANDERER,
         RobotType.MUCKRAKER,
         RobotType.MUCKRAKER,
         RobotType.MUCKRAKER,
     };
 
-    static int lastDirectionInd = 7;
-    static int muckrakersBuilt = 0;
+    private static int lastDirectionInd = 7;
+
+    private static int muckrakersBuilt = 0, slanderersBuilt = 0, politiciansBuilt = 0;
 
     static RobotType randomSpawnableRobotType() {
         return spawnableRobot[(int) (Math.random() * spawnableRobot.length)];
@@ -60,16 +64,16 @@ public strictfp class EnlightenmentCenter {
         }
 
         RobotType toBuild = randomSpawnableRobotType();
-        float influenceFac = 0, multiplier = mType.actionCooldown / (float) rc.sensePassability(rc.getLocation());
+        float influenceFac = 0, multiplier = 15 * mType.actionCooldown / (float) rc.sensePassability(rc.getLocation());
         switch (toBuild) {
             case MUCKRAKER:
-                influenceFac = 1f;
+                influenceFac = 0.5f;
                 break;
             case POLITICIAN:
-                influenceFac = 3f;
+                influenceFac = 2f;
                 break;
             case SLANDERER:
-                influenceFac = 1.5f;
+                influenceFac = 1f;
         }
 
         Direction dir = getOptimalDirection();
@@ -79,8 +83,8 @@ public strictfp class EnlightenmentCenter {
         }
 
         int totalInfluence = rc.getInfluence();
-        if (rc.canBid(totalInfluence/2) && rc.getTeamVotes() <= 1500) {
-            rc.bid(totalInfluence/2);
+        if (rc.canBid((int) (totalInfluence*RATIO_BET)) && rc.getTeamVotes() <= 1500) {
+            rc.bid((int) (totalInfluence*RATIO_BET));
         }
     }
 

@@ -86,12 +86,5 @@ public strictfp class Muckraker {
         if (newFlag != prevFlag) {
             rc.setFlag(newFlag);
         }
-
-        if (DEBUG) {
-            float k = 1f;
-            if (Clock.getBytecodeNum() > 1000*k) {
-                System.out.println("ByteCodes Used over " + k + "k: " + Clock.getBytecodeNum());
-            }
-        }
     }
 }

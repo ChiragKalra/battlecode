@@ -1,6 +1,7 @@
 package gen1.helpers;
 
 import battlecode.common.*;
+
 import gen1.dataclasses.PassabilityGrid;
 
 import java.util.*;
@@ -9,61 +10,7 @@ import static gen1.RobotPlayer.*;
 
 
 public class TerrainHelper {
-    private static int minX = 0, maxX = Integer.MAX_VALUE, minY = 0, maxY = Integer.MAX_VALUE;
 
-    public static void markOutsideMap(MapLocation current, MapLocation got) throws GameActionException {
-        MapLocation parX = new MapLocation(got.x, current.y), parY = new MapLocation(current.x, got.y);
-        if (current.isWithinDistanceSquared(parX, sensorRadius) && !rc.onTheMap(parX)) {
-            if (got.x < current.x) {
-                minX = Math.max(got.x, minX);
-            } else if (current.x < got.x) {
-                maxX = Math.min(got.x, maxX);
-            }
-        }
-        if (current.isWithinDistanceSquared(parY, sensorRadius) && !rc.onTheMap(parY)) {
-            if (got.y < current.y) {
-                minY = Math.max(got.y, minY);
-            } else if (current.y < got.y) {
-                maxY = Math.min(got.y, maxY);
-            }
-        }
-    }
-
-    public static boolean isOutsideMap (MapLocation ml) {
-        return maxX <= ml.x || ml.x <= minX || maxY <= ml.y || ml.y <= minY;
-    }
-
-
-/*
-
-     *
-     * @return
-     *      a grid with passability values around the given map location
-     *
-     *      passability[x][y] = 0, for
-     *          - locations not on the map
-     *          - locations having robots
-     *          - locations outside of radius
-     *
-    public static PassabilityGrid getPassabilityGrid (MapLocation current) throws GameActionException {
-        int limX = (int) Math.sqrt(sensorRadius), sz = 2*limX+1, bt = 0;
-        double[] grid = new double[sz*sz];
-        MapLocation ml;
-        grid[sz*limX + limX] = rc.sensePassability(current);
-        for (int x = -limX; x <= limX; x++) {
-            int limY = (int) Math.sqrt(sensorRadius - x*x);
-            for (int y = -limY; y <= limY; y++) {
-                ml = new MapLocation(x+current.x, y+current.y);
-                try {
-                    if (!rc.isLocationOccupied(ml)) {
-                        grid[sz*(x + limX) + (y + limX)] = rc.sensePassability(ml);
-                    }
-                } catch (GameActionException ignored) {}
-            }
-        }
-        return new PassabilityGrid(current, sensorRadius, grid);
-    }
- */
     private static ArrayList<MapLocation> relativeLocations;
 
     private static MapLocation[] getCircumferencePoints(MapLocation center) {
@@ -97,7 +44,7 @@ public class TerrainHelper {
      * @return
      *      optimal location to move to get to location
      */
-    public static MapLocation getOptimalLocation(
+    public static MapLocation getOptimalLocation (
             MapLocation current, MapLocation destination, PassabilityGrid grid
     ) throws GameActionException {
         MapLocation[] circumference = getCircumferencePoints(current);
@@ -114,4 +61,65 @@ public class TerrainHelper {
         }
         return minima;
     }
+
+    /*
+    private static int minX = 0, maxX = Integer.MAX_VALUE, minY = 0, maxY = Integer.MAX_VALUE;
+
+        // uses 27 bytecodes, use RobotController.onTheMap() instead
+        @Deprecated
+        public static boolean isOutsideMap (MapLocation ml) {
+            return maxX <= ml.x || ml.x <= minX || maxY <= ml.y || ml.y <= minY;
+        }
+
+
+        @Deprecated
+        public static void markOutsideMap(MapLocation current, MapLocation got) throws GameActionException {
+            MapLocation parX = new MapLocation(got.x, current.y), parY = new MapLocation(current.x, got.y);
+            if (current.isWithinDistanceSquared(parX, sensorRadius) && !rc.onTheMap(parX)) {
+                if (got.x < current.x) {
+                    minX = Math.max(got.x, minX);
+                } else if (current.x < got.x) {
+                    maxX = Math.min(got.x, maxX);
+                }
+            }
+            if (current.isWithinDistanceSquared(parY, sensorRadius) && !rc.onTheMap(parY)) {
+                if (got.y < current.y) {
+                    minY = Math.max(got.y, minY);
+                } else if (current.y < got.y) {
+                    maxY = Math.min(got.y, maxY);
+                }
+            }
+        }
+
+
+
+
+         *
+         * @return
+         *      a grid with passability values around the given map location
+         *
+         *      passability[x][y] = 0, for
+         *          - locations not on the map
+         *          - locations having robots
+         *          - locations outside of radius
+         *
+        public static PassabilityGrid getPassabilityGrid (MapLocation current) throws GameActionException {
+            int limX = (int) Math.sqrt(sensorRadius), sz = 2*limX+1, bt = 0;
+            double[] grid = new double[sz*sz];
+            MapLocation ml;
+            grid[sz*limX + limX] = rc.sensePassability(current);
+            for (int x = -limX; x <= limX; x++) {
+                int limY = (int) Math.sqrt(sensorRadius - x*x);
+                for (int y = -limY; y <= limY; y++) {
+                    ml = new MapLocation(x+current.x, y+current.y);
+                    try {
+                        if (!rc.isLocationOccupied(ml)) {
+                            grid[sz*(x + limX) + (y + limX)] = rc.sensePassability(ml);
+                        }
+                    } catch (GameActionException ignored) {}
+                }
+            }
+            return new PassabilityGrid(current, sensorRadius, grid);
+        }
+     */
 }
