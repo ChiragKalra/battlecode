@@ -45,7 +45,7 @@ public class TerrainHelper {
     ) throws GameActionException {
         Direction direction = destination.directionTo(current);
 
-        int dirInd = directionList.indexOf(direction), decided = dirInd;
+        int dirInd = directionList.indexOf(direction), decided = -1;
 
         double factor = 0;
 
@@ -57,6 +57,9 @@ public class TerrainHelper {
                 decided = i;
                 factor = cur;
             }
+        }
+        if (decided == -1) {
+            return null;
         }
 
         return destination.add(directions[decided]);

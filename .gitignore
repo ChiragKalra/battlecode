@@ -32,6 +32,8 @@ gradlew
 gradle/
 build/
 
+test/
+
 LICENSE
 README.md
 version.txt

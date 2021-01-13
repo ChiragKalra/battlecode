@@ -12,6 +12,12 @@ import static gen2.Muckraker.*;
 public strictfp class RobotPlayer {
     // toggle logging before competitive matches
     public static final boolean DEBUG = true;
+    public static void log (String s) {
+        if (DEBUG) {
+            System.out.println(s);
+        }
+    }
+
 
     public static final int MAX_GENERATED_INFLUENCE = 22364;
 
@@ -23,11 +29,6 @@ public strictfp class RobotPlayer {
     public static MapLocation spawnerLocation;
     public static int enlightenmentCenterId;
 
-    public static void log (String s) {
-        if (DEBUG) {
-            System.out.println(s);
-        }
-    }
 
 
     private static void setEnlightenmentCenterLocation() {
@@ -122,11 +123,10 @@ public strictfp class RobotPlayer {
                         break;
                     case MUCKRAKER:
                         MuckrakerFlag.updateFlag();
-                        break;
                 }
 
                 if (DEBUG) {
-                    float k = 15f;
+                    float k = 19f;
                     if (Clock.getBytecodeNum() > 1000 * k) {
                         System.out.println("ByteCodes Used over " + k + "k: " + Clock.getBytecodeNum());
                     }

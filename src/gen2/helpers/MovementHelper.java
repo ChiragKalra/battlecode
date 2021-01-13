@@ -50,12 +50,16 @@ public class MovementHelper {
         return new MapLocation(d.x, d.y);
     }
 
-    public static Direction vectorAddition(Direction a, Direction b) {
-        return (new MapLocation(0,0)).directionTo(new MapLocation(a.dx+b.dx, a.dy+b.dy));
+    public static Direction vectorAddition(Direction ... dirs) {
+        MapLocation yeah = new MapLocation(0,0);
+        for (Direction d : dirs) {
+            yeah = yeah.add(d);
+        }
+        return (new MapLocation(0,0)).directionTo(yeah);
     }
 
     public static MapLocation multiply(MapLocation loc, Direction dir, int n) {
-        return loc.translate(dir.dx*n, dir.dy*n);
+        return clone(loc).translate(dir.dx*n, dir.dy*n);
     }
 
     public static Direction getAntiCrowdingDirection(MapLocation current) throws GameActionException {
@@ -149,6 +153,7 @@ public class MovementHelper {
     public static ArrayList<Direction> getShortestRoute(
             MapLocation current, MapLocation destination, PassabilityGrid passability
     ) throws GameActionException {
+
         int size = passability.diameter;
         MapLocation source = new MapLocation(size / 2, size / 2);
         destination = new MapLocation(destination.x + size / 2 - current.x, destination.y + size / 2 - current.y);
@@ -191,7 +196,9 @@ public class MovementHelper {
                     continue;
                 }
 
-                double edgeWeight = mType.actionCooldown / passability.getIndexed(cur.x, cur.y);
+                // to reduce cross-walks
+                double diagonalFactor = Math.abs(dx[i]) == Math.abs(dy[i]) ? 1.25 : 1;
+                double edgeWeight = diagonalFactor / passability.getIndexed(cur.x, cur.y);
                 if (distance[cur.x][cur.y] + edgeWeight < distance[loc.x][loc.y]) {
                     distance[loc.x][loc.y] = distance[cur.x][cur.y] + edgeWeight;
                     pq.add(new Pair<>(distance[loc.x][loc.y], new MapLocation(loc.x, loc.y)));

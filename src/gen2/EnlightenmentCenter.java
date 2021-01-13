@@ -30,7 +30,7 @@ public strictfp class EnlightenmentCenter {
     public static void scanMuckrakerFlagsForECs () throws GameActionException {
         for (int id : muckrakersBuilt) {
             int flag = rc.getFlag(id);
-            if (isPlaced(flag)) {
+            if (!isPlaced(flag)) {
                 if (isBroadcastingNeutralEC(flag)) {
                     Pair<MapLocation, Integer> pair = new Pair<>(
                             getCoordinatesFromFlag(flag), getNeutralHpFromFlag(flag)
@@ -88,7 +88,7 @@ public strictfp class EnlightenmentCenter {
                 }
             }
         }
-        if (!spawned && round < 500) {
+        if (!spawned && muckrakersBuilt.size() < 121 && round < 500) {
             spawnMuckraker();
         }
     }

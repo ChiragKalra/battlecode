@@ -145,11 +145,18 @@ public class GridHelper {
     public static Boolean formsGrid () throws GameActionException {
         MapLocation mapLocation = rc.getLocation();
 
+        // direct away from ECs to not absorb damage by pols
+        for (RobotInfo ri : rc.senseNearbyRobots(25)) {
+            if (ri.team != mTeam && ri.type == RobotType.ENLIGHTENMENT_CENTER) {
+                return false;
+            }
+        }
+
         boolean validPos = false;
         for (int i = 0; i < 8; i += 2) {
             Direction dir = directions[i];
             MapLocation ml = multiply(mapLocation, dir, MUCKRAKER_GRID_WIDTH);
-            if (rc.onTheMap(ml) && rc.isLocationOccupied(ml)) {
+            if (rc.onTheMap(ml)) {
                 RobotInfo ri = rc.senseRobotAtLocation(ml);
                 if (ri != null && ri.team == mTeam) {
                     if (ri.type == RobotType.MUCKRAKER) {
@@ -163,6 +170,9 @@ public class GridHelper {
                         validPos = true;
                     }
                 }
+            }
+            if (validPos) {
+                break;
             }
         }
 
@@ -220,6 +230,13 @@ public class GridHelper {
                     movesToVacant.remove(movesToVacant.size() - 1);
                     return ret;
                 }
+            }
+        }
+
+        // direct away from ECs to not absorb damage by pols
+        for (RobotInfo ri : rc.senseNearbyRobots(25)) {
+            if (ri.team != mTeam && ri.type == RobotType.ENLIGHTENMENT_CENTER) {
+                return ri.location.directionTo(rc.getLocation());
             }
         }
 

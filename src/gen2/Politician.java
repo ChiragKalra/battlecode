@@ -15,18 +15,29 @@ public strictfp class Politician {
         for (RobotInfo ri : rc.senseNearbyRobots(2, mTeam)) {
             if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
                 int flag = rc.getFlag(ri.getID());
-                if (isAttackType(flag)) attackLocation = getAttackCoordinates(flag);
+                if (isAttackType(flag)) {
+                    attackLocation = getAttackCoordinates(flag);
+                }
                 break;
             }
         }
     }
 
     public static void move() throws GameActionException {
-        if (rc.isReady()) {
-            if (shouldAttack(attackLocation != null)) {
-                rc.empower(actionRadius);
+        if (attackLocation != null) {
+            if (targetAlreadyCaptured(attackLocation)) {
+                attackLocation = null;
             }
-            tryMove(getNextDirection(rc.getLocation(), attackLocation), Precision.MIN);
+        }
+        if (rc.isReady()) {
+            Direction bo = shouldBackOff();
+            if (bo != null) {
+                tryMove(bo, Precision.MIN);
+            } else if (shouldAttack(attackLocation != null)) {
+                rc.empower(actionRadius);
+            } else {
+                tryMove(getNextDirection(rc.getLocation(), attackLocation), Precision.MIN);
+            }
         }
     }
 }

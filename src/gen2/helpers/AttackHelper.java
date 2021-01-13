@@ -2,32 +2,55 @@ package gen2.helpers;
 
 import battlecode.common.*;
 
-import gen2.util.Pair;
-import gen2.util.PassabilityGrid;
+import gen2.util.*;
 
 import java.util.*;
 
 import static gen2.RobotPlayer.*;
 import static gen2.helpers.MovementHelper.*;
+import static gen2.flags.MuckrakerFlag.*;
 import static gen2.helpers.TerrainHelper.getOptimalLocation;
 
 public class AttackHelper {
 
-    private static final double ATTACK_THRESHOLD_RATIO = 4;
+    private static final double ATTACK_THRESHOLD_RATIO = 0.9;
 
-    public static boolean shouldAttack(boolean attackType) {
-        int hp = 0;
-        for (RobotInfo ri: rc.senseNearbyRobots(2)) {
-            if (ri.team != mTeam) {
-                if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
-                    return true;
-                }
-                hp += ri.conviction;
+    // move pols away if lots of pol crowding within action radius
+    public static Direction shouldBackOff () {
+        MapLocation sum = rc.getLocation(), curr = sum;
+        for (RobotInfo ri: rc.senseNearbyRobots(actionRadius, mTeam)) {
+            if (ri.type == RobotType.POLITICIAN && ri.getID() < rc.getID()) {
+                sum = sum.translate(ri.getLocation().x - curr.x, ri.getLocation().y - curr.y);
             }
         }
-        if (attackType) return false;
-        double hmm = hp/(rc.getConviction()*rc.getEmpowerFactor(mTeam, 0)-10);
-        return hmm > ATTACK_THRESHOLD_RATIO;
+        if (sum.equals(curr)) {
+            return null;
+        }
+        return sum.directionTo(curr);
+    }
+
+    public static boolean targetAlreadyCaptured(MapLocation target) throws GameActionException {
+        if (target.isWithinDistanceSquared(rc.getLocation(), sensorRadius)) {
+            return rc.senseRobotAtLocation(target).team == mTeam;
+        }
+        return false;
+    }
+
+    public static boolean shouldAttack(boolean attackType) throws GameActionException {
+        RobotInfo[] nearby = rc.senseNearbyRobots(actionRadius);
+        if (nearby.length == 0) {
+            return false;
+        }
+        int damage = (int) (rc.getConviction()*rc.getEmpowerFactor(mTeam, 0)-10),
+                each = damage/nearby.length, done = 0;
+        for (RobotInfo ri: nearby) {
+            if (ri.team != mTeam) {
+                done += Math.min(ri.conviction, each);
+            } else {
+                done += Math.min(ri.influence-ri.conviction, each);
+            }
+        }
+        return done/(double) damage > ATTACK_THRESHOLD_RATIO;
     }
 
     public static Pair<MapLocation, Integer> getNearbyEnemyEC() {
@@ -65,6 +88,10 @@ public class AttackHelper {
 
     public static Direction getNextDirection(MapLocation mLoc, MapLocation ec) throws GameActionException {
         if (ec == null) {
+            //TODO WALL TYPE POLITICIAN
+            return getRandomDirection();
+        }
+        if (mLoc.isAdjacentTo(ec)) {
             return getRandomDirection();
         }
 
@@ -84,11 +111,14 @@ public class AttackHelper {
 
         PassabilityGrid passability = new PassabilityGrid(mLoc, sensorRadius);
         MapLocation ideal = getOptimalLocation(mLoc, ec, passability);
-        movesToVacant = getShortestRoute(mLoc, ideal, passability);
-        if (movesToVacant != null) {
-            return getNextDirection(mLoc, ec);
+
+        if (ideal != null) {
+            movesToVacant = getShortestRoute(mLoc, ideal, passability);
+            if (movesToVacant != null) {
+                return getNextDirection(mLoc, ec);
+            }
         }
 
-        return getRandomDirection();
+        return mLoc.directionTo(ec);
     }
 }

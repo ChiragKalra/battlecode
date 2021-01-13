@@ -3,6 +3,8 @@ package gen2.flags;
 import battlecode.common.*;
 import gen2.util.Pair;
 
+import java.util.HashMap;
+
 import static gen2.Muckraker.*;
 import static gen2.RobotPlayer.*;
 import static gen2.helpers.AttackHelper.*;
@@ -26,7 +28,9 @@ import static gen2.helpers.MovementHelper.*;
            6  , 0   -> free;
            7  , 0   -> free;
 
- 4-6     - politician approaching direction
+ 4       - slanderer adjacent
+ 5       - free
+ 6       - broadcast modes muckraker/politician on/off
 
  7-13    - enemy/neutral enlightenment center x
  14-20   - enemy/neutral enlightenment center y
@@ -37,7 +41,7 @@ import static gen2.helpers.MovementHelper.*;
  */
 public class MuckrakerFlag {
     public static boolean isPlaced (int flag) {
-        return (flag % 16) != 0;
+        return (flag % 16) == 1 || (flag & 8) == 8;
     }
 
     public static Direction getDirection(int flag) {
@@ -75,6 +79,41 @@ public class MuckrakerFlag {
         return (int) Math.pow((flag >> 21) % 8, 10);
     }
 
+    private static final HashMap<MapLocation, Integer> ecsBroadcasts = new HashMap<>();
+
+    // update flag if EC nearby for 1 full round
+    public static void updateFlagForEC () throws GameActionException {
+        int prevFlag = rc.getFlag(rc.getID()), newFlag = 0;
+        // set enemy/neutral enlightenment center location
+        Pair<MapLocation, Integer> got = getNearbyNeutralEC();
+        if (got != null && !ecsBroadcasts.containsKey(got.key)) {
+            int relX = got.key.x - spawnerLocation.x + 63,
+                    relY = got.key.y - spawnerLocation.y + 63,
+                    hp = (int) Math.ceil((got.value - 150) / 50.0);
+
+            ecsBroadcasts.put(got.key, 2);
+            newFlag = 2;
+            newFlag += relX << 7;
+            newFlag += relY << 14;
+            newFlag += hp << 21;
+        } else {
+            got = getNearbyEnemyEC();
+            if (got != null && !ecsBroadcasts.containsKey(got.key)) {
+                int relX = got.key.x - spawnerLocation.x + 63,
+                        relY = got.key.y - spawnerLocation.y + 63,
+                        hp = Math.min((int) Math.log10(got.value), 7);
+
+                ecsBroadcasts.put(got.key, 2);
+                newFlag = 3;
+                newFlag += relX << 7;
+                newFlag += relY << 14;
+                newFlag += hp << 21;
+            }
+        }// update
+        if (newFlag != prevFlag) {
+            rc.setFlag(newFlag);
+        }
+    }
 
     // check for flag changes and set flag
     public static void updateFlag() throws GameActionException {
@@ -91,34 +130,18 @@ public class MuckrakerFlag {
             }
         }
 
-        // set enemy/neutral enlightenment center location
-        Pair<MapLocation, Integer> got = getNearbyNeutralEC();
-        if (spawnerLocation != null && got != null) {
-            int relX = got.key.x - spawnerLocation.x + 63,
-                    relY = got.key.y - spawnerLocation.y + 63,
-                    hp = (int) Math.ceil((got.value-150)/50.0);
-
-            newFlag = 2;
-            newFlag += relX << 7;
-            newFlag += relY << 14;
-            newFlag += hp << 21;
-        }
-        if (got == null) {
-            got = getNearbyEnemyEC();
-            if (spawnerLocation != null && got != null) {
-                int relX = got.key.x - spawnerLocation.x + 63,
-                        relY = got.key.y - spawnerLocation.y + 63,
-                        hp = Math.min((int) Math.log10(got.value), 7);
-
-                newFlag = 3;
-                newFlag += relX << 7;
-                newFlag += relY << 14;
-                newFlag += hp << 21;
+        // dont update if EC broadcast displayed
+        boolean allowUpdate = true;
+        for (MapLocation key: ecsBroadcasts.keySet()) {
+            Integer count = ecsBroadcasts.get(key);
+            if (count > 0) {
+                ecsBroadcasts.put(key, count-1);
+                allowUpdate = false;
             }
         }
 
         // update
-        if (newFlag != prevFlag) {
+        if (newFlag != prevFlag && allowUpdate) {
             rc.setFlag(newFlag);
         }
     }

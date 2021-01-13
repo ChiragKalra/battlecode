@@ -1,6 +1,7 @@
 package gen2;
 
 import battlecode.common.*;
+import gen2.flags.MuckrakerFlag;
 
 import static gen2.RobotPlayer.*;
 import static gen2.helpers.GridHelper.*;
@@ -12,23 +13,22 @@ public strictfp class Muckraker {
     public static MapLocation gridReferenceLocation = null;
 
     public static void move() throws GameActionException {
-        // occupy a grid spot if not unplaced
-        if (!placed) {
-            if (tryMove(getNextDirection(rc.getLocation()), Precision.MIN)) {
-                placed = formsGrid();
-            }
-        }
-
-        RobotInfo[] afterMoveNearby = rc.senseNearbyRobots(sensorRadius, mTeam);
-
         // check for slanderers
-        for (RobotInfo robot : afterMoveNearby) {
+        for (RobotInfo robot : rc.senseNearbyRobots(sensorRadius, mTeam)) {
             if (robot.location.isWithinDistanceSquared(rc.getLocation(), actionRadius) && robot.type.canBeExposed()) {
                 // expose the slanderer
                 if (rc.canExpose(robot.location)) {
                     rc.expose(robot.location);
                     return;
                 }
+            }
+        }
+
+        // occupy a grid spot if not unplaced
+        if (!placed) {
+            if (tryMove(getNextDirection(rc.getLocation()), Precision.MIN)) {
+                MuckrakerFlag.updateFlagForEC();
+                placed = formsGrid();
             }
         }
     }
