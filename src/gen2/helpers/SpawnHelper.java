@@ -11,8 +11,8 @@ public class SpawnHelper {
     public static Direction getOptimalDirection (Direction to) throws GameActionException {
         MapLocation current = rc.getLocation();
         PassabilityGrid grid = new PassabilityGrid(current, sensorRadius);
-        float[] filter = {.5f, .25f, .125f, .0625f, 0.03125f},
-                identity = {1f, 1f, 1f, 1f, 1f};
+        double[] filter = DIRECTION_FACTOR,
+                identity = {1, 1, 1, 1, 1};
 
         int dirInd = directionList.indexOf(to), decided = dirInd;
 

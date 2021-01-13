@@ -6,6 +6,8 @@ import gen2.util.PassabilityGrid;
 import java.util.*;
 
 import static gen2.RobotPlayer.*;
+import static gen2.helpers.MovementHelper.*;
+import static gen2.helpers.MovementHelper.directions;
 
 
 public class TerrainHelper {
@@ -38,15 +40,31 @@ public class TerrainHelper {
         return ret;
     }
 
-
-    /*
-     * @return
-     *      optimal location to move to get to location
-     */
-    public static MapLocation getOptimalLocation (
+    private static MapLocation getVacantNearby (
             MapLocation current, MapLocation destination, PassabilityGrid grid
     ) throws GameActionException {
-        // TODO find high passability location if destination inside sensor radius
+        Direction direction = destination.directionTo(current);
+
+        int dirInd = directionList.indexOf(direction), decided = dirInd;
+
+        double factor = 0;
+
+        for (int i = 0; i < 8; i++) {
+            Direction d = directions[i];
+            int filterInd = Math.min(Math.abs(dirInd-i), Math.abs(dirInd - 8 + i));
+            double cur = DIRECTION_FACTOR[filterInd]*grid.getRelative(d.dx, d.dy);
+            if (cur > factor) {
+                decided = i;
+                factor = cur;
+            }
+        }
+
+        return destination.add(directions[decided]);
+    }
+
+    private static MapLocation getIntermediate (
+            MapLocation current, MapLocation destination, PassabilityGrid grid
+    ) throws GameActionException {
         MapLocation[] circumference = getCircumferencePoints(current);
         double radians = Math.atan((destination.y-current.y) / Math.max(destination.x - current.x, 0.1));
         MapLocation minima = null;
@@ -60,5 +78,22 @@ public class TerrainHelper {
             }
         }
         return minima;
+    }
+
+
+    /*
+     * @return
+     *      optimal location to move to get to location
+     */
+    public static MapLocation getOptimalLocation (
+            MapLocation current, MapLocation destination, PassabilityGrid grid
+    ) throws GameActionException {
+        if (current.distanceSquaredTo(destination) > sensorRadius) {
+            // find intermediate location if destination outside sensor radius
+            return getIntermediate(current, destination, grid);
+        } else {
+            // find high passability location if destination inside sensor radius
+            return getVacantNearby(current, destination, grid);
+        }
     }
 }

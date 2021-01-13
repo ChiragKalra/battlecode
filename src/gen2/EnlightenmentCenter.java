@@ -4,9 +4,7 @@ import battlecode.common.*;
 
 import gen2.util.Pair;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 import static gen2.RobotPlayer.*;
 import static gen2.flags.MuckrakerFlag.*;

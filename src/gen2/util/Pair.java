@@ -11,7 +11,7 @@ public class Pair<T, U> {
 
     @Override
     public boolean equals (Object a) {
-        if (a==null) return false;
+        if (a == null) return false;
         if (!(a instanceof Pair)) return false;
         Pair<?, ?> p = (Pair<?, ?>) a;
         return key.equals(p.key) && value.equals(p.value);

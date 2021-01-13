@@ -245,10 +245,7 @@ public class GridHelper {
                             selected.add(dir);
                         }
                     }
-                } catch (GameActionException e) {
-                    // robot has moved out of sensor range in this time
-                    // e.printStackTrace();
-                }
+                } catch (GameActionException ignored) { }
             }
         }
 

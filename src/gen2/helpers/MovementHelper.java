@@ -17,6 +17,9 @@ public class MovementHelper {
     // max acceptable crowding ratio in a direction
     public static final double RATIO_CROWDING = 0.33;
 
+    // adjacent direction preference factor
+    public static final double[] DIRECTION_FACTOR = {.5, .25, .125, .0625, 0.03125};
+
     // movement precision
     @SuppressWarnings("unused")
     public enum  Precision {
@@ -51,12 +54,8 @@ public class MovementHelper {
         return (new MapLocation(0,0)).directionTo(new MapLocation(a.dx+b.dx, a.dy+b.dy));
     }
 
-    public static MapLocation multiply(MapLocation got, Direction dir, int n) {
-        MapLocation loc = clone(got);
-        for (int i = 0; i < n; i++) {
-            loc = loc.add(dir);
-        }
-        return loc;
+    public static MapLocation multiply(MapLocation loc, Direction dir, int n) {
+        return loc.translate(dir.dx*n, dir.dy*n);
     }
 
     public static Direction getAntiCrowdingDirection(MapLocation current) throws GameActionException {
@@ -76,14 +75,14 @@ public class MovementHelper {
             }
         }
 
-        float[] ratios = new float[8], filter = {0.05f, .2f, .5f, .2f, .05f};
+        double[] ratios = new double[8], filter = {0.05, .2, .5, .2, .05};
         for (int i = 0; i < 8; i++) {
             ratios[i] = occupied[i] / (float) total[i];
         }
         ratios = convolveCircularly(ratios, filter);
 
         int maxInd = -1;
-        float maxRatio = 0;
+        double maxRatio = 0;
         for (int i = 0; i < 8; i++) {
             if (ratios[i] > maxRatio) {
                 maxRatio = ratios[i];
@@ -214,6 +213,5 @@ public class MovementHelper {
         }
         return route;
     }
-
 
 }

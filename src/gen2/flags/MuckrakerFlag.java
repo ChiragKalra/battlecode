@@ -21,6 +21,11 @@ import static gen2.helpers.MovementHelper.*;
            2  , 0   -> broadcasting neutral EC coordinates;
            3  , 0   -> broadcasting enemy EC coordinates;
 
+           4  , 0   -> free;
+           5  , 0   -> free;
+           6  , 0   -> free;
+           7  , 0   -> free;
+
  4-6     - politician approaching direction
 
  7-13    - enemy/neutral enlightenment center x
