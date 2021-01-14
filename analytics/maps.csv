@@ -1,18 +1,18 @@
-ind, map, default, neutral, dim
-0, Andromeda, 1, 6, 64*64
-1, Arena, 1, 6, 32*32
-2, Bog, 1, 6, 64*64
-3, Branches, 1, 6, 64*64
-4, Chevron, 3, 4, 64*32
-5, Corridor,1, 6, 33*40
-6, Cow, 2, 6, 50*80
-7, CrossStitch, 1, 2, 64*64
-8, CrownJewels, 1, 2, 64*32
-9, ExesAndOhs, 1, 6, 64*42
-10, FiveOfHearts, 1, 4, 64*64
-11, Gridlock, 1, 6, 64*64
-12, Illusion, 1, 4, 35*36
-13, NotAPuzzle, 1, 6, 64*64
-14, Rainbow, 1, 2, 50*32
-15, SlowMusic, 1, 6, 64*48
-16, SnowFlake, 1, 2, 35*36
+ind, map, default, neutral, dim,passability
+0, Andromeda,1,6, 64*64,1
+1, Arena,1,6, 32*32,1
+2, Bog,1,6, 64*64,1
+3, Branches,1,6, 64*64,1
+4, Chevron,3,4, 64*32,1
+5, Corridor,1,6, 33*40,1
+6, Cow,2,6, 50*80,1
+7, CrossStitch,1,4, 64*64,1
+8, CrownJewels,1,6, 64*32,1
+9, ExesAndOhs,1,6, 64*42,1
+10, FiveOfHearts,1,6, 64*64,1
+11, Gridlock,1,6, 64*64,1
+12, Illusion,1,4, 35*36,1
+13, NotAPuzzle,1,6, 64*64,1
+14, Rainbow,1,2, 50*32,1
+15, SlowMusic,1,6, 64*48,1
+16, SnowFlake,1,2, 35*36,1
