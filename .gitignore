@@ -33,6 +33,7 @@ gradle/
 build/
 
 test/
+matches/
 
 LICENSE
 README.md
