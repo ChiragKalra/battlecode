@@ -18,7 +18,7 @@ public strictfp class EnlightenmentCenter {
     private static final int FACTOR_MUCKRAKER_HP = 1;
 
 
-    public static HashSet<Pair<MapLocation, Integer>>
+    public final static HashSet<Pair<MapLocation, Integer>>
             // store detected neutral centers
             neutralECs = new HashSet<>(),
             // move if pols sent to capture, remove if captured
@@ -27,37 +27,45 @@ public strictfp class EnlightenmentCenter {
             enemyECs = new HashSet<>();
 
 
-    public static void scanMuckrakerFlagsForECs () throws GameActionException {
-        ArrayList<Integer> placed = new ArrayList<>();
+    public static void scanMuckrakerFlagsForECs () {
+        ArrayList<Integer> dead = new ArrayList<>();
         for (int id : wanderingMuckrakers) {
-            int flag = rc.getFlag(id);
-            if (!isPlaced(flag)) {
-                if (isBroadcastingNeutralEC(flag)) {
-                    Pair<MapLocation, Integer> pair = new Pair<>(
-                            getCoordinatesFromFlag(flag), getNeutralHpFromFlag(flag)
-                    );
-                    if (!neutralPolsSent.contains(pair)) {
-                        neutralECs.add(pair);
+            try {
+                int flag = rc.getFlag(id);
+                if (!isPlaced(flag)) {
+                    if (isBroadcastingNeutralEC(flag)) {
+                        Pair<MapLocation, Integer> pair = new Pair<>(
+                                getCoordinatesFromFlag(flag), getNeutralHpFromFlag(flag)
+                        );
+                        if (!neutralPolsSent.contains(pair)) {
+                            neutralECs.add(pair);
+                        }
                     }
+                    if (isBroadcastingEnemyEC(flag)) {
+                        MapLocation ml = getCoordinatesFromFlag(flag);
+                        int hp = getEnemyHpFromFlag(flag);
+                        enemyECs.add(new Pair<>(ml, hp));
+                    }
+                } else {
+                    placedMuckrakers.add(id);
                 }
-                if (isBroadcastingEnemyEC(flag)) {
-                    MapLocation ml = getCoordinatesFromFlag(flag);
-                    int hp = getEnemyHpFromFlag(flag);
-                    enemyECs.add(new Pair<>(ml, hp));
-                }
-            } else {
-                placed.add(id);
+            } catch (GameActionException e) {
+                // muckraker has been martyred
+                dead.add(id);
             }
         }
-        // remove placed integers from hashset for better speed
-        for (int id : placed) {
+        // remove placed mucks
+        for (int id : placedMuckrakers) {
             wanderingMuckrakers.remove(id);
         }
-        placedMuckrakers += placed.size();
+        // remove dead mucks
+        for (int id : dead) {
+            wanderingMuckrakers.remove(id);
+        }
     }
 
-    public static HashSet<Integer> wanderingMuckrakers = new HashSet<>();
-    public static int placedMuckrakers = 0;
+    public static final HashSet<Integer> wanderingMuckrakers = new HashSet<>();
+    public static final HashSet<Integer> placedMuckrakers = new HashSet<>();
     private static boolean spawnMuckraker() throws GameActionException {
         Direction dir = getOptimalDirection(getDirectionFromAdjacentFlags(rc.getLocation()));
         if (dir == null ) {
@@ -73,7 +81,7 @@ public strictfp class EnlightenmentCenter {
         return false;
     }
 
-    public static HashMap<MapLocation, Integer>attackPoliticiansBuilt = new HashMap<>();
+    public static final HashMap<MapLocation, Integer>attackPoliticiansBuilt = new HashMap<>();
     private static boolean spawnAttackPolitician (MapLocation toAttack, int hp) throws GameActionException {
         Direction dir = getOptimalDirection(rc.getLocation().directionTo(toAttack));
         if (dir == null) {
@@ -103,7 +111,7 @@ public strictfp class EnlightenmentCenter {
                 }
             }
         }
-        if (!spawned && (wanderingMuckrakers.size()+placedMuckrakers) < 121 && round < 500) {
+        if (!spawned && (wanderingMuckrakers.size()+placedMuckrakers.size()) < 121) {
             spawnMuckraker();
         }
     }
@@ -117,7 +125,7 @@ public strictfp class EnlightenmentCenter {
         }
 
         int totalInfluence = rc.getInfluence();
-        if (round > 500 && rc.canBid((int) (totalInfluence*RATIO_BET)) && rc.getTeamVotes() <= 1500) {
+        if (rc.getRoundNum() > 500 && rc.canBid((int) (totalInfluence*RATIO_BET)) && rc.getTeamVotes() <= 1500) {
             rc.bid((int) (totalInfluence*RATIO_BET));
         }
     }

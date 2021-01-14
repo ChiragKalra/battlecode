@@ -7,8 +7,6 @@ import gen2.flags.MuckrakerFlag;
 import gen2.flags.PoliticianFlag;
 import gen2.flags.SlandererFlag;
 
-import static gen2.Muckraker.*;
-
 public strictfp class RobotPlayer {
     // toggle logging before competitive matches
     public static final boolean DEBUG = true;
@@ -19,10 +17,10 @@ public strictfp class RobotPlayer {
     }
 
 
+    @SuppressWarnings("unused")
     public static final int MAX_GENERATED_INFLUENCE = 22364;
 
     public static RobotController rc;
-    public static int round;
     public static Team mTeam, enemyTeam;
     public static int actionRadius, sensorRadius, detectionRadius;
     public static RobotType mType;
@@ -38,7 +36,7 @@ public strictfp class RobotPlayer {
             } else {
                 for (RobotInfo ri : rc.senseNearbyRobots(sensorRadius, mTeam)) {
                     if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
-                        spawnerLocation = gridReferenceLocation = ri.location;
+                        spawnerLocation = ri.location;
                         enlightenmentCenterId = ri.getID();
                         break;
                     }
@@ -50,7 +48,6 @@ public strictfp class RobotPlayer {
     @SuppressWarnings("unused")
     public static void run (RobotController robotController) {
         rc = robotController;
-        round = rc.getRoundNum();
         mType = rc.getType();
         mTeam = rc.getTeam();
         enemyTeam = mTeam.opponent();
@@ -59,7 +56,7 @@ public strictfp class RobotPlayer {
         detectionRadius = mType.detectionRadiusSquared;
 
         if (mType == RobotType.ENLIGHTENMENT_CENTER) {
-            log("round ec obtained: " + round);
+            log("round ec obtained: " + rc.getRoundNum());
         }
 
 
@@ -86,7 +83,7 @@ public strictfp class RobotPlayer {
             e.printStackTrace();
         }
 
-        while (round < GameConstants.GAME_MAX_NUMBER_OF_ROUNDS) {
+        while (rc.getRoundNum() < GameConstants.GAME_MAX_NUMBER_OF_ROUNDS) {
             try {
                 // slanderer will convert to politician in 300 rounds, watch for changes
                 if (mType != rc.getType()) {
@@ -136,7 +133,6 @@ public strictfp class RobotPlayer {
                     }
                 }
 
-                round++;
                 Clock.yield();
             } catch (Exception e) {
                 if (DEBUG) {

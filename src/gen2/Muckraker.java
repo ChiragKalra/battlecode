@@ -10,7 +10,6 @@ import static gen2.helpers.MovementHelper.*;
 
 public strictfp class Muckraker {
     public static boolean placed = false;
-    public static MapLocation gridReferenceLocation = null;
 
     public static void move() throws GameActionException {
         // check for slanderers

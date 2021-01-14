@@ -115,8 +115,12 @@ public class MovementHelper {
         } else {
             // optimise for shorter and longer movements
             if (rc.canMove(dir)) {
-                rc.move(dir);
-                return true;
+                try {
+                    rc.move(dir);
+                    return true;
+                } catch (GameActionException e) {
+                    return false;
+                }
             } else if (rc.getCooldownTurns() < 1) {
                 int dirInt = directionList.indexOf(dir);
                 // if blocked by another robot, find the next best direction

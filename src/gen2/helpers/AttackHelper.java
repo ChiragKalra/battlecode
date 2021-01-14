@@ -38,7 +38,7 @@ public class AttackHelper {
         return false;
     }
 
-    public static boolean shouldAttack(boolean attackType) throws GameActionException {
+    public static boolean shouldAttack(boolean attackType) {
         RobotInfo[] nearby = rc.senseNearbyRobots(actionRadius);
         if (nearby.length == 0) {
             return false;

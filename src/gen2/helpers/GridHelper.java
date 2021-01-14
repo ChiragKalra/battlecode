@@ -5,7 +5,6 @@ import gen2.util.PassabilityGrid;
 
 import java.util.*;
 
-import static gen2.Muckraker.*;
 import static gen2.RobotPlayer.*;
 import static gen2.helpers.MovementHelper.*;
 import static gen2.flags.MuckrakerFlag.*;
@@ -29,7 +28,7 @@ public class GridHelper {
         //check in all 4 directions
         MapLocation[] possible = {north, east, south, west};
         for (MapLocation mp: possible) {
-            if (rc.canSenseLocation(mp) && !rc.isLocationOccupied(mp) && !isNearDetectedEC(mp)) {
+            if (rc.canSenseLocation(mp) && !rc.isLocationOccupied(mp) && isNotNearDetectedEC(mp)) {
                 selected = current.directionTo(mp);
                 break;
             }
@@ -83,80 +82,21 @@ public class GridHelper {
         return getDirectionFromAdjacentFlags(current);
     }
 
-    private static Boolean isAdjacentTo(MapLocation a, MapLocation b) {
-        boolean yDif = Math.abs(a.y - b.y) == MUCKRAKER_GRID_WIDTH,
-                xDif = Math.abs(a.x - b.x) == MUCKRAKER_GRID_WIDTH;
-        if (a.x == b.x) {
-            return yDif;
-        } else if (a.y == b.y) {
-            return xDif;
-        } else {
-            return yDif && xDif;
-        }
-    }
-
-    private static Boolean isGridOverlapping(MapLocation mapLocation) throws GameActionException {
-        ArrayList<MapLocation> placedLocations = new ArrayList<>();
-        for (RobotInfo ri: rc.senseNearbyRobots(sensorRadius, mTeam)) {
-            if (ri.type == RobotType.MUCKRAKER) {
-                try {
-                    int flag = rc.getFlag(ri.getID());
-                    if (isPlaced(flag)) {
-                        placedLocations.add(ri.location);
-                    }
-                } catch (GameActionException ignored) { }
-            } else if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
-                placedLocations.add(ri.location);
-            }
-        }
-
-        boolean overlapping = false;
-        for (int i = 0; i < placedLocations.size(); i++) {
-            if (!isAdjacentTo(mapLocation, placedLocations.get(i))) {
-                for (int j = i+1; j < placedLocations.size(); j++) {
-                    MapLocation a = placedLocations.get(i), b = placedLocations.get(j);
-                    if (isAdjacentTo(a, b)) {
-                        boolean first = true, second = true;
-                        a = multiply(a, a.directionTo(mapLocation), MUCKRAKER_GRID_WIDTH);
-                        b = multiply(b, b.directionTo(mapLocation), MUCKRAKER_GRID_WIDTH);
-                        if (rc.canSenseLocation(a)) {
-                            RobotInfo ri = rc.senseRobotAtLocation(a);
-                            first = ri != null && ri.team == mTeam && isPlaced(rc.getFlag(ri.getID()));
-                        }
-                        if (rc.canSenseLocation(b)) {
-                            RobotInfo ri = rc.senseRobotAtLocation(b);
-                            second = ri != null && ri.team == mTeam && isPlaced(rc.getFlag(ri.getID()));
-                        }
-                        overlapping = first && second;
-                        break;
-                    }
-                }
-                if (overlapping) {
-                    // tweak spawn enlightenment center coordinates to avoid wanderers deep in other grid
-                    gridReferenceLocation = placedLocations.get(i);
-                    break;
-                }
-            }
-        }
-        return overlapping;
-    }
-
-
     private static final HashSet<MapLocation> nearestECs = new HashSet<>();
-    private static boolean isNearDetectedEC(MapLocation ml) {
+    private static boolean isNotNearDetectedEC(MapLocation ml) {
         for (MapLocation loc: nearestECs) {
             if (loc.isWithinDistanceSquared(ml, AVOID_EC_RADIUS_SQUARED)) {
-                return true;
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     // check if current position is valid for grid formation
-    public static Boolean formsGrid () throws GameActionException {
+    public static Boolean formsGrid () {
         MapLocation mapLocation = rc.getLocation();
 
-        // direct away from ECs to not absorb damage by pols
+        // direct away from ECs to not absorb damage by politicians
         for (RobotInfo ri : rc.senseNearbyRobots(AVOID_EC_RADIUS_SQUARED)) {
             if (ri.team != mTeam && ri.type == RobotType.ENLIGHTENMENT_CENTER) {
                 nearestECs.add(ri.location);
@@ -164,46 +104,17 @@ public class GridHelper {
             }
         }
 
-        boolean validPos = false;
-        for (int i = 0; i < 8; i += 2) {
-            Direction dir = directions[i];
-            MapLocation ml = multiply(mapLocation, dir, MUCKRAKER_GRID_WIDTH);
-            if (rc.onTheMap(ml)) {
-                RobotInfo ri = rc.senseRobotAtLocation(ml);
-                if (ri != null && ri.team == mTeam) {
-                    if (ri.type == RobotType.MUCKRAKER) {
-                        try {
-                            int flag = rc.getFlag(ri.getID());
-                            if (isPlaced(flag)) {
-                                validPos = true;
-                            }
-                        } catch (GameActionException ignored) { }
-                    } else if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
-                        validPos = true;
-                    }
-                }
-            }
-            if (validPos) {
-                break;
-            }
-        }
-
-        // invalid, return false
-        if (!validPos) return false;
-
-        // valid, check for overlapping grids
-        return !isGridOverlapping(mapLocation);
+        return mapLocation.x % MUCKRAKER_GRID_WIDTH == 0 && mapLocation.y % MUCKRAKER_GRID_WIDTH == 0;
     }
 
     // check for vacant grid spot in the sensor radius
     private static MapLocation checkVacantSpot(MapLocation mLoc) throws GameActionException {
-        int sx = gridReferenceLocation.x, sy = gridReferenceLocation.y,
-                mx = mLoc.x, my = mLoc.y;
+        int mx = mLoc.x, my = mLoc.y;
 
-        int modX = Math.floorMod(sx-mx, MUCKRAKER_GRID_WIDTH),
-                modY = Math.floorMod(sy-my, MUCKRAKER_GRID_WIDTH),
-                remX = (sx-mx) % MUCKRAKER_GRID_WIDTH,
-                remY = (sy-my) % MUCKRAKER_GRID_WIDTH;
+        int modX = Math.floorMod(-mx, MUCKRAKER_GRID_WIDTH),
+                modY = Math.floorMod(-my, MUCKRAKER_GRID_WIDTH),
+                remX = (-mx) % MUCKRAKER_GRID_WIDTH,
+                remY = (-my) % MUCKRAKER_GRID_WIDTH;
 
         MapLocation north = new MapLocation(mx + remX, my + modY),
                 east = new MapLocation(mx + modX, my + remY),
@@ -213,7 +124,7 @@ public class GridHelper {
         //check in all 4 directions
         MapLocation[] possible = {north, east, south, west};
         for (MapLocation mp: possible) {
-            if (rc.canSenseLocation(mp) && !rc.isLocationOccupied(mp) && !isNearDetectedEC(mp)) {
+            if (rc.canSenseLocation(mp) && !rc.isLocationOccupied(mp) && isNotNearDetectedEC(mp)) {
                 return mp;
             }
         }
