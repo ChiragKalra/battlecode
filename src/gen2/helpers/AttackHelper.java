@@ -8,7 +8,6 @@ import java.util.*;
 
 import static gen2.RobotPlayer.*;
 import static gen2.helpers.MovementHelper.*;
-import static gen2.flags.MuckrakerFlag.*;
 import static gen2.helpers.TerrainHelper.getOptimalLocation;
 
 public class AttackHelper {
@@ -31,7 +30,10 @@ public class AttackHelper {
 
     public static boolean targetAlreadyCaptured(MapLocation target) throws GameActionException {
         if (target.isWithinDistanceSquared(rc.getLocation(), sensorRadius)) {
-            return rc.senseRobotAtLocation(target).team == mTeam;
+            RobotInfo ri = rc.senseRobotAtLocation(target);
+            if (ri != null) {
+                return ri.team == mTeam;
+            }
         }
         return false;
     }
@@ -44,9 +46,11 @@ public class AttackHelper {
         int damage = (int) (rc.getConviction()*rc.getEmpowerFactor(mTeam, 0)-10),
                 each = damage/nearby.length, done = 0;
         for (RobotInfo ri: nearby) {
-            if (ri.team != mTeam) {
+            if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
+                done += each;
+            } else if (ri.team != mTeam) {
                 done += Math.min(ri.conviction, each);
-            } else {
+            } else  {
                 done += Math.min(ri.influence-ri.conviction, each);
             }
         }

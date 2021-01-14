@@ -17,6 +17,9 @@ public class MovementHelper {
     // max acceptable crowding ratio in a direction
     public static final double RATIO_CROWDING = 0.33;
 
+    // 1 means no restriction, 1< means restriction
+    public static final double DIAGONAL_MOVEMENT_REDUCTION_FACTOR = 1;
+
     // adjacent direction preference factor
     public static final double[] DIRECTION_FACTOR = {.5, .25, .125, .0625, 0.03125};
 
@@ -153,7 +156,6 @@ public class MovementHelper {
     public static ArrayList<Direction> getShortestRoute(
             MapLocation current, MapLocation destination, PassabilityGrid passability
     ) throws GameActionException {
-
         int size = passability.diameter;
         MapLocation source = new MapLocation(size / 2, size / 2);
         destination = new MapLocation(destination.x + size / 2 - current.x, destination.y + size / 2 - current.y);
@@ -197,7 +199,7 @@ public class MovementHelper {
                 }
 
                 // to reduce cross-walks
-                double diagonalFactor = Math.abs(dx[i]) == Math.abs(dy[i]) ? 1.25 : 1;
+                double diagonalFactor = Math.abs(dx[i]) == Math.abs(dy[i]) ? DIAGONAL_MOVEMENT_REDUCTION_FACTOR : 1;
                 double edgeWeight = diagonalFactor / passability.getIndexed(cur.x, cur.y);
                 if (distance[cur.x][cur.y] + edgeWeight < distance[loc.x][loc.y]) {
                     distance[loc.x][loc.y] = distance[cur.x][cur.y] + edgeWeight;

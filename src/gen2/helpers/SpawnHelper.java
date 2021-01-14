@@ -14,12 +14,11 @@ public class SpawnHelper {
         double[] filter = DIRECTION_FACTOR,
                 identity = {1, 1, 1, 1, 1};
 
-        int dirInd = directionList.indexOf(to), decided = dirInd;
+        int dirInd = directionList.indexOf(to), decided = -1;
 
         if (to == null) {
             filter = identity;
             dirInd = 0;
-            decided = 0;
         }
 
         double factor = 0;
@@ -32,6 +31,10 @@ public class SpawnHelper {
                 decided = i;
                 factor = cur;
             }
+        }
+
+        if (decided == -1) {
+            return null;
         }
 
         return directions[decided];

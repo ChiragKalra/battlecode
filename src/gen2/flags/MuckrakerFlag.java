@@ -89,7 +89,7 @@ public class MuckrakerFlag {
         if (got != null && !ecsBroadcasts.containsKey(got.key)) {
             int relX = got.key.x - spawnerLocation.x + 63,
                     relY = got.key.y - spawnerLocation.y + 63,
-                    hp = (int) Math.ceil((got.value - 150) / 50.0);
+                    hp = Math.max((int) Math.ceil((got.value - 150) / 50.0), 0);
 
             ecsBroadcasts.put(got.key, 2);
             newFlag = 2;
@@ -109,7 +109,9 @@ public class MuckrakerFlag {
                 newFlag += relY << 14;
                 newFlag += hp << 21;
             }
-        }// update
+        }
+
+        // update
         if (newFlag != prevFlag) {
             rc.setFlag(newFlag);
         }

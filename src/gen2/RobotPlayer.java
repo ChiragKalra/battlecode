@@ -58,6 +58,10 @@ public strictfp class RobotPlayer {
         sensorRadius = mType.sensorRadiusSquared;
         detectionRadius = mType.detectionRadiusSquared;
 
+        if (mType == RobotType.ENLIGHTENMENT_CENTER) {
+            log("round ec obtained: " + round);
+        }
+
 
         try {
             // set spawner location for relative movement
@@ -126,9 +130,9 @@ public strictfp class RobotPlayer {
                 }
 
                 if (DEBUG) {
-                    float k = 19f;
-                    if (Clock.getBytecodeNum() > 1000 * k) {
-                        System.out.println("ByteCodes Used over " + k + "k: " + Clock.getBytecodeNum());
+                    float k = 0f;
+                    if (Clock.getBytecodesLeft() < 1000 * k) {
+                        System.out.println("ByteCodes left under " + k + "k: " + Clock.getBytecodesLeft());
                     }
                 }
 

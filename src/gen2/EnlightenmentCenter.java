@@ -28,7 +28,8 @@ public strictfp class EnlightenmentCenter {
 
 
     public static void scanMuckrakerFlagsForECs () throws GameActionException {
-        for (int id : muckrakersBuilt) {
+        ArrayList<Integer> placed = new ArrayList<>();
+        for (int id : wanderingMuckrakers) {
             int flag = rc.getFlag(id);
             if (!isPlaced(flag)) {
                 if (isBroadcastingNeutralEC(flag)) {
@@ -44,18 +45,29 @@ public strictfp class EnlightenmentCenter {
                     int hp = getEnemyHpFromFlag(flag);
                     enemyECs.add(new Pair<>(ml, hp));
                 }
+            } else {
+                placed.add(id);
             }
         }
+        // remove placed integers from hashset for better speed
+        for (int id : placed) {
+            wanderingMuckrakers.remove(id);
+        }
+        placedMuckrakers += placed.size();
     }
 
-    public static HashSet<Integer> muckrakersBuilt = new HashSet<>();
+    public static HashSet<Integer> wanderingMuckrakers = new HashSet<>();
+    public static int placedMuckrakers = 0;
     private static boolean spawnMuckraker() throws GameActionException {
         Direction dir = getOptimalDirection(getDirectionFromAdjacentFlags(rc.getLocation()));
+        if (dir == null ) {
+            return false;
+        }
         double cooldown = rc.sensePassability(rc.getLocation());
         int xp = (int) (FACTOR_MUCKRAKER_HP/cooldown);
         if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, xp)) {
             rc.buildRobot(RobotType.MUCKRAKER, dir, xp);
-            muckrakersBuilt.add(rc.senseRobotAtLocation(rc.getLocation().add(dir)).getID());
+            wanderingMuckrakers.add(rc.senseRobotAtLocation(rc.getLocation().add(dir)).getID());
             return true;
         }
         return false;
@@ -64,6 +76,9 @@ public strictfp class EnlightenmentCenter {
     public static HashMap<MapLocation, Integer>attackPoliticiansBuilt = new HashMap<>();
     private static boolean spawnAttackPolitician (MapLocation toAttack, int hp) throws GameActionException {
         Direction dir = getOptimalDirection(rc.getLocation().directionTo(toAttack));
+        if (dir == null) {
+            return false;
+        }
         int xp = hp + 11;
         if (rc.canBuildRobot(RobotType.POLITICIAN, dir, xp)) {
             broadcastAttackCoordinates(toAttack);
@@ -80,7 +95,7 @@ public strictfp class EnlightenmentCenter {
         boolean spawned = false;
         if (!neutralECs.isEmpty()) {
             for (Pair<MapLocation, Integer> got: neutralECs) {
-                if (spawnAttackPolitician(got.key, got.value)) {
+                if (spawnAttackPolitician(got.key, got.value + 50)) {
                     neutralPolsSent.add(got);
                     neutralECs.remove(got);
                     spawned = true;
@@ -88,19 +103,13 @@ public strictfp class EnlightenmentCenter {
                 }
             }
         }
-        if (!spawned && muckrakersBuilt.size() < 121 && round < 500) {
+        if (!spawned && (wanderingMuckrakers.size()+placedMuckrakers) < 121 && round < 500) {
             spawnMuckraker();
         }
     }
 
 
     public static void move() throws GameActionException {
-        if (DEBUG) {
-            if (round % 500 == 0) {
-                System.out.println("Round number:- " + round);
-            }
-        }
-
         scanMuckrakerFlagsForECs();
 
         if (rc.isReady()) {

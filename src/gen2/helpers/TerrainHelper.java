@@ -40,31 +40,6 @@ public class TerrainHelper {
         return ret;
     }
 
-    private static MapLocation getVacantNearby (
-            MapLocation current, MapLocation destination, PassabilityGrid grid
-    ) throws GameActionException {
-        Direction direction = destination.directionTo(current);
-
-        int dirInd = directionList.indexOf(direction), decided = -1;
-
-        double factor = 0;
-
-        for (int i = 0; i < 8; i++) {
-            Direction d = directions[i];
-            int filterInd = Math.min(Math.abs(dirInd-i), Math.abs(dirInd - 8 + i));
-            double cur = DIRECTION_FACTOR[filterInd]*grid.getRelative(d.dx, d.dy);
-            if (cur > factor) {
-                decided = i;
-                factor = cur;
-            }
-        }
-        if (decided == -1) {
-            return null;
-        }
-
-        return destination.add(directions[decided]);
-    }
-
     private static MapLocation getIntermediate (
             MapLocation current, MapLocation destination, PassabilityGrid grid
     ) throws GameActionException {
@@ -95,8 +70,7 @@ public class TerrainHelper {
             // find intermediate location if destination outside sensor radius
             return getIntermediate(current, destination, grid);
         } else {
-            // find high passability location if destination inside sensor radius
-            return getVacantNearby(current, destination, grid);
+            return null;
         }
     }
 }
