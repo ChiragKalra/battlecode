@@ -4,7 +4,7 @@ ind, map, default, neutral, dim
 2, Bog, 1, 6, 64*64
 3, Branches, 1, 6, 64*64
 4, Chevron, 3, 4, 64*32
-5, Corridor, , 4, 33*40
+5, Corridor,1, 6, 33*40
 6, Cow, 2, 6, 50*80
 7, CrossStitch, 1, 2, 64*64
 8, CrownJewels, 1, 2, 64*32
