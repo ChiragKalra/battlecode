@@ -15,6 +15,7 @@ import static gen2.util.Functions.getRandom;
 // muckraker info grid formation helper
 public class GridHelper {
     public static final int MUCKRAKER_GRID_WIDTH = 5;
+    public static final int AVOID_EC_RADIUS_SQUARED = 25;
 
     private static Direction getAdjacentVacant(MapLocation current) throws GameActionException {
         int mx = current.x, my = current.y;
@@ -28,7 +29,7 @@ public class GridHelper {
         //check in all 4 directions
         MapLocation[] possible = {north, east, south, west};
         for (MapLocation mp: possible) {
-            if (rc.canSenseLocation(mp) && !rc.isLocationOccupied(mp)) {
+            if (rc.canSenseLocation(mp) && !rc.isLocationOccupied(mp) && !isNearDetectedEC(mp)) {
                 selected = current.directionTo(mp);
                 break;
             }
@@ -141,13 +142,24 @@ public class GridHelper {
     }
 
 
+    private static final HashSet<MapLocation> nearestECs = new HashSet<>();
+    private static boolean isNearDetectedEC(MapLocation ml) {
+        for (MapLocation loc: nearestECs) {
+            if (loc.isWithinDistanceSquared(ml, AVOID_EC_RADIUS_SQUARED)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // check if current position is valid for grid formation
     public static Boolean formsGrid () throws GameActionException {
         MapLocation mapLocation = rc.getLocation();
 
         // direct away from ECs to not absorb damage by pols
-        for (RobotInfo ri : rc.senseNearbyRobots(25)) {
+        for (RobotInfo ri : rc.senseNearbyRobots(AVOID_EC_RADIUS_SQUARED)) {
             if (ri.team != mTeam && ri.type == RobotType.ENLIGHTENMENT_CENTER) {
+                nearestECs.add(ri.location);
                 return false;
             }
         }
@@ -201,7 +213,7 @@ public class GridHelper {
         //check in all 4 directions
         MapLocation[] possible = {north, east, south, west};
         for (MapLocation mp: possible) {
-            if (rc.canSenseLocation(mp) && !rc.isLocationOccupied(mp)) {
+            if (rc.canSenseLocation(mp) && !rc.isLocationOccupied(mp) && !isNearDetectedEC(mp)) {
                 return mp;
             }
         }

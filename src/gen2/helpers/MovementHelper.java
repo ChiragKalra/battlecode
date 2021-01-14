@@ -177,8 +177,8 @@ public class MovementHelper {
         PriorityQueue<Pair<Double, MapLocation>> pq = new PriorityQueue<>(Comparator.comparingDouble(x -> x.key));
         pq.add(new Pair<>(0d, source));
 
-        int[] dx = {0, 0, 1, 1, 1, -1, -1, -1};
-        int[] dy = {1, -1, 0, 1, -1, 0, 1, -1};
+        int[] dx = {0, 0, 1, -1, 1, 1, -1, -1};
+        int[] dy = {1, -1, 0, 0, -1, 1, 1, -1};
 
         while (!pq.isEmpty()) {
             MapLocation cur = pq.poll().value;

@@ -135,7 +135,9 @@ public strictfp class RobotPlayer {
                 round++;
                 Clock.yield();
             } catch (Exception e) {
-                e.printStackTrace();
+                if (DEBUG) {
+                    e.printStackTrace();
+                }
             }
         }
     }
