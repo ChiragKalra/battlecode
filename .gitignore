@@ -28,6 +28,7 @@ battlecode-scaffold.iws
 access.txt
 
 gradlew.bat
+gradle.properties
 gradlew
 gradle/
 build/
