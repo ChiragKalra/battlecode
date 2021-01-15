@@ -83,7 +83,7 @@ public strictfp class RobotPlayer {
             e.printStackTrace();
         }
 
-        while (rc.getRoundNum() < GameConstants.GAME_MAX_NUMBER_OF_ROUNDS) {
+        while (rc.getRoundNum() <= GameConstants.GAME_MAX_NUMBER_OF_ROUNDS) {
             try {
                 // slanderer will convert to politician in 300 rounds, watch for changes
                 if (mType != rc.getType()) {

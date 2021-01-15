@@ -27,9 +27,9 @@ import static gen2.helpers.MovementHelper.*;
            5  , 0   -> free;
            6  , 0   -> free;
            7  , 0   -> free;
+ 4       - directly observed vacancy
 
- 4       - slanderer adjacent
- 5       - free
+ 5       - slanderer adjacent
  6       - broadcast modes muckraker/politician on/off
 
  7-13    - enemy/neutral enlightenment center x
@@ -39,9 +39,14 @@ import static gen2.helpers.MovementHelper.*;
                 enemy   : log10(hp)
 
  */
+
+
 public class MuckrakerFlag {
     public static boolean isPlaced (int flag) {
         return (flag % 16) == 1 || (flag & 8) == 8;
+    }
+    public static boolean hasVacancyNearby (int flag) {
+        return (flag & 16) == 16;
     }
 
     public static Direction getDirection(int flag) {
@@ -123,7 +128,7 @@ public class MuckrakerFlag {
 
         // set vacant grid location direction
         if (placed) {
-            Direction direction = getGridDirectionForFlag();
+            Pair<Direction, Boolean> direction = getGridDirectionForFlag();
             if (direction == null) {
                 newFlag = 1;
             } else {

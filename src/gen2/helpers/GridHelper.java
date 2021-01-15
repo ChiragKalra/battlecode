@@ -1,6 +1,7 @@
 package gen2.helpers;
 
 import battlecode.common.*;
+import gen2.util.Pair;
 import gen2.util.PassabilityGrid;
 
 import java.util.*;
@@ -63,23 +64,29 @@ public class GridHelper {
      *      3. no vacancies (select one random direction out of adjacent muckrakers)
      *
      */
-    public static Direction getGridDirectionForFlag() throws GameActionException {
+    public static Pair<Direction, Boolean> getGridDirectionForFlag() throws GameActionException {
         MapLocation current = rc.getLocation();
 
         // find adjacent vacancies
         Direction vacancy = getAdjacentVacant(current);
         if (vacancy != null) {
-            return vacancy;
+            return new Pair<>(vacancy, true);
         }
 
         // avoid crowding if any
         Direction antiCrowd = getAntiCrowdingDirection(current);
         if (antiCrowd != null) {
-            return antiCrowd;
+            return new Pair<>(antiCrowd, false);
+        }
+
+        Direction adj = getDirectionFromAdjacentFlags(current);
+
+        if (adj == null) {
+            return null;
         }
 
         // select random direction out of adjacent muckrakers
-        return getDirectionFromAdjacentFlags(current);
+        return new Pair<>(adj, false);
     }
 
     private static final HashSet<MapLocation> nearestECs = new HashSet<>();
@@ -197,7 +204,8 @@ public class GridHelper {
             if (movesToVacant != null) {
                 return getNextDirection(mLoc);
             }
-        }*/
+        }
+        */
         return selected.isEmpty() ? getRandomDirection() : (Direction) getRandom(selected.toArray());
     }
 }
