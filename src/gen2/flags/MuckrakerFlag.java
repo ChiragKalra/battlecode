@@ -84,6 +84,10 @@ public class MuckrakerFlag {
         return (int) Math.pow((flag >> 21) % 8, 10);
     }
 
+    public static boolean isAdjacentToSlanderer(int flag) {
+    	return (flag & (1 << 5)) != 0;
+    }
+
     private static final HashMap<MapLocation, Integer> ecsBroadcasts = new HashMap<>();
 
     // update flag if EC nearby for 1 full round
