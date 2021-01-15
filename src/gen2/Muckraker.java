@@ -13,7 +13,7 @@ public strictfp class Muckraker {
 
     public static void move() throws GameActionException {
         // check for slanderers
-        for (RobotInfo robot : rc.senseNearbyRobots(sensorRadius, mTeam)) {
+        for (RobotInfo robot : rc.senseNearbyRobots(sensorRadius, enemyTeam)) {
             if (robot.location.isWithinDistanceSquared(rc.getLocation(), actionRadius) && robot.type.canBeExposed()) {
                 // expose the slanderer
                 if (rc.canExpose(robot.location)) {
