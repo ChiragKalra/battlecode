@@ -6,8 +6,6 @@ import gen2.util.PassabilityGrid;
 import java.util.*;
 
 import static gen2.RobotPlayer.*;
-import static gen2.helpers.MovementHelper.*;
-import static gen2.helpers.MovementHelper.directions;
 
 
 public class TerrainHelper {

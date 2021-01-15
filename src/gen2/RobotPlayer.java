@@ -16,10 +16,6 @@ public strictfp class RobotPlayer {
         }
     }
 
-
-    @SuppressWarnings("unused")
-    public static final int MAX_GENERATED_INFLUENCE = 22364;
-
     public static RobotController rc;
     public static Team mTeam, enemyTeam;
     public static int actionRadius, sensorRadius, detectionRadius;
@@ -67,7 +63,7 @@ public strictfp class RobotPlayer {
             // init special variables
             switch (mType) {
                 case ENLIGHTENMENT_CENTER:
-                    // EnlightenmentCenter.init();
+                    EnlightenmentCenter.init();
                     break;
                 case POLITICIAN:
                     Politician.init();
@@ -93,22 +89,25 @@ public strictfp class RobotPlayer {
                     sensorRadius = mType.sensorRadiusSquared;
                 }
 
-                // dont compute movement/ability if cooldown active
-                if (rc.isReady()) {
-                    switch (mType) {
-                        case ENLIGHTENMENT_CENTER:
-                            EnlightenmentCenter.move();
-                            break;
-                        case POLITICIAN:
+                switch (mType) {
+                    case ENLIGHTENMENT_CENTER:
+                        EnlightenmentCenter.move();
+                        break;
+                    case POLITICIAN:
+                        // dont compute movement/ability if cooldown active
+                        if (rc.isReady()) {
                             Politician.move();
-                            break;
-                        case SLANDERER:
-                            Slanderer.move();
-                            break;
-                        case MUCKRAKER:
+                        }
+                        break;
+                    case SLANDERER:
+                        Slanderer.move();
+                        break;
+                    case MUCKRAKER:
+                        // dont compute movement/ability if cooldown active
+                        if (rc.isReady()) {
                             Muckraker.move();
-                            break;
-                    }
+                        }
+                        break;
                 }
 
                 // update flag at the end of each round
@@ -140,5 +139,7 @@ public strictfp class RobotPlayer {
                 }
             }
         }
+
+        //
     }
 }

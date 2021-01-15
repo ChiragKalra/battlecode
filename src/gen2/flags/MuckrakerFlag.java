@@ -42,6 +42,8 @@ import static gen2.helpers.MovementHelper.*;
 
 
 public class MuckrakerFlag {
+    private static final int COOLDOWN_EC_BROADCAST = 10;
+
     public static boolean isPlaced (int flag) {
         return (flag % 16) == 1 || (flag & 8) == 8;
     }
@@ -108,7 +110,7 @@ public class MuckrakerFlag {
                         relY = got.key.y - spawnerLocation.y + 63,
                         hp = Math.min((int) Math.log10(got.value), 7);
 
-                ecsBroadcasts.put(got.key, 2);
+                ecsBroadcasts.put(got.key, COOLDOWN_EC_BROADCAST);
                 newFlag = 3;
                 newFlag += relX << 7;
                 newFlag += relY << 14;

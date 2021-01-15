@@ -17,11 +17,11 @@ public class SpawnHelper {
 
     private static int slandererHPFloor (int hp) {
         double func = (0.02 + 0.03*Math.exp(-0.001*hp))*hp;
-        return (int)(Math.floor(func)/func*hp);
+        return (int) Math.ceil(Math.floor(func)/func*hp);
     }
 
     private static double getMuckrakerProbability (int round) {
-        return 1 - sigmoid((round-200)/35.0);
+        return 1 - 0.8*sigmoid((round-225)/35.0);
     }
 
     private static double getPoliticianProbability (int round) {
@@ -50,7 +50,9 @@ public class SpawnHelper {
         }
     }
 
-    public static final HashSet<Integer> wanderingMuckrakers = new HashSet<>();
+    public static HashSet<Integer>
+            wanderingMuckrakers = new HashSet<>(),
+            scannedMuckrakers = new HashSet<>();
     public static final HashSet<Integer> placedMuckrakers = new HashSet<>();
     public static boolean spawnMuckraker() throws GameActionException {
         Direction dir = getOptimalDirection(getDirectionFromAdjacentFlags(rc.getLocation()));
@@ -87,7 +89,8 @@ public class SpawnHelper {
         if (dir == null ) {
             return false;
         }
-        int xp = slandererHPFloor(FACTOR_SLANDERER_HP * 25);
+        //int xp = slandererHPFloor(Math.max(25, (int)(xpDelta*RATIO_UNITS)));
+        int xp = slandererHPFloor(Math.max(25, 2));
         if (rc.canBuildRobot(RobotType.SLANDERER, dir, xp)) {
             rc.buildRobot(RobotType.SLANDERER, dir, xp);
             wanderingMuckrakers.add(rc.senseRobotAtLocation(rc.getLocation().add(dir)).getID());
@@ -101,7 +104,8 @@ public class SpawnHelper {
         if (dir == null ) {
             return false;
         }
-        int xp = slandererHPFloor( (int) (FACTOR_POLITICIAN_HP * 25 * 0.075 * rc.getConviction()));
+        //int xp = slandererHPFloor(Math.max((int) (xpDelta * RATIO_UNITS), 25));
+        int xp = slandererHPFloor(Math.max(25, 2));
         if (rc.canBuildRobot(RobotType.POLITICIAN, dir, xp)) {
             rc.buildRobot(RobotType.POLITICIAN, dir, xp);
             wanderingMuckrakers.add(rc.senseRobotAtLocation(rc.getLocation().add(dir)).getID());

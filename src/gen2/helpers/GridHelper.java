@@ -164,7 +164,7 @@ public class GridHelper {
         }
 
         // direct away from ECs to not absorb damage by pols
-        for (RobotInfo ri : rc.senseNearbyRobots(25)) {
+        for (RobotInfo ri : rc.senseNearbyRobots(AVOID_EC_RADIUS_SQUARED)) {
             if (ri.team != mTeam && ri.type == RobotType.ENLIGHTENMENT_CENTER) {
                 return ri.location.directionTo(rc.getLocation());
             }
