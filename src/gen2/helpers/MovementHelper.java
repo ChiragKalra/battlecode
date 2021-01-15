@@ -203,8 +203,8 @@ public class MovementHelper {
                 }
 
                 // to reduce cross-walks
-                double diagonalFactor = Math.abs(dx[i]) == Math.abs(dy[i]) ? DIAGONAL_MOVEMENT_REDUCTION_FACTOR : 1;
-                double edgeWeight = diagonalFactor / passability.getIndexed(cur.x, cur.y);
+                // double diagonalFactor = Math.abs(dx[i]) == Math.abs(dy[i]) ? DIAGONAL_MOVEMENT_REDUCTION_FACTOR : 1;
+                double edgeWeight = rc.getType().actionCooldown / passability.getIndexed(cur.x, cur.y);
                 if (distance[cur.x][cur.y] + edgeWeight < distance[loc.x][loc.y]) {
                     distance[loc.x][loc.y] = distance[cur.x][cur.y] + edgeWeight;
                     pq.add(new Pair<>(distance[loc.x][loc.y], new MapLocation(loc.x, loc.y)));
@@ -226,5 +226,4 @@ public class MovementHelper {
         }
         return route;
     }
-
 }
