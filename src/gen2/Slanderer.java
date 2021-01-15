@@ -7,9 +7,12 @@ import java.util.*;
 
 import static gen2.RobotPlayer.*;
 import static gen2.helpers.MovementHelper.*;
+import static gen2.flags.MuckrakerFlag.*;
 
 public strictfp class Slanderer {
 	private static ArrayList<Direction> movesToVacant = null;
+    private static MapLocation muckrakerLocation = null;
+    private static int muckrakerID = -1;
 
     // TODO: run away from enemy muckrakers and politicians
     public static void move() throws GameActionException {
@@ -19,19 +22,26 @@ public strictfp class Slanderer {
 
     	// check if there's a muckraker in the sensing radius with a vacant adjacent location
     	boolean availableMuckraker = false;
-    	// TODO: remove muckrakerLocation if not needed
-    	MapLocation muckrakerLocation = new MapLocation(-1, -1);
+        muckrakerID = -1;
+        muckrakerLocation = new MapLocation(-1, -1);
     	MapLocation vacantLocation = new MapLocation(-1, -1);
     	int distanceToLocation = 1000;
 
-    	for (RobotInfo ri : rc.senseNearbyRobots()) {
-    		if (ri.getTeam() == mTeam && ri.getType() == RobotType.MUCKRAKER) {
+    	for (RobotInfo robot : rc.senseNearbyRobots()) {
+    		if (robot.getTeam() == mTeam && robot.getType() == RobotType.MUCKRAKER) {
     			// if there's a muckraker in an adjacent cell
-    			if (rc.getLocation().isAdjacentTo(ri.getLocation())) {
+                // TODO: muckraker has multiple adjacent slanderers
+    			if (rc.getLocation().isAdjacentTo(robot.getLocation())) {
     				return;
     			}
 
-    			MapLocation ml = getAdjacentVacantLocation(ri.getLocation());
+                int muckrakerFlag = rc.getFlag(robot.getID());
+                // a slanderer already present next to muckraker
+                if (isAdjacentToSlanderer(muckrakerFlag)) {
+                    continue;
+                }
+
+    			MapLocation ml = getAdjacentVacantLocation(robot.getLocation());
     			if (ml == null) {
     				continue;
     			}
@@ -39,7 +49,8 @@ public strictfp class Slanderer {
     			availableMuckraker = true;
     			int distance = rc.getLocation().distanceSquaredTo(ml);
     			if (distance < distanceToLocation) {
-    				muckrakerLocation = ri.getLocation();
+    				muckrakerID = robot.getID();
+                    muckrakerLocation = robot.getLocation();
     				vacantLocation = ml;
     				distanceToLocation = distance;
     			}
@@ -53,7 +64,7 @@ public strictfp class Slanderer {
 
         // TODO: get a list of available muckrakers and sort by distance, iterate and check if there's a path
         // TODO: move code to FarmHelper.java
-        // if no available path tryMove()
+        // TODO: use anti-crowding
         
         PassabilityGrid passability = new PassabilityGrid(rc.getLocation(), sensorRadius);
         movesToVacant = getShortestRoute(rc.getLocation(), vacantLocation, passability);
@@ -72,9 +83,23 @@ public strictfp class Slanderer {
             movesToVacant = null;
             return false;
         }
+        if (muckrakerID == -1 || muckrakerLocation == null) {
+            movesToVacant = null;
+            return false;
+        }
 
         Direction dir = movesToVacant.get(movesToVacant.size() - 1);
         if (rc.canMove(dir)) {
+            if (rc.canGetFlag(muckrakerID)) {
+                int muckrakerFlag = rc.getFlag(muckrakerID);
+                if (isAdjacentToSlanderer(muckrakerFlag)) {
+                    movesToVacant = null;
+                    return false;
+                }
+            }
+
+            // TODO: check all 8 adjacent cells of muckraker
+
             movesToVacant.remove(movesToVacant.size() - 1);
             rc.move(dir);
             return true;
@@ -91,14 +116,21 @@ public strictfp class Slanderer {
 
     	for (Direction dir : Direction.allDirections()) {
     		MapLocation adjacentLocation = ml.add(dir);
-    		if (rc.getLocation().isWithinDistanceSquared(adjacentLocation, sensorRadius) && rc.onTheMap(adjacentLocation)
-    			&& !rc.isLocationOccupied(adjacentLocation)) {
-    			foundLocation = true;
-    			int distance = rc.getLocation().distanceSquaredTo(adjacentLocation);
-    			if (distance < distanceToLocation) {
-    				distanceToLocation = distance;
-    				vacantLocation = adjacentLocation;
-    			}
+    		if (rc.getLocation().isWithinDistanceSquared(adjacentLocation, sensorRadius) && rc.onTheMap(adjacentLocation)) {
+    			if (!rc.isLocationOccupied(adjacentLocation)) {
+        			foundLocation = true;
+        			int distance = rc.getLocation().distanceSquaredTo(adjacentLocation);
+        			if (distance < distanceToLocation) {
+        				distanceToLocation = distance;
+        				vacantLocation = adjacentLocation;
+                    }
+                } else {
+                    RobotInfo robot = rc.senseRobotAtLocation(adjacentLocation);
+                    // a slanderer already present next to muckraker
+                    if (robot.getTeam() == mTeam && robot.getType() == RobotType.SLANDERER) {
+                        return null;
+                    }
+                }
     		}
     	}
 
