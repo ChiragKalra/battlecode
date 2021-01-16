@@ -38,23 +38,6 @@ public class GridHelper {
         return selected;
     }
 
-    // select random direction out of adjacent muckrakers
-    public static Direction getDirectionFromAdjacentFlags(MapLocation now) throws GameActionException {
-        ArrayList<Direction> selected = new ArrayList<>();
-        RobotInfo[] nearby = rc.senseNearbyRobots(sensorRadius, mTeam);
-        for (RobotInfo ri: nearby) {
-            int flag = rc.getFlag(ri.getID());
-            if (ri.type == RobotType.MUCKRAKER && isPlaced(flag)) {
-                Direction dir = getDirection(rc.getFlag(rc.getID()));
-                if (dir != null) {
-                    Direction sum = vectorAddition(dir, now.directionTo(ri.location));
-                    selected.add(sum == Direction.CENTER ? dir : sum);
-                }
-            }
-        }
-        return selected.isEmpty() ? null : (Direction) getRandom(selected.toArray());
-    }
-
     /*
      * direction which needs to be stored in the flag after the bot is placed
      *
@@ -154,7 +137,6 @@ public class GridHelper {
         return null;
     }
 
-
     /*
      * @return
      *      1. next direction to move to if directed by other muckrakers
@@ -162,6 +144,13 @@ public class GridHelper {
      *
      */
     public static Direction getNextDirection() throws GameActionException {
+        // direct away from ECs to not absorb damage by pols
+        for (RobotInfo ri : rc.senseNearbyRobots(AVOID_EC_RADIUS_SQUARED)) {
+            if (ri.team != mTeam && ri.type == RobotType.ENLIGHTENMENT_CENTER) {
+                return ri.location.directionTo(rc.getLocation());
+            }
+        }
+
         ArrayList<Direction> selected = new ArrayList<>();
         RobotInfo[] fellow = rc.senseNearbyRobots(sensorRadius, mTeam);
         for (RobotInfo ri : fellow) {
@@ -176,5 +165,22 @@ public class GridHelper {
             }
         }
         return selected.isEmpty() ? getRandomDirection() : (Direction) getRandom(selected.toArray());
+    }
+
+    // select random direction out of adjacent muckrakers
+    public static Direction getDirectionFromAdjacentFlags(MapLocation now) throws GameActionException {
+        ArrayList<Direction> selected = new ArrayList<>();
+        RobotInfo[] nearby = rc.senseNearbyRobots(sensorRadius, mTeam);
+        for (RobotInfo ri: nearby) {
+            int flag = rc.getFlag(ri.getID());
+            if (ri.type == RobotType.MUCKRAKER && isPlaced(flag)) {
+                Direction dir = getDirection(rc.getFlag(rc.getID()));
+                if (dir != null) {
+                    Direction sum = vectorAddition(dir, now.directionTo(ri.location));
+                    selected.add(sum == Direction.CENTER ? dir : sum);
+                }
+            }
+        }
+        return selected.isEmpty() ? null : (Direction) getRandom(selected.toArray());
     }
 }

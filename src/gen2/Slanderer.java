@@ -1,6 +1,7 @@
 package gen2;
 
 import battlecode.common.*;
+import gen2.helpers.MovementHelper;
 import gen2.util.PassabilityGrid;
 
 import java.util.*;
@@ -16,6 +17,8 @@ public strictfp class Slanderer {
 
     // TODO: run away from enemy muckrakers and politicians
     public static void move() throws GameActionException {
+        MovementHelper.tryMove(getRandomDirection(), Precision.MIN);
+/*
     	if (tryMoveShortestPath()) {
     		return;
     	}
@@ -72,7 +75,7 @@ public strictfp class Slanderer {
         	tryMove(getRandomDirection());
         } else {
         	tryMoveShortestPath();
-        }
+        }*/
     }
 
     private static boolean tryMoveShortestPath() throws GameActionException {

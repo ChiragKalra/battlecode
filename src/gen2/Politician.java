@@ -10,20 +10,22 @@ import static gen2.flags.EnlightenmentCenterFlag.*;
 
 public strictfp class Politician {
     public static MapLocation attackLocation = null;
+    public static boolean isAttackType = false;
 
     public static void init() throws GameActionException {
-        for (RobotInfo ri : rc.senseNearbyRobots(2, mTeam)) {
-            if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
-                int flag = rc.getFlag(ri.getID());
-                if (isAttackType(flag)) {
-                    attackLocation = getAttackCoordinates(flag);
-                }
-                break;
-            }
+        isAttackType = isAttackType(rc.getFlag(enlightenmentCenterId));
+    }
+
+    public static void checkForAttackCoordinates() throws GameActionException {
+        int flag = rc.getFlag(enlightenmentCenterId);
+        if (isAttackType) {
+            attackLocation = getAttackCoordinates(flag);
         }
     }
 
     public static void move() throws GameActionException {
+        checkForAttackCoordinates();
+
         if (attackLocation != null) {
             if (targetAlreadyCaptured(attackLocation)) {
                 attackLocation = null;
@@ -33,10 +35,11 @@ public strictfp class Politician {
             Direction bo = shouldBackOff();
             if (bo != null) {
                 tryMove(bo, Precision.MIN);
-            } else if (shouldAttack(attackLocation != null)) {
+            } else if (shouldAttack()) {
                 rc.empower(actionRadius);
             } else {
-                tryMove(getNextDirection(rc.getLocation(), attackLocation), Precision.MIN);
+                Direction next = getNextDirection(rc.getLocation(), attackLocation);
+                tryMove(next, Precision.MIN);
             }
         }
     }

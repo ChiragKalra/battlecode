@@ -92,7 +92,7 @@ public class MuckrakerFlag {
 
     private static final HashMap<MapLocation, Integer> ecsBroadcasts = new HashMap<>();
 
-    // update flag if EC nearby for 1 full round
+    // update flag if EC nearby for 10 full rounds
     public static void updateFlagForEC () throws GameActionException {
         int prevFlag = rc.getFlag(rc.getID()), newFlag = 0;
         // set enemy/neutral enlightenment center location
@@ -102,7 +102,7 @@ public class MuckrakerFlag {
                     relY = got.key.y - spawnerLocation.y + 63,
                     hp = Math.max((int) Math.ceil((got.value - 150) / 50.0), 0);
 
-            ecsBroadcasts.put(got.key, 2);
+            ecsBroadcasts.put(got.key, COOLDOWN_EC_BROADCAST);
             newFlag = 2;
             newFlag += relX << 7;
             newFlag += relY << 14;

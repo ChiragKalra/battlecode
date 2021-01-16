@@ -32,6 +32,11 @@ public class EnlightenmentCenterFlag {
         return (flag & (1<<14)) == (1<<14);
     }
 
+    public static void setDefensePoliticianSpawned() throws GameActionException {
+        int flag = rc.getFlag(rc.getID());
+        rc.setFlag(flag ^ (1 << 14));
+    }
+
     public static MapLocation getAttackCoordinates (int flag) {
         int relX = (flag) % 128 - 63,
                 relY = (flag >> 7) % 128 - 63;

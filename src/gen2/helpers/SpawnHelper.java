@@ -4,16 +4,15 @@ import battlecode.common.Direction;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotType;
+import gen2.flags.EnlightenmentCenterFlag;
 import gen2.util.PassabilityGrid;
 import gen2.util.SpawnType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 
-import static gen2.EnlightenmentCenter.*;
+import static gen2.EnlightenmentCenter.RATIO_UNITS;
+import static gen2.EnlightenmentCenter.wanderingMuckrakers;
 import static gen2.RobotPlayer.rc;
 import static gen2.RobotPlayer.sensorRadius;
-import static gen2.flags.EnlightenmentCenterFlag.broadcastAttackCoordinates;
 import static gen2.helpers.GridHelper.getDirectionFromAdjacentFlags;
 import static gen2.helpers.MovementHelper.*;
 
@@ -24,10 +23,6 @@ public class SpawnHelper {
         return (int) Math.ceil(Math.floor(func)/func*hp);
     }
 
-    public static ArrayList<Integer>
-            wanderingMuckrakers = new ArrayList<>(),
-            scannedMuckrakers = new ArrayList<>();
-    public static final ArrayList<Integer> placedMuckrakers = new ArrayList<>();
     public static boolean spawnMuckraker() throws GameActionException {
         Direction dir = getOptimalDirection(getDirectionFromAdjacentFlags(rc.getLocation()));
         if (dir == null ) {
@@ -42,20 +37,14 @@ public class SpawnHelper {
         return false;
     }
 
-    public static final HashMap<MapLocation, Integer> attackPoliticiansBuilt = new HashMap<>();
-    public static boolean spawnAttackPolitician (MapLocation toAttack) throws GameActionException {
+    public static boolean spawnAttackPolitician (MapLocation toAttack, int hp) throws GameActionException {
         Direction dir = getOptimalDirection(rc.getLocation().directionTo(toAttack));
         if (dir == null) {
             return false;
         }
-        int hp = slandererHPFloor((int)(xpDelta*RATIO_UNITS)), xp = hp + 11;
+        int xp = Math.max(hp + 11, (int)(rc.getInfluence()*RATIO_UNITS));
         if (rc.canBuildRobot(RobotType.POLITICIAN, dir, xp)) {
-            if (toAttack != null) {
-                detectedECs.put(toAttack, detectedECs.get(toAttack)-hp);
-                broadcastAttackCoordinates(toAttack);
-            }
             rc.buildRobot(RobotType.POLITICIAN, dir, xp);
-            attackPoliticiansBuilt.put(toAttack, rc.senseRobotAtLocation(rc.getLocation().add(dir)).getID());
             return true;
         }
         return false;
@@ -70,7 +59,6 @@ public class SpawnHelper {
         int xp = slandererHPFloor(Math.max(25, 2));
         if (rc.canBuildRobot(RobotType.SLANDERER, dir, xp)) {
             rc.buildRobot(RobotType.SLANDERER, dir, xp);
-            wanderingMuckrakers.add(rc.senseRobotAtLocation(rc.getLocation().add(dir)).getID());
             return true;
         }
         return false;
@@ -84,8 +72,8 @@ public class SpawnHelper {
         //int xp = slandererHPFloor(Math.max((int) (xpDelta * RATIO_UNITS), 25));
         int xp = slandererHPFloor(Math.max(25, 2));
         if (rc.canBuildRobot(RobotType.POLITICIAN, dir, xp)) {
+            EnlightenmentCenterFlag.setDefensePoliticianSpawned();
             rc.buildRobot(RobotType.POLITICIAN, dir, xp);
-            wanderingMuckrakers.add(rc.senseRobotAtLocation(rc.getLocation().add(dir)).getID());
             return true;
         }
         return false;

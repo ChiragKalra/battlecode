@@ -8,7 +8,7 @@ import gen2.flags.PoliticianFlag;
 import gen2.flags.SlandererFlag;
 import gen2.util.Logger;
 
-import static gen2.flags.MuckrakerFlag.isPlaced;
+import static gen2.Politician.isAttackType;
 
 public strictfp class RobotPlayer {
     // toggle logging before competitive matches
@@ -90,6 +90,8 @@ public strictfp class RobotPlayer {
                 // slanderer will convert to politician in 300 rounds, watch for changes
                 if (mType != rc.getType()) {
                     mType = rc.getType();
+                    // TODO decide
+                    isAttackType = true;
                     detectionRadius = mType.detectionRadiusSquared;
                     actionRadius = mType.actionRadiusSquared;
                     sensorRadius = mType.sensorRadiusSquared;
@@ -132,14 +134,14 @@ public strictfp class RobotPlayer {
                         MuckrakerFlag.updateFlag();
                 }
 
-                if (roundNumber != rc.getRoundNum() && mType==RobotType.ENLIGHTENMENT_CENTER) {
+                if (roundNumber != rc.getRoundNum() && mType==RobotType.POLITICIAN) {
                     logger.flush();
                 }
 
                 Clock.yield();
             } catch (Exception e) {
                 if (DEBUG) {
-                    //e.printStackTrace();
+                    e.printStackTrace();
                 }
             }
         }

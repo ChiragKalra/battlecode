@@ -6,8 +6,8 @@ import static gen2.util.Functions.sigmoid;
 public enum SpawnType {
     AttackPolitician(4, 21, 500),
     DefensePolitician(4, 21, 200),
-    Muckraker(1,1,5),
-    Slanderer(5, 21, 200);
+    Muckraker(0,1,5),
+    Slanderer(2, 21, 200);
 
     public final int cooldown, minHp, maxHp;
 
@@ -40,31 +40,18 @@ public enum SpawnType {
     }
 
     private static double getMuckrakerProbability (int round) {
-        return 1 - 0.8*sigmoid((round-225)/35.0);
+        return 1 - 0.6*sigmoid((round-325)/35.0);
     }
 
     private static double getPoliticianProbability (int round) {
-        return sigmoid((round-300)/45.0);
+        return sigmoid((round-400)/45.0);
     }
 
     private static double getAttackPoliticianProbability (int round) {
-        return sigmoid((round-300)/45.0);
+        return sigmoid((round-250)/60.0);
     }
 
     private static double getSlandererProbability (int round) {
-        return sigmoid((round-400)/60.0);
-    }
-
-    public double getProbability(int round) {
-        switch (this) {
-            case Muckraker:
-                return getMuckrakerProbability(round);
-            case Slanderer:
-                return getSlandererProbability(round);
-            case DefensePolitician:
-                return getPoliticianProbability(round);
-            default:
-                return getAttackPoliticianProbability(round);
-        }
+        return sigmoid((round-100)/40.0);
     }
 }
