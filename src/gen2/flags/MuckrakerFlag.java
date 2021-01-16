@@ -151,7 +151,7 @@ public class MuckrakerFlag {
             if (direction == null) {
                 newFlag = 1;
             } else {
-                int threeBit = directionList.indexOf(direction);
+                int threeBit = directionList.indexOf(direction.key);
                 newFlag = threeBit + 8;
             }
         }

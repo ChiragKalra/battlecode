@@ -12,12 +12,12 @@ public class TerrainHelper {
 
     private static ArrayList<MapLocation> relativeLocations;
 
-    private static MapLocation[] getCircumferencePoints(MapLocation center) {
-        int rad = (int) Math.sqrt(sensorRadius);
+    public static MapLocation[] getCircumferencePoints(MapLocation center, int radiusSquared) {
+        int rad = (int) Math.sqrt(radiusSquared);
         if (relativeLocations == null) {
             relativeLocations = new ArrayList<>();
             for (int x = -rad; x <= rad; x++) {
-                int limY = (int) Math.sqrt(sensorRadius - x*x);
+                int limY = (int) Math.sqrt(radiusSquared - x*x);
                 if (Math.abs(x) == rad) {
                     for (int y = -limY; y <= limY; y++) {
                         relativeLocations.add(new MapLocation(x, y));
@@ -41,7 +41,7 @@ public class TerrainHelper {
     private static MapLocation getIntermediate (
             MapLocation current, MapLocation destination, PassabilityGrid grid
     ) throws GameActionException {
-        MapLocation[] circumference = getCircumferencePoints(current);
+        MapLocation[] circumference = getCircumferencePoints(current, sensorRadius);
         double radians = Math.atan((destination.y-current.y) / Math.max(destination.x - current.x, 0.1));
         MapLocation minima = null;
         double maxFac = 0;

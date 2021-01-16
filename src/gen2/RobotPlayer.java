@@ -21,7 +21,7 @@ public strictfp class RobotPlayer {
     public static int actionRadius, sensorRadius, detectionRadius;
     public static RobotType mType;
     public static MapLocation spawnerLocation;
-    public static int enlightenmentCenterId;
+    public static int enlightenmentCenterId, roundNumber;
 
 
 
@@ -81,6 +81,8 @@ public strictfp class RobotPlayer {
 
         while (rc.getRoundNum() <= GameConstants.GAME_MAX_NUMBER_OF_ROUNDS) {
             try {
+                roundNumber = rc.getRoundNum();
+
                 // slanderer will convert to politician in 300 rounds, watch for changes
                 if (mType != rc.getType()) {
                     mType = rc.getType();
@@ -123,13 +125,6 @@ public strictfp class RobotPlayer {
                         break;
                     case MUCKRAKER:
                         MuckrakerFlag.updateFlag();
-                }
-
-                if (DEBUG) {
-                    float k = 0f;
-                    if (Clock.getBytecodesLeft() < 1000 * k) {
-                        System.out.println("ByteCodes left under " + k + "k: " + Clock.getBytecodesLeft());
-                    }
                 }
 
                 Clock.yield();

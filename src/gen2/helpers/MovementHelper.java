@@ -8,6 +8,7 @@ import static gen2.RobotPlayer.*;
 import static gen2.util.Functions.convolveCircularly;
 
 
+import gen2.util.Logger;
 import gen2.util.Pair;
 import gen2.util.Functions;
 import gen2.util.PassabilityGrid;
@@ -16,6 +17,7 @@ public class MovementHelper {
 
     // max acceptable crowding ratio in a direction
     public static final double RATIO_CROWDING = 0.33;
+    public static final int RADIUS_CROWDING = actionRadius;
 
     // 1 means no restriction, 1< means restriction
     public static final double DIAGONAL_MOVEMENT_REDUCTION_FACTOR = 1;
@@ -67,10 +69,10 @@ public class MovementHelper {
 
     public static Direction getAntiCrowdingDirection(MapLocation current) throws GameActionException {
         byte[] occupied = new byte[8], total = new byte[8];
-        int rad = (int) Math.sqrt(detectionRadius);
-        PassabilityGrid grid = new PassabilityGrid(current, detectionRadius);
+        int rad = (int) Math.sqrt(RADIUS_CROWDING);
+        PassabilityGrid grid = new PassabilityGrid(current, RADIUS_CROWDING);
         for (int x = -rad; x <= rad; x++) {
-            int limY = (int) Math.sqrt(detectionRadius - x*x);
+            int limY = (int) Math.sqrt(RADIUS_CROWDING - x*x);
             for (int y = -limY; y <= limY; y++) {
                 MapLocation ml = new MapLocation(x+current.x, y+current.y);
                 int dirInd = directionList.indexOf(current.directionTo(ml));
@@ -99,7 +101,6 @@ public class MovementHelper {
         if (maxRatio <= RATIO_CROWDING) {
             return null;
         }
-
         return directions[(maxInd+4)%8];
     }
 
@@ -115,12 +116,8 @@ public class MovementHelper {
         } else {
             // optimise for shorter and longer movements
             if (rc.canMove(dir)) {
-                try {
-                    rc.move(dir);
-                    return true;
-                } catch (GameActionException e) {
-                    return false;
-                }
+                rc.move(dir);
+                return true;
             } else if (rc.getCooldownTurns() < 1) {
                 int dirInt = directionList.indexOf(dir);
                 // if blocked by another robot, find the next best direction
@@ -139,11 +136,9 @@ public class MovementHelper {
                         }
                     }
                 }
-                return false;
-            } else {
-                return false;
             }
         }
+        return false;
     }
 
 
@@ -160,7 +155,10 @@ public class MovementHelper {
     public static ArrayList<Direction> getShortestRoute(
             MapLocation current, MapLocation destination, PassabilityGrid passability
     ) throws GameActionException {
+        Logger logger = new Logger("dijkstras");
+
         int size = passability.diameter;
+        int srcToDesInd = directionList.indexOf(current.directionTo(destination));
         MapLocation source = new MapLocation(size / 2, size / 2);
         destination = new MapLocation(destination.x + size / 2 - current.x, destination.y + size / 2 - current.y);
 
@@ -173,18 +171,12 @@ public class MovementHelper {
         distance[source.x][source.y] = 0;
 
         MapLocation[][] parent = new MapLocation[size][size];
-        for (int x = 0; x < size; ++x) {
-            for (int y = 0; y < size; ++y) {
-                parent[x][y] = new MapLocation(-1, -1);
-            }
-        }
+        logger.log("adj matrix");
 
         boolean[][] visited = new boolean[size][size];
         PriorityQueue<Pair<Double, MapLocation>> pq = new PriorityQueue<>(Comparator.comparingDouble(x -> x.key));
         pq.add(new Pair<>(0d, source));
-
-        int[] dx = {0, 0, 1, -1, 1, 1, -1, -1};
-        int[] dy = {1, -1, 0, 0, -1, 1, 1, -1};
+        logger.log("pq init");
 
         while (!pq.isEmpty()) {
             MapLocation cur = pq.poll().value;
@@ -193,8 +185,9 @@ public class MovementHelper {
             }
 
             visited[cur.x][cur.y] = true;
-            for (int i = 0; i < 8; ++i) {
-                MapLocation loc = new MapLocation(cur.x + dx[i], cur.y + dy[i]);
+            for (int i = -1; i < 1; ++i) {
+                Direction d = directions[Math.floorMod(srcToDesInd+i, 8)];
+                MapLocation loc = new MapLocation(cur.x + d.dx, cur.y + d.dy);
                 if (loc.x < 0 || loc.x >= size || loc.y < 0 || loc.y >= size) {
                     continue;
                 }
@@ -213,6 +206,8 @@ public class MovementHelper {
             }
         }
 
+        logger.log("main algo");
+
         if (distance[destination.x][destination.y] >= INFINITY) {
             return null;
         }
@@ -224,6 +219,7 @@ public class MovementHelper {
             route.add(parent[loc.x][loc.y].directionTo(loc));
             loc = parent[loc.x][loc.y];
         }
+        logger.flush();
         return route;
     }
 }

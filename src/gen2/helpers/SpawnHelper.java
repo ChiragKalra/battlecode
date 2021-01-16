@@ -3,6 +3,7 @@ package gen2.helpers;
 import battlecode.common.*;
 import gen2.util.PassabilityGrid;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -50,10 +51,10 @@ public class SpawnHelper {
         }
     }
 
-    public static HashSet<Integer>
-            wanderingMuckrakers = new HashSet<>(),
-            scannedMuckrakers = new HashSet<>();
-    public static final HashSet<Integer> placedMuckrakers = new HashSet<>();
+    public static ArrayList<Integer>
+            wanderingMuckrakers = new ArrayList<>(),
+            scannedMuckrakers = new ArrayList<>();
+    public static final ArrayList<Integer> placedMuckrakers = new ArrayList<>();
     public static boolean spawnMuckraker() throws GameActionException {
         Direction dir = getOptimalDirection(getDirectionFromAdjacentFlags(rc.getLocation()));
         if (dir == null ) {

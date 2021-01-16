@@ -1,6 +1,7 @@
 package gen2.helpers;
 
 import battlecode.common.*;
+import gen2.util.DirectionFeeder;
 import gen2.util.Pair;
 import gen2.util.PassabilityGrid;
 
@@ -80,11 +81,9 @@ public class GridHelper {
         }
 
         Direction adj = getDirectionFromAdjacentFlags(current);
-
         if (adj == null) {
             return null;
         }
-
         // select random direction out of adjacent muckrakers
         return new Pair<>(adj, false);
     }
@@ -138,74 +137,44 @@ public class GridHelper {
         return null;
     }
 
+    /*
+     * @return
+     *      1. direction feeder to vacancy
+     *      2. null if no vacancy nearby
+     *
+     */
+    public static DirectionFeeder getDirectionsToVacancy () throws GameActionException {
+        MapLocation mLoc = rc.getLocation(), vacantSpot = checkVacantSpot(mLoc);
+        if (vacantSpot != null) {
+            ArrayList<Direction> route = getShortestRoute(mLoc, vacantSpot, new PassabilityGrid(mLoc, sensorRadius));
+            if (route != null) {
+                return new DirectionFeeder(route);
+            }
+        }
+        return null;
+    }
 
-    private static ArrayList<Direction> movesToVacant = null;
 
     /*
      * @return
-     *      1. next direction to move to if vacancy detected nearby
-     *      2. next direction to move to if directed by other muckrakers
-     *      3. next random direction to move to
+     *      1. next direction to move to if directed by other muckrakers
+     *      2. next random direction to move to
      *
      */
-    public static Direction getNextDirection(MapLocation mLoc) throws GameActionException {
-        // if movesToVacant is not empty return next move
-        if (movesToVacant != null) {
-            if (movesToVacant.isEmpty()) {
-                movesToVacant = null;
-            } else {
-                Direction ret = movesToVacant.get(movesToVacant.size() - 1);
-                // if blockage in path, re-compute path
-                if (rc.canMove(ret)) {
-                    movesToVacant.remove(movesToVacant.size() - 1);
-                    return ret;
-                }
-            }
-        }
-
-        // direct away from ECs to not absorb damage by pols
-        for (RobotInfo ri : rc.senseNearbyRobots(AVOID_EC_RADIUS_SQUARED)) {
-            if (ri.team != mTeam && ri.type == RobotType.ENLIGHTENMENT_CENTER) {
-                return ri.location.directionTo(rc.getLocation());
-            }
-        }
-
-        PassabilityGrid passability = new PassabilityGrid(mLoc, sensorRadius);
-
-        MapLocation vacantSpot = checkVacantSpot(mLoc);
-        if (vacantSpot != null) {
-            movesToVacant = getShortestRoute(mLoc, vacantSpot, passability);
-            if (movesToVacant != null) {
-                return getNextDirection(mLoc);
-            }
-        }
-
+    public static Direction getNextDirection() throws GameActionException {
         ArrayList<Direction> selected = new ArrayList<>();
         RobotInfo[] fellow = rc.senseNearbyRobots(sensorRadius, mTeam);
         for (RobotInfo ri : fellow) {
-            if (ri.type == RobotType.MUCKRAKER) {
-                try {
-                    int flag = rc.getFlag(ri.getID());
-                    if (isPlaced(flag)) {
-                        Direction dir = getDirection(flag);
-                        if (dir != null) {
-                            selected.add(dir);
-                        }
+            if (ri.type == RobotType.MUCKRAKER && rc.canGetFlag(ri.getID())) {
+                int flag = rc.getFlag(ri.getID());
+                if (isPlaced(flag)) {
+                    Direction dir = getDirection(flag);
+                    if (dir != null) {
+                        selected.add(dir);
                     }
-                } catch (GameActionException ignored) { }
+                }
             }
         }
-
-        /*
-        TODO : REPLACE
-        vacantSpot = getOptimalLocationInDirection(mLoc, decided, passability);
-        if (vacantSpot != null) {
-            movesToVacant = getShortestRoute(mLoc, vacantSpot, passability);
-            if (movesToVacant != null) {
-                return getNextDirection(mLoc);
-            }
-        }
-        */
         return selected.isEmpty() ? getRandomDirection() : (Direction) getRandom(selected.toArray());
     }
 }

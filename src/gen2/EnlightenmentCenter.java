@@ -6,8 +6,7 @@ import gen2.util.Pair;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import static gen2.RobotPlayer.log;
-import static gen2.RobotPlayer.rc;
+import static gen2.RobotPlayer.*;
 import static gen2.flags.MuckrakerFlag.*;
 import static gen2.helpers.SpawnHelper.*;
 
@@ -43,10 +42,12 @@ public strictfp class EnlightenmentCenter {
         ArrayList<Integer> dead = new ArrayList<>();
         if (!scannedMuckrakers.isEmpty() && wanderingMuckrakers.isEmpty()) {
             wanderingMuckrakers = scannedMuckrakers;
-            scannedMuckrakers = new HashSet<>();
+            scannedMuckrakers = new ArrayList<>();
         }
 
-        for (int id : wanderingMuckrakers) {
+        for (int i = wanderingMuckrakers.size()-1; i>=0; i--) {
+            int id = wanderingMuckrakers.get(i);
+            wanderingMuckrakers.remove(i);
             if (!rc.canGetFlag(id)) {
                 // muckraker has been martyred
                 dead.add(id);
@@ -73,21 +74,9 @@ public strictfp class EnlightenmentCenter {
                 }
             }
 
-            if (Clock.getBytecodesLeft() < 2000) {
+            if (rc.getRoundNum() > roundNumber) {
                 break;
             }
-        }
-        // remove scanned mucks
-        for (int id : scannedMuckrakers) {
-            wanderingMuckrakers.remove(id);
-        }
-        // remove placed mucks
-        for (int id : placedMuckrakers) {
-            wanderingMuckrakers.remove(id);
-        }
-        // remove dead mucks
-        for (int id : dead) {
-            wanderingMuckrakers.remove(id);
         }
     }
 
