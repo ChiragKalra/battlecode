@@ -85,23 +85,11 @@ public class AttackHelper {
         return false;
     }
 
-    public static Pair<MapLocation, Integer> getNearbyEnemyEC() {
+    public static Pair<MapLocation, Integer> getNearbyEC(Team team) {
         // check nearby
-        RobotInfo[] nearby = rc.senseNearbyRobots();
+        RobotInfo[] nearby = rc.senseNearbyRobots(sensorRadius, team);
         for (RobotInfo ri: nearby) {
-            if (ri.team == enemyTeam && ri.type == RobotType.ENLIGHTENMENT_CENTER) {
-                return new Pair<>(ri.location, ri.conviction);
-            }
-        }
-        return null;
-    }
-
-
-    public static Pair<MapLocation, Integer> getNearbyNeutralEC() {
-        // check nearby
-        RobotInfo[] nearby = rc.senseNearbyRobots();
-        for (RobotInfo ri: nearby) {
-            if (ri.team == Team.NEUTRAL && ri.type == RobotType.ENLIGHTENMENT_CENTER) {
+            if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
                 return new Pair<>(ri.location, ri.conviction);
             }
         }

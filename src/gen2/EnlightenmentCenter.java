@@ -3,6 +3,7 @@ package gen2;
 import battlecode.common.*;
 
 import gen2.flags.EnlightenmentCenterFlag;
+import gen2.flags.MuckrakerFlag;
 import gen2.util.SpawnType;
 
 import java.util.*;
@@ -34,6 +35,18 @@ public strictfp class EnlightenmentCenter {
 
 
     public static void scanMuckrakerFlagsForECs () throws GameActionException {
+        for (RobotInfo ri: rc.senseNearbyRobots(sensorRadius, mTeam)) {
+            if (ri.type == RobotType.MUCKRAKER) {
+                int flag = rc.getFlag(ri.getID());
+                if (MuckrakerFlag.isBroadcastingEnemyECForTeam(flag)) {
+                    detectedECs.put(
+                            getCoordinatesFromFlag(flag),
+                            1
+                    );
+                }
+            }
+        }
+
         for (int i = wanderingMuckrakers.size()-1; i>=0; i--) {
             int id = wanderingMuckrakers.get(i);
             wanderingMuckrakers.remove(i);

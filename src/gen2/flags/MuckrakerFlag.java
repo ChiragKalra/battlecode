@@ -22,8 +22,8 @@ import static gen2.helpers.MovementHelper.*;
 
            2  , 0   -> broadcasting neutral EC coordinates;
            3  , 0   -> broadcasting enemy EC coordinates;
+           4  , 0   -> broadcasting enemy EC coordinates for nearby Team EC;
 
-           4  , 0   -> free;
            5  , 0   -> free;
            6  , 0   -> free;
            7  , 0   -> free;
@@ -72,6 +72,13 @@ public class MuckrakerFlag {
         return flag % 8 == 3;
     }
 
+    public static boolean isBroadcastingEnemyECForTeam (int flag) {
+        if ((flag & 8) == 8) {
+            return false;
+        }
+        return flag % 8 == 4;
+    }
+
     public static MapLocation getCoordinatesFromFlag(int flag) {
         int relX = (flag >> 7) % 128 - 63,
                 relY = (flag >> 14) % 128 - 63;
@@ -96,7 +103,7 @@ public class MuckrakerFlag {
     public static void updateFlagForEC () throws GameActionException {
         int prevFlag = rc.getFlag(rc.getID()), newFlag = 0;
         // set enemy/neutral enlightenment center location
-        Pair<MapLocation, Integer> got = getNearbyNeutralEC();
+        Pair<MapLocation, Integer> got = getNearbyEC(Team.NEUTRAL);
         if (got != null && !ecsBroadcasts.containsKey(got.key)) {
             int relX = got.key.x - spawnerLocation.x + 63,
                     relY = got.key.y - spawnerLocation.y + 63,
@@ -108,7 +115,7 @@ public class MuckrakerFlag {
             newFlag += relY << 14;
             newFlag += hp << 21;
         } else {
-            got = getNearbyEnemyEC();
+            got = getNearbyEC(mTeam.opponent());
             if (got != null && !ecsBroadcasts.containsKey(got.key)) {
                 int relX = got.key.x - spawnerLocation.x + 63,
                         relY = got.key.y - spawnerLocation.y + 63,
@@ -128,6 +135,32 @@ public class MuckrakerFlag {
         }
     }
 
+    // update flag if EC nearby for 10 full rounds
+    public static boolean updateFlagForECNearby () throws GameActionException {
+        int prevFlag = rc.getFlag(rc.getID()), newFlag = prevFlag,
+                ecFlag = rc.getFlag(enlightenmentCenterId);
+
+        // set enemy/neutral enlightenment center location
+        Pair<MapLocation, Integer> got = getNearbyEC(mTeam);
+        if (got != null && !ecsBroadcasts.containsKey(got.key) && EnlightenmentCenterFlag.isAttackType(ecFlag)) {
+            MapLocation mapLocation = EnlightenmentCenterFlag.getAttackCoordinates(ecFlag);
+            int relX = mapLocation.x - got.key.x + 63,
+                    relY = mapLocation.y - got.key.y + 63;
+
+            ecsBroadcasts.put(got.key, COOLDOWN_EC_BROADCAST);
+            newFlag = 4;
+            newFlag += relX << 7;
+            newFlag += relY << 14;
+        }
+
+        // update
+        if (newFlag != prevFlag) {
+            rc.setFlag(newFlag);
+            return true;
+        }
+        return false;
+    }
+
     private static int updateSlandererAdjacentBit(int flag) {
     	// 5       - slanderer adjacent
     	for (RobotInfo robot : rc.senseNearbyRobots(sensorRadius, mTeam)) {
@@ -142,11 +175,15 @@ public class MuckrakerFlag {
     }
 
     // check for flag changes and set flag
+    private static boolean broadcastToNearEC = false;
     public static void updateFlag() throws GameActionException {
         int prevFlag = rc.getFlag(rc.getID()), newFlag = 0;
 
         // set vacant grid location direction
         if (placed) {
+            if (!broadcastToNearEC) {
+                broadcastToNearEC = updateFlagForECNearby();
+            }
             Pair<Direction, Boolean> direction = getGridDirectionForFlag();
             if (direction == null) {
                 newFlag = 1;
