@@ -20,6 +20,9 @@ public strictfp class Politician {
         int flag = rc.getFlag(enlightenmentCenterId);
         if (isAttackType) {
             attackLocation = getAttackCoordinates(flag);
+            if (targetAlreadyCaptured(attackLocation)) {
+                attackLocation = null;
+            }
         }
     }
 

@@ -13,8 +13,8 @@ import static gen2.helpers.TerrainHelper.getOptimalLocation;
 
 public class AttackHelper {
 
-    private static final double ATTACK_THRESHOLD_RATIO = 0.9;
-    private static final double ATTACK_AFTER_ROUNDS = 4;
+    private static final double ATTACK_THRESHOLD_RATIO = 0.6;
+    private static final double ATTACK_AFTER_ROUNDS = 0;
 
     private static final HashMap<MapLocation, Integer> roundsNotAttackedEC = new HashMap<>();
 
@@ -43,11 +43,19 @@ public class AttackHelper {
         return sum.directionTo(curr);
     }
 
+
+    private static final HashSet<MapLocation> captured = new HashSet<>();
     public static boolean targetAlreadyCaptured(MapLocation target) throws GameActionException {
+        if (captured.contains(target)) {
+            return true;
+        }
         if (target.isWithinDistanceSquared(rc.getLocation(), sensorRadius)) {
             RobotInfo ri = rc.senseRobotAtLocation(target);
             if (ri != null) {
-                return ri.team == mTeam;
+                if (ri.team == mTeam) {
+                    captured.add(target);
+                    return true;
+                }
             }
         }
         return false;
@@ -106,7 +114,7 @@ public class AttackHelper {
      */
 
     public static Direction getNextDirection(MapLocation mLoc, MapLocation ec) throws GameActionException {
-        if (isAttackType || ec == null) {
+        if (!isAttackType || ec == null) {
             //TODO WALL TYPE POLITICIAN
             return getRandomDirection();
         }

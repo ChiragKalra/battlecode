@@ -44,5 +44,9 @@ public strictfp class Muckraker {
                 }
             }
         }
+
+        if (placed) {
+            MuckrakerFlag.updateFlagIfECNearby();
+        }
     }
 }

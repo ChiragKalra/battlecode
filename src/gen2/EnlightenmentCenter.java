@@ -34,6 +34,38 @@ public strictfp class EnlightenmentCenter {
     public static MapLocation targetEC;
 
 
+    public static void scanMuckrakersForCapturedECs () throws GameActionException {
+        for (int i = placedMuckrakers.size()-1; i>=0; i--) {
+            int id = placedMuckrakers.get(i);
+            if (rc.canGetFlag(id)) {
+                int flag = rc.getFlag(id);
+                if (!isPlaced(flag)) {
+                    if (isBroadcastingCaptured(flag)) {
+                        MapLocation got = getCoordinatesFromFlag(flag);
+                        detectedECs.remove(got);
+                        if (targetEC.equals(got)) {
+                            if (detectedECs.isEmpty()) {
+                                targetEC = null;
+                            } else {
+                                targetEC = Collections.min(
+                                        detectedECs.entrySet(),
+                                        Comparator.comparingInt(Map.Entry::getValue)
+                                ).getKey();
+                                EnlightenmentCenterFlag.broadcastAttackCoordinates(targetEC);
+                            }
+                        }
+                    }
+                }
+            } else {
+                placedMuckrakers.remove(i);
+            }
+            if (rc.getRoundNum() > roundNumber) {
+                return;
+            }
+        }
+    }
+
+
     public static void scanMuckrakerFlagsForECs () throws GameActionException {
         for (RobotInfo ri: rc.senseNearbyRobots(sensorRadius, mTeam)) {
             if (ri.type == RobotType.MUCKRAKER) {
@@ -139,6 +171,9 @@ public strictfp class EnlightenmentCenter {
             RATIO_UNITS += RATIO_BID;
         }
 
+        if (rc.getRoundNum() > 150) {
+            scanMuckrakersForCapturedECs();
+        }
         if (rc.getRoundNum() > 50) {
             scanMuckrakerFlagsForECs();
         }

@@ -23,8 +23,8 @@ import static gen2.helpers.MovementHelper.*;
            2  , 0   -> broadcasting neutral EC coordinates;
            3  , 0   -> broadcasting enemy EC coordinates;
            4  , 0   -> broadcasting enemy EC coordinates for nearby Team EC;
+           5  , 0   -> broadcast captured EC coordinates;
 
-           5  , 0   -> free;
            6  , 0   -> free;
            7  , 0   -> free;
  4       - directly observed vacancy
@@ -47,9 +47,6 @@ public class MuckrakerFlag {
     public static boolean isPlaced (int flag) {
         return (flag % 16) == 1 || (flag & 8) == 8;
     }
-    public static boolean hasVacancyNearby (int flag) {
-        return (flag & 16) == 16;
-    }
 
     public static Direction getDirection(int flag) {
         if ((flag & 8) != 8) {
@@ -63,6 +60,13 @@ public class MuckrakerFlag {
             return false;
         }
         return flag % 8 == 2;
+    }
+
+    public static boolean isBroadcastingCaptured(int flag) {
+        if ((flag & 8) == 8) {
+            return false;
+        }
+        return flag % 8 == 5;
     }
 
     public static boolean isBroadcastingEnemyEC(int flag) {
@@ -97,7 +101,9 @@ public class MuckrakerFlag {
     	return (flag & (1 << 5)) != 0;
     }
 
-    private static final HashMap<MapLocation, Integer> ecsBroadcasts = new HashMap<>();
+    private static final HashMap<MapLocation, Integer>
+            ecsBroadcasts = new HashMap<>(),
+            capturedBroadcasts = new HashMap<>();
 
     // update flag if EC nearby for 10 full rounds
     public static void updateFlagForEC () throws GameActionException {
@@ -135,19 +141,18 @@ public class MuckrakerFlag {
         }
     }
 
-    // update flag if EC nearby for 10 full rounds
     public static boolean updateFlagForECNearby () throws GameActionException {
         int prevFlag = rc.getFlag(rc.getID()), newFlag = prevFlag,
                 ecFlag = rc.getFlag(enlightenmentCenterId);
 
         // set enemy/neutral enlightenment center location
         Pair<MapLocation, Integer> got = getNearbyEC(mTeam);
-        if (got != null && !ecsBroadcasts.containsKey(got.key) && EnlightenmentCenterFlag.isAttackType(ecFlag)) {
+        if (got != null && got.key != spawnerLocation &&
+                !ecsBroadcasts.containsKey(got.key) && EnlightenmentCenterFlag.isAttackType(ecFlag)) {
             MapLocation mapLocation = EnlightenmentCenterFlag.getAttackCoordinates(ecFlag);
             int relX = mapLocation.x - got.key.x + 63,
                     relY = mapLocation.y - got.key.y + 63;
 
-            ecsBroadcasts.put(got.key, COOLDOWN_EC_BROADCAST);
             newFlag = 4;
             newFlag += relX << 7;
             newFlag += relY << 14;
@@ -159,6 +164,29 @@ public class MuckrakerFlag {
             return true;
         }
         return false;
+    }
+
+    public static void updateFlagIfECNearby () throws GameActionException {
+        int prevFlag = rc.getFlag(rc.getID()), newFlag = prevFlag,
+                ecFlag = rc.getFlag(enlightenmentCenterId);
+
+        // set enemy/neutral enlightenment center location
+        Pair<MapLocation, Integer> got = getNearbyEC(mTeam);
+        if (got != null && got.key != spawnerLocation &&
+                !capturedBroadcasts.containsKey(got.key) && EnlightenmentCenterFlag.isAttackType(ecFlag)) {
+            int relX = got.key.x - spawnerLocation.x + 63,
+                    relY = got.key.y - spawnerLocation.y + 63;
+
+            capturedBroadcasts.put(got.key, COOLDOWN_EC_BROADCAST);
+            newFlag = 5;
+            newFlag += relX << 7;
+            newFlag += relY << 14;
+        }
+
+        // update
+        if (newFlag != prevFlag) {
+            rc.setFlag(newFlag);
+        }
     }
 
     private static int updateSlandererAdjacentBit(int flag) {
@@ -175,21 +203,19 @@ public class MuckrakerFlag {
     }
 
     // check for flag changes and set flag
-    private static boolean broadcastToNearEC = false;
     public static void updateFlag() throws GameActionException {
         int prevFlag = rc.getFlag(rc.getID()), newFlag = 0;
 
         // set vacant grid location direction
         if (placed) {
-            if (!broadcastToNearEC) {
-                broadcastToNearEC = updateFlagForECNearby();
-            }
-            Pair<Direction, Boolean> direction = getGridDirectionForFlag();
-            if (direction == null) {
-                newFlag = 1;
-            } else {
-                int threeBit = directionList.indexOf(direction.key);
-                newFlag = threeBit + 8;
+            if (!updateFlagForECNearby()) {
+                Pair<Direction, Boolean> direction = getGridDirectionForFlag();
+                if (direction == null) {
+                    newFlag = 1;
+                } else {
+                    int threeBit = directionList.indexOf(direction.key);
+                    newFlag = threeBit + 8;
+                }
             }
         }
 
@@ -200,6 +226,15 @@ public class MuckrakerFlag {
             if (count > 0) {
                 ecsBroadcasts.put(key, count-1);
                 allowUpdate = false;
+            }
+        }
+        if (allowUpdate) {
+            for (MapLocation key: capturedBroadcasts.keySet()) {
+                Integer count = capturedBroadcasts.get(key);
+                if (count > 0) {
+                    capturedBroadcasts.put(key, count-1);
+                    allowUpdate = false;
+                }
             }
         }
 

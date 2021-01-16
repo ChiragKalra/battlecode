@@ -134,11 +134,13 @@ public strictfp class RobotPlayer {
                         MuckrakerFlag.updateFlag();
                 }
 
-                if (roundNumber != rc.getRoundNum() && mType==RobotType.POLITICIAN) {
+                if (roundNumber != rc.getRoundNum() && mType!=RobotType.SLANDERER) {
                     logger.flush();
                 }
 
-                Clock.yield();
+                if (roundNumber == rc.getRoundNum()) {
+                    Clock.yield();
+                }
             } catch (Exception e) {
                 if (DEBUG) {
                     e.printStackTrace();
