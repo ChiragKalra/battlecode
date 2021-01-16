@@ -1,54 +1,27 @@
 package gen2.helpers;
 
-import battlecode.common.*;
+import battlecode.common.Direction;
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
+import battlecode.common.RobotType;
 import gen2.util.PassabilityGrid;
+import gen2.util.SpawnType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 
 import static gen2.EnlightenmentCenter.*;
+import static gen2.RobotPlayer.rc;
+import static gen2.RobotPlayer.sensorRadius;
 import static gen2.flags.EnlightenmentCenterFlag.broadcastAttackCoordinates;
 import static gen2.helpers.GridHelper.getDirectionFromAdjacentFlags;
 import static gen2.helpers.MovementHelper.*;
-import static gen2.RobotPlayer.*;
-import static gen2.util.Functions.sigmoid;
 
 public class SpawnHelper {
 
     private static int slandererHPFloor (int hp) {
         double func = (0.02 + 0.03*Math.exp(-0.001*hp))*hp;
         return (int) Math.ceil(Math.floor(func)/func*hp);
-    }
-
-    private static double getMuckrakerProbability (int round) {
-        return 1 - 0.8*sigmoid((round-225)/35.0);
-    }
-
-    private static double getPoliticianProbability (int round) {
-        return sigmoid((round-300)/45.0);
-    }
-
-    private static double getSlandererProbability (int round) {
-        return sigmoid((round-400)/60.0);
-    }
-
-    public static RobotType getOptimalType() {
-        int round = rc.getRoundNum();
-        double mr = getMuckrakerProbability(round),
-                pol = getPoliticianProbability(round),
-                slan = getSlandererProbability(round),
-                total = mr + pol + slan,
-                rand = Math.random();
-        mr /= total;
-        pol /= total;
-        if (rand < mr) {
-            return RobotType.MUCKRAKER;
-        } else if (rand < mr + pol) {
-            return RobotType.POLITICIAN;
-        } else {
-            return RobotType.SLANDERER;
-        }
     }
 
     public static ArrayList<Integer>
@@ -60,7 +33,7 @@ public class SpawnHelper {
         if (dir == null ) {
             return false;
         }
-        int xp = FACTOR_MUCKRAKER_HP;
+        int xp = SpawnType.Muckraker.minHp;
         if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, xp)) {
             rc.buildRobot(RobotType.MUCKRAKER, dir, xp);
             wanderingMuckrakers.add(rc.senseRobotAtLocation(rc.getLocation().add(dir)).getID());
@@ -70,14 +43,17 @@ public class SpawnHelper {
     }
 
     public static final HashMap<MapLocation, Integer> attackPoliticiansBuilt = new HashMap<>();
-    public static boolean spawnAttackPolitician (MapLocation toAttack, int hp) throws GameActionException {
+    public static boolean spawnAttackPolitician (MapLocation toAttack) throws GameActionException {
         Direction dir = getOptimalDirection(rc.getLocation().directionTo(toAttack));
         if (dir == null) {
             return false;
         }
-        int xp = hp + 11;
+        int hp = slandererHPFloor((int)(xpDelta*RATIO_UNITS)), xp = hp + 11;
         if (rc.canBuildRobot(RobotType.POLITICIAN, dir, xp)) {
-            broadcastAttackCoordinates(toAttack);
+            if (toAttack != null) {
+                detectedECs.put(toAttack, detectedECs.get(toAttack)-hp);
+                broadcastAttackCoordinates(toAttack);
+            }
             rc.buildRobot(RobotType.POLITICIAN, dir, xp);
             attackPoliticiansBuilt.put(toAttack, rc.senseRobotAtLocation(rc.getLocation().add(dir)).getID());
             return true;

@@ -2,44 +2,35 @@ package gen2;
 
 import battlecode.common.*;
 import gen2.util.Pair;
+import gen2.util.SpawnType;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.*;
 
 import static gen2.RobotPlayer.*;
 import static gen2.flags.MuckrakerFlag.*;
 import static gen2.helpers.SpawnHelper.*;
+import static gen2.util.SpawnType.*;
 
 
 public strictfp class EnlightenmentCenter {
-    public static final int FACTOR_MUCKRAKER_HP = 1;
-    public static final int
-            COOLDOWN_SLANDERER = 5,
-            COOLDOWN_POLITICIAN = 4,
-            COOLDOWN_MUCKRAKER = 1;
 
     public static final double RATIO_BID = 0.6;
-    //public static final double RATIO_UNITS = 0.2;
+    public static final double RATIO_UNITS = 0.2;
 
-    //public static int xpDelta= 0;
-    //public static int[] xpAtRound = new int[1501];
+    public static int xpDelta= 0;
+    public static int[] xpAtRound = new int[1501];
 
     private static int mCooldown = 0;
 
-    public final static HashSet<Pair<MapLocation, Integer>>
-            // store detected neutral centers
-            neutralECs = new HashSet<>(),
-            // move if pols sent to capture, remove if captured
-            neutralPolsSent = new HashSet<>(),
-            // store detected neutral centers
-            enemyECs = new HashSet<>();
+    public final static HashMap<MapLocation, Integer> detectedECs = new HashMap<>();
+
+    public static MapLocation targetEC;
 
 
     public static void scanMuckrakerFlagsForVacancies() {
     }
 
     public static void scanMuckrakerFlagsForECs () throws GameActionException {
-        ArrayList<Integer> dead = new ArrayList<>();
         if (!scannedMuckrakers.isEmpty() && wanderingMuckrakers.isEmpty()) {
             wanderingMuckrakers = scannedMuckrakers;
             scannedMuckrakers = new ArrayList<>();
@@ -49,24 +40,18 @@ public strictfp class EnlightenmentCenter {
             int id = wanderingMuckrakers.get(i);
             wanderingMuckrakers.remove(i);
             if (!rc.canGetFlag(id)) {
-                // muckraker has been martyred
-                dead.add(id);
-            } else {
                 int flag = rc.getFlag(id);
                 if (!isPlaced(flag)) {
                     if (isBroadcastingNeutralEC(flag)) {
-                        Pair<MapLocation, Integer> pair = new Pair<>(
-                                getCoordinatesFromFlag(flag), getNeutralHpFromFlag(flag)
+                        detectedECs.put(
+                                getCoordinatesFromFlag(flag),
+                                getNeutralHpFromFlag(flag)
                         );
-                        if (!neutralPolsSent.contains(pair)) {
-                            neutralECs.add(pair);
-                        }
-
-                    }
-                    if (isBroadcastingEnemyEC(flag)) {
-                        MapLocation ml = getCoordinatesFromFlag(flag);
-                        int hp = getEnemyHpFromFlag(flag);
-                        enemyECs.add(new Pair<>(ml, hp));
+                    } else if (isBroadcastingEnemyEC(flag)) {
+                        detectedECs.put(
+                                getCoordinatesFromFlag(flag),
+                                getEnemyHpFromFlag(flag)
+                        );
                     }
                     scannedMuckrakers.add(id);
                 } else {
@@ -74,8 +59,13 @@ public strictfp class EnlightenmentCenter {
                 }
             }
 
+            if ((targetEC==null || detectedECs.get(targetEC) <= 0) && !detectedECs.isEmpty()) {
+                // choose to attack the lowest HP EC
+                targetEC = Collections.min(detectedECs.entrySet(), Comparator.comparingInt(Map.Entry::getValue)).getKey();
+            }
+
             if (rc.getRoundNum() > roundNumber) {
-                break;
+                return;
             }
         }
     }
@@ -83,50 +73,38 @@ public strictfp class EnlightenmentCenter {
 
 
     private static boolean spawnOptimal() throws GameActionException {
+        SpawnType got = getOptimalType();
         boolean spawned = false;
-        if (!neutralECs.isEmpty()) {
-            for (Pair<MapLocation, Integer> got: neutralECs) {
-                if (spawnAttackPolitician(got.key, got.value + 50)) {
-                    neutralPolsSent.add(got);
-                    neutralECs.remove(got);
-                    spawned = true;
-                    break;
-                }
-            }
+        switch (got) {
+            case Muckraker:
+                spawned = spawnMuckraker();
+                break;
+            case AttackPolitician:
+                spawned = spawnAttackPolitician(targetEC);
+                break;
+            case DefensePolitician:
+                spawned = spawnDefencePolitician();
+                break;
+            case Slanderer:
+                spawned = spawnSlanderer();
+                break;
         }
+
         if (spawned) {
-            return true;
+            mCooldown += got.cooldown;
         }
 
-        switch (getOptimalType()) {
-            case MUCKRAKER:
-                if (spawnMuckraker()) {
-                    mCooldown += COOLDOWN_MUCKRAKER;
-                    return true;
-                }
-            case SLANDERER:
-                if (spawnSlanderer()) {
-                    mCooldown += COOLDOWN_SLANDERER;
-                    return true;
-                }
-            case POLITICIAN:
-                if (spawnDefencePolitician()) {
-                    mCooldown += COOLDOWN_POLITICIAN;
-                    return true;
-                }
-        }
-
-        return false;
+        return spawned;
     }
 
 
     public static void init() {
-        //xpAtRound[rc.getRoundNum()-1] = rc.getInfluence();
+        xpAtRound[rc.getRoundNum()-1] = rc.getInfluence();
     }
 
     public static void move() throws GameActionException {
-        //xpDelta = rc.getInfluence()-xpAtRound[rc.getRoundNum()-1];
-        //xpAtRound[rc.getRoundNum()] = rc.getInfluence();
+        xpDelta = rc.getInfluence()-xpAtRound[rc.getRoundNum()-1];
+        xpAtRound[rc.getRoundNum()] = rc.getInfluence();
 
         if (mCooldown > 0) {
             mCooldown--;

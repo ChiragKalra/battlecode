@@ -19,15 +19,12 @@ public class MovementHelper {
     public static final double RATIO_CROWDING = 0.33;
     public static final int RADIUS_CROWDING = actionRadius;
 
-    // 1 means no restriction, 1< means restriction
-    public static final double DIAGONAL_MOVEMENT_REDUCTION_FACTOR = 1;
-
     // adjacent direction preference factor
     public static final double[] DIRECTION_FACTOR = {.5, .25, .125, .0625, 0.03125};
 
     // movement precision
     @SuppressWarnings("unused")
-    public enum  Precision {
+    public enum Precision {
         MAX,
         MID,
         MIN
@@ -155,28 +152,18 @@ public class MovementHelper {
     public static ArrayList<Direction> getShortestRoute(
             MapLocation current, MapLocation destination, PassabilityGrid passability
     ) throws GameActionException {
-        Logger logger = new Logger("dijkstras");
-
         int size = passability.diameter;
         int srcToDesInd = directionList.indexOf(current.directionTo(destination));
         MapLocation source = new MapLocation(size / 2, size / 2);
         destination = new MapLocation(destination.x + size / 2 - current.x, destination.y + size / 2 - current.y);
 
-        double[][] distance = new double[size][size];
-        for (int x = 0; x < size; ++x) {
-            for (int y = 0; y < size; ++y) {
-                distance[x][y] = INFINITY;
-            }
-        }
-        distance[source.x][source.y] = 0;
-
+        Double[][] distance = new Double[size][size];
         MapLocation[][] parent = new MapLocation[size][size];
-        logger.log("adj matrix");
-
         boolean[][] visited = new boolean[size][size];
         PriorityQueue<Pair<Double, MapLocation>> pq = new PriorityQueue<>(Comparator.comparingDouble(x -> x.key));
+
+        distance[source.x][source.y] = 0d;
         pq.add(new Pair<>(0d, source));
-        logger.log("pq init");
 
         while (!pq.isEmpty()) {
             MapLocation cur = pq.poll().value;
@@ -197,18 +184,19 @@ public class MovementHelper {
 
                 // to reduce cross-walks
                 // double diagonalFactor = Math.abs(dx[i]) == Math.abs(dy[i]) ? DIAGONAL_MOVEMENT_REDUCTION_FACTOR : 1;
-                double edgeWeight = rc.getType().actionCooldown / passability.getIndexed(cur.x, cur.y);
-                if (distance[cur.x][cur.y] + edgeWeight < distance[loc.x][loc.y]) {
-                    distance[loc.x][loc.y] = distance[cur.x][cur.y] + edgeWeight;
-                    pq.add(new Pair<>(distance[loc.x][loc.y], new MapLocation(loc.x, loc.y)));
+                double edgeWeight = 1 / passability.getIndexed(cur.x, cur.y), curDis = distance[cur.x][cur.y];
+                if (distance[loc.x][loc.y] == null) {
+                    distance[loc.x][loc.y] = INFINITY;
+                }
+                if (curDis + edgeWeight < distance[loc.x][loc.y]) {
+                    double dis = distance[loc.x][loc.y] = curDis + edgeWeight;
+                    pq.add(new Pair<>(dis, loc));
                     parent[loc.x][loc.y] = cur;
                 }
             }
         }
 
-        logger.log("main algo");
-
-        if (distance[destination.x][destination.y] >= INFINITY) {
+        if (distance[destination.x][destination.y] == null || distance[destination.x][destination.y] >= INFINITY) {
             return null;
         }
 
@@ -219,7 +207,6 @@ public class MovementHelper {
             route.add(parent[loc.x][loc.y].directionTo(loc));
             loc = parent[loc.x][loc.y];
         }
-        logger.flush();
         return route;
     }
 }

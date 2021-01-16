@@ -6,6 +6,9 @@ import gen2.flags.EnlightenmentCenterFlag;
 import gen2.flags.MuckrakerFlag;
 import gen2.flags.PoliticianFlag;
 import gen2.flags.SlandererFlag;
+import gen2.util.Logger;
+
+import static gen2.flags.MuckrakerFlag.isPlaced;
 
 public strictfp class RobotPlayer {
     // toggle logging before competitive matches
@@ -82,6 +85,7 @@ public strictfp class RobotPlayer {
         while (rc.getRoundNum() <= GameConstants.GAME_MAX_NUMBER_OF_ROUNDS) {
             try {
                 roundNumber = rc.getRoundNum();
+                Logger logger = new Logger("full");
 
                 // slanderer will convert to politician in 300 rounds, watch for changes
                 if (mType != rc.getType()) {
@@ -111,6 +115,7 @@ public strictfp class RobotPlayer {
                         }
                         break;
                 }
+                logger.log("move");
 
                 // update flag at the end of each round
                 switch (mType) {
@@ -127,10 +132,14 @@ public strictfp class RobotPlayer {
                         MuckrakerFlag.updateFlag();
                 }
 
+                if (roundNumber != rc.getRoundNum() && mType==RobotType.ENLIGHTENMENT_CENTER) {
+                    logger.flush();
+                }
+
                 Clock.yield();
             } catch (Exception e) {
                 if (DEBUG) {
-                    e.printStackTrace();
+                    //e.printStackTrace();
                 }
             }
         }

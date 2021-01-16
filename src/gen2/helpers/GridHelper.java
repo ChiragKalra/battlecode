@@ -88,7 +88,7 @@ public class GridHelper {
         return new Pair<>(adj, false);
     }
 
-    private static final HashSet<MapLocation> nearestECs = new HashSet<>();
+    private static final ArrayList<MapLocation> nearestECs = new ArrayList<>();
     private static boolean isNotNearDetectedEC(MapLocation ml) {
         for (MapLocation loc: nearestECs) {
             if (loc.isWithinDistanceSquared(ml, AVOID_EC_RADIUS_SQUARED)) {
