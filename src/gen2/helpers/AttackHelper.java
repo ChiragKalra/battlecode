@@ -20,8 +20,19 @@ public class AttackHelper {
 
     // move pols away if lots of pol crowding within action radius
     public static Direction shouldBackOff () {
+        RobotInfo[] nearby = rc.senseNearbyRobots();
+        boolean nearbyEc = false;
+        for (RobotInfo ri: nearby) {
+            if (ri.team != mTeam && ri.type == RobotType.ENLIGHTENMENT_CENTER) {
+                nearbyEc = true;
+                break;
+            }
+        }
+        if (!nearbyEc) {
+            return null;
+        }
         MapLocation sum = rc.getLocation(), curr = sum;
-        for (RobotInfo ri: rc.senseNearbyRobots(actionRadius, mTeam)) {
+        for (RobotInfo ri: nearby) {
             if (ri.type == RobotType.POLITICIAN && ri.getConviction() > rc.getConviction()) {
                 sum = sum.translate(ri.getLocation().x - curr.x, ri.getLocation().y - curr.y);
             }

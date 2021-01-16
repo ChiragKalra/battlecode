@@ -126,12 +126,23 @@ public class GridHelper {
      *      2. null if no vacancy nearby
      *
      */
+    private static boolean exploded = false;
     public static DirectionFeeder getDirectionsToVacancy () throws GameActionException {
+        if (rc.getRoundNum() < 150 && !exploded) {
+            ArrayList<Direction> route = new ArrayList<>();
+            Direction d = spawnerLocation.directionTo(rc.getLocation());
+            for (int i = 0; i < 4*5; i++) {
+                route.add(d);
+            }
+            exploded = true;
+            return new DirectionFeeder(route, false);
+        }
+
         MapLocation mLoc = rc.getLocation(), vacantSpot = checkVacantSpot(mLoc);
         if (vacantSpot != null) {
             ArrayList<Direction> route = getShortestRoute(mLoc, vacantSpot, new PassabilityGrid(mLoc, sensorRadius));
             if (route != null) {
-                return new DirectionFeeder(route);
+                return new DirectionFeeder(route, true);
             }
         }
         return null;

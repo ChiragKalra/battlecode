@@ -40,7 +40,7 @@ public enum SpawnType {
     }
 
     private static double getMuckrakerProbability (int round) {
-        return 1 - 0.6*sigmoid((round-325)/35.0);
+        return 1 - 0.8*sigmoid((round-300)/25.0);
     }
 
     private static double getPoliticianProbability (int round) {
@@ -48,7 +48,7 @@ public enum SpawnType {
     }
 
     private static double getAttackPoliticianProbability (int round) {
-        return sigmoid((round-250)/60.0);
+        return sigmoid((round-200)/60.0);
     }
 
     private static double getSlandererProbability (int round) {

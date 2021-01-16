@@ -17,7 +17,7 @@ public strictfp class EnlightenmentCenter {
 
     public static double RATIO_BID = 0.6;
     public static double RATIO_UNITS = 0.2;
-    public static double RATIO_SPAWN_BUFF = 0.15;
+    public static double RATIO_SPAWN_BUFF = 0.3;
 
     public static int xpDelta= 0;
     public static int[] xpAtRound = new int[1501];

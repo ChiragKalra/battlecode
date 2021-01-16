@@ -8,9 +8,11 @@ import static gen2.RobotPlayer.rc;
 
 public class DirectionFeeder {
     public final ArrayList<Direction> directions;
+    private final boolean recomputePath;
 
-    public DirectionFeeder(ArrayList<Direction> directions) {
+    public DirectionFeeder(ArrayList<Direction> directions, Boolean recomputePath) {
         this.directions = directions;
+        this.recomputePath = recomputePath;
     }
 
     public boolean hasNext() {
@@ -21,7 +23,7 @@ public class DirectionFeeder {
         if (!directions.isEmpty()) {
             Direction ret = directions.get(directions.size() - 1);
             // if blockage in path, return null
-            if (rc.canMove(ret)) {
+            if (rc.canMove(ret) || !recomputePath) {
                 directions.remove(directions.size() - 1);
                 return ret;
             }
