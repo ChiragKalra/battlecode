@@ -8,11 +8,11 @@ import gen3.flags.EnlightenmentCenterFlag;
 import gen3.util.PassabilityGrid;
 import gen3.util.SpawnType;
 
-import static gen2.EnlightenmentCenter.RATIO_UNITS;
-import static gen2.EnlightenmentCenter.wanderingMuckrakers;
-import static gen2.RobotPlayer.*;
-import static gen2.helpers.GridHelper.getDirectionFromAdjacentFlags;
-import static gen2.helpers.MovementHelper.*;
+import static gen3.EnlightenmentCenter.RATIO_UNITS;
+import static gen3.EnlightenmentCenter.wanderingMuckrakers;
+import static gen3.RobotPlayer.*;
+import static gen3.helpers.GridHelper.getDirectionFromAdjacentFlags;
+import static gen3.helpers.MovementHelper.*;
 
 public class SpawnHelper {
 

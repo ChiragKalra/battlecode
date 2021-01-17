@@ -3,8 +3,8 @@ package gen3.util;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 
-import static gen2.RobotPlayer.rc;
-import static gen2.RobotPlayer.sensorRadius;
+import static gen3.RobotPlayer.rc;
+import static gen3.RobotPlayer.sensorRadius;
 
 @SuppressWarnings("unused")
 public class PassabilityGrid {

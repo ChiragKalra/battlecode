@@ -6,10 +6,10 @@ import battlecode.common.RobotInfo;
 import gen3.flags.MuckrakerFlag;
 import gen3.util.DirectionFeeder;
 
-import static gen2.RobotPlayer.*;
-import static gen2.helpers.GridHelper.*;
-import static gen2.helpers.MovementHelper.Precision;
-import static gen2.helpers.MovementHelper.tryMove;
+import static gen3.RobotPlayer.*;
+import static gen3.helpers.GridHelper.*;
+import static gen3.helpers.MovementHelper.Precision;
+import static gen3.helpers.MovementHelper.tryMove;
 
 
 public strictfp class Muckraker {

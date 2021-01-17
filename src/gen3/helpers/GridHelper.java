@@ -7,11 +7,11 @@ import gen3.util.PassabilityGrid;
 
 import java.util.ArrayList;
 
-import static gen2.RobotPlayer.*;
-import static gen2.flags.MuckrakerFlag.getDirection;
-import static gen2.flags.MuckrakerFlag.isPlaced;
-import static gen2.helpers.MovementHelper.*;
-import static gen2.util.Functions.getRandom;
+import static gen3.RobotPlayer.*;
+import static gen3.flags.MuckrakerFlag.getDirection;
+import static gen3.flags.MuckrakerFlag.isPlaced;
+import static gen3.helpers.MovementHelper.*;
+import static gen3.util.Functions.getRandom;
 
 
 // muckraker info grid formation helper

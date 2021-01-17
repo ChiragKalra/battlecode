@@ -4,7 +4,7 @@ import battlecode.common.Direction;
 
 import java.util.ArrayList;
 
-import static gen2.RobotPlayer.rc;
+import static gen3.RobotPlayer.rc;
 
 public class DirectionFeeder {
     public final ArrayList<Direction> directions;

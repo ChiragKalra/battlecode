@@ -2,7 +2,7 @@ package gen3.util;
 
 import battlecode.common.Clock;
 
-import static gen2.RobotPlayer.*;
+import static gen3.RobotPlayer.*;
 
 public class Logger {
     private final int start, startRN;

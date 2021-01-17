@@ -7,10 +7,10 @@ import gen3.util.SpawnType;
 
 import java.util.*;
 
-import static gen2.RobotPlayer.*;
-import static gen2.flags.MuckrakerFlag.*;
-import static gen2.helpers.SpawnHelper.*;
-import static gen2.util.SpawnType.getOptimalType;
+import static gen3.RobotPlayer.*;
+import static gen3.flags.MuckrakerFlag.*;
+import static gen3.helpers.SpawnHelper.*;
+import static gen3.util.SpawnType.getOptimalType;
 
 
 public strictfp class EnlightenmentCenter {

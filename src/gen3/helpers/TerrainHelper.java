@@ -6,7 +6,7 @@ import gen3.util.PassabilityGrid;
 
 import java.util.ArrayList;
 
-import static gen2.RobotPlayer.sensorRadius;
+import static gen3.RobotPlayer.sensorRadius;
 
 
 public class TerrainHelper {

@@ -4,12 +4,12 @@ import battlecode.common.Direction;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 
-import static gen2.RobotPlayer.*;
-import static gen2.flags.EnlightenmentCenterFlag.getAttackCoordinates;
-import static gen2.flags.EnlightenmentCenterFlag.isAttackType;
-import static gen2.helpers.AttackHelper.*;
-import static gen2.helpers.MovementHelper.Precision;
-import static gen2.helpers.MovementHelper.tryMove;
+import static gen3.RobotPlayer.*;
+import static gen3.flags.EnlightenmentCenterFlag.getAttackCoordinates;
+import static gen3.flags.EnlightenmentCenterFlag.isAttackType;
+import static gen3.helpers.AttackHelper.*;
+import static gen3.helpers.MovementHelper.Precision;
+import static gen3.helpers.MovementHelper.tryMove;
 
 
 public strictfp class Politician {

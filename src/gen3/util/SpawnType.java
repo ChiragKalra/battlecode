@@ -1,7 +1,7 @@
 package gen3.util;
 
-import static gen2.RobotPlayer.rc;
-import static gen2.util.Functions.sigmoid;
+import static gen3.RobotPlayer.rc;
+import static gen3.util.Functions.sigmoid;
 
 public enum SpawnType {
     AttackPolitician(4, 21, 500),

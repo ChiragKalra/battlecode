@@ -5,12 +5,12 @@ import gen3.util.Pair;
 
 import java.util.HashMap;
 
-import static gen2.Muckraker.placed;
-import static gen2.RobotPlayer.*;
-import static gen2.helpers.AttackHelper.getNearbyEC;
-import static gen2.helpers.GridHelper.getGridDirectionForFlag;
-import static gen2.helpers.MovementHelper.directionList;
-import static gen2.helpers.MovementHelper.directions;
+import static gen3.Muckraker.placed;
+import static gen3.RobotPlayer.*;
+import static gen3.helpers.AttackHelper.getNearbyEC;
+import static gen3.helpers.GridHelper.getGridDirectionForFlag;
+import static gen3.helpers.MovementHelper.directionList;
+import static gen3.helpers.MovementHelper.directions;
 
 
 /*

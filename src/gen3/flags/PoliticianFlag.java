@@ -3,7 +3,7 @@ package gen3.flags;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 
-import static gen2.RobotPlayer.spawnerLocation;
+import static gen3.RobotPlayer.spawnerLocation;
 
 
 /*

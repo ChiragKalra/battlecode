@@ -7,7 +7,7 @@ import gen3.flags.SlandererFlag;
 import gen3.flags.MuckrakerFlag;
 import gen3.util.Logger;
 
-import static gen2.Politician.isAttackType;
+import static gen3.Politician.isAttackType;
 
 public strictfp class RobotPlayer {
     // toggle logging before competitive matches

@@ -8,11 +8,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import static gen2.Politician.isAttackType;
-import static gen2.RobotPlayer.*;
-import static gen2.helpers.MovementHelper.getRandomDirection;
-import static gen2.helpers.MovementHelper.getShortestRoute;
-import static gen2.helpers.TerrainHelper.getOptimalLocation;
+import static gen3.Politician.isAttackType;
+import static gen3.RobotPlayer.*;
+import static gen3.helpers.MovementHelper.getRandomDirection;
+import static gen3.helpers.MovementHelper.getShortestRoute;
+import static gen3.helpers.TerrainHelper.getOptimalLocation;
 
 public class AttackHelper {
 

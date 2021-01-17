@@ -9,9 +9,9 @@ import gen3.util.PassabilityGrid;
 
 import java.util.*;
 
-import static gen2.RobotPlayer.actionRadius;
-import static gen2.RobotPlayer.rc;
-import static gen2.util.Functions.convolveCircularly;
+import static gen3.RobotPlayer.actionRadius;
+import static gen3.RobotPlayer.rc;
+import static gen3.util.Functions.convolveCircularly;
 
 public class MovementHelper {
 
