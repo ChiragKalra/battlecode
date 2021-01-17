@@ -1,12 +1,11 @@
-package gen2;
+package gen3;
 
 import battlecode.common.*;
-
-import gen2.flags.EnlightenmentCenterFlag;
-import gen2.flags.MuckrakerFlag;
-import gen2.flags.PoliticianFlag;
-import gen2.flags.SlandererFlag;
-import gen2.util.Logger;
+import gen3.flags.EnlightenmentCenterFlag;
+import gen3.flags.PoliticianFlag;
+import gen3.flags.SlandererFlag;
+import gen3.flags.MuckrakerFlag;
+import gen3.util.Logger;
 
 import static gen2.Politician.isAttackType;
 

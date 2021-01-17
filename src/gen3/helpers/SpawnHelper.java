@@ -1,13 +1,12 @@
-package gen2.helpers;
+package gen3.helpers;
 
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotType;
-import gen2.flags.EnlightenmentCenterFlag;
-import gen2.util.PassabilityGrid;
-import gen2.util.SpawnType;
-
+import gen3.flags.EnlightenmentCenterFlag;
+import gen3.util.PassabilityGrid;
+import gen3.util.SpawnType;
 
 import static gen2.EnlightenmentCenter.RATIO_UNITS;
 import static gen2.EnlightenmentCenter.wanderingMuckrakers;

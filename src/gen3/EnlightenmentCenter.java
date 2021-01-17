@@ -1,17 +1,16 @@
-package gen2;
+package gen3;
 
 import battlecode.common.*;
-
-import gen2.flags.EnlightenmentCenterFlag;
-import gen2.flags.MuckrakerFlag;
-import gen2.util.SpawnType;
+import gen3.flags.EnlightenmentCenterFlag;
+import gen3.flags.MuckrakerFlag;
+import gen3.util.SpawnType;
 
 import java.util.*;
 
 import static gen2.RobotPlayer.*;
 import static gen2.flags.MuckrakerFlag.*;
 import static gen2.helpers.SpawnHelper.*;
-import static gen2.util.SpawnType.*;
+import static gen2.util.SpawnType.getOptimalType;
 
 
 public strictfp class EnlightenmentCenter {

@@ -1,11 +1,15 @@
-package gen2;
+package gen3;
 
-import battlecode.common.*;
+import battlecode.common.Direction;
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
 
 import static gen2.RobotPlayer.*;
-import static gen2.helpers.MovementHelper.*;
+import static gen2.flags.EnlightenmentCenterFlag.getAttackCoordinates;
+import static gen2.flags.EnlightenmentCenterFlag.isAttackType;
 import static gen2.helpers.AttackHelper.*;
-import static gen2.flags.EnlightenmentCenterFlag.*;
+import static gen2.helpers.MovementHelper.Precision;
+import static gen2.helpers.MovementHelper.tryMove;
 
 
 public strictfp class Politician {
