@@ -98,10 +98,6 @@ public class MuckrakerFlag {
         return (int) Math.pow((flag >> 21) % 8, 10);
     }
 
-    public static boolean isAdjacentToSlanderer(int flag) {
-    	return (flag & (1 << 5)) != 0;
-    }
-
     private static final HashMap<MapLocation, Integer>
             ecsBroadcasts = new HashMap<>(),
             capturedBroadcasts = new HashMap<>();
@@ -190,19 +186,6 @@ public class MuckrakerFlag {
         }
     }
 
-    private static int updateSlandererAdjacentBit(int flag) {
-    	// 5       - slanderer adjacent
-    	for (RobotInfo robot : rc.senseNearbyRobots(sensorRadius, mTeam)) {
-        	if (robot.getType() == RobotType.SLANDERER && rc.getLocation().isAdjacentTo(robot.getLocation())) {
-        		flag |= 1 << 5;
-        		return flag;
-       		}
-       	}
-
-       	flag = flag & ~(1 << 5);
-       	return flag;
-    }
-
     // check for flag changes and set flag
     public static void updateFlag() throws GameActionException {
         int prevFlag = rc.getFlag(rc.getID()), newFlag = 0;
@@ -237,10 +220,6 @@ public class MuckrakerFlag {
                     allowUpdate = false;
                 }
             }
-        }
-
-        if (allowUpdate) {
-        	newFlag = updateSlandererAdjacentBit(newFlag);
         }
 
         // update
