@@ -3,6 +3,7 @@ package gen3;
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
+import gen3.util.Logger;
 
 import static gen3.RobotPlayer.*;
 import static gen3.flags.EnlightenmentCenterFlag.getAttackCoordinates;
@@ -22,16 +23,16 @@ public strictfp class Politician {
 
     public static void checkForAttackCoordinates() throws GameActionException {
         int flag = rc.getFlag(enlightenmentCenterId);
-        if (isAttackType) {
-            attackLocation = getAttackCoordinates(flag);
-            if (targetAlreadyCaptured(attackLocation)) {
-                attackLocation = null;
-            }
+        attackLocation = getAttackCoordinates(flag);
+        if (targetAlreadyCaptured(attackLocation)) {
+            attackLocation = null;
         }
     }
 
     public static void move() throws GameActionException {
-        checkForAttackCoordinates();
+        if (isAttackType) {
+            checkForAttackCoordinates();
+        }
 
         if (attackLocation != null) {
             if (targetAlreadyCaptured(attackLocation)) {

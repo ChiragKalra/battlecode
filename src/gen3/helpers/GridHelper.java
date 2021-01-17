@@ -87,12 +87,12 @@ public class GridHelper {
         MapLocation mapLocation = rc.getLocation();
 
         // direct away from ECs to not absorb damage by politicians
-        for (RobotInfo ri : rc.senseNearbyRobots(AVOID_EC_RADIUS_SQUARED)) {
+        /*for (RobotInfo ri : rc.senseNearbyRobots(AVOID_EC_RADIUS_SQUARED)) {
             if (ri.team != mTeam && ri.type == RobotType.ENLIGHTENMENT_CENTER) {
                 nearestECs.add(ri.location);
                 return false;
             }
-        }
+        }*/
 
         return mapLocation.x % MUCKRAKER_GRID_WIDTH == 0 && mapLocation.y % MUCKRAKER_GRID_WIDTH == 0;
     }
@@ -139,6 +139,12 @@ public class GridHelper {
             return new DirectionFeeder(route, false);
         }
 
+        /*for (RobotInfo ri : rc.senseNearbyRobots(AVOID_EC_RADIUS_SQUARED)) {
+            if (ri.team != mTeam && ri.type == RobotType.ENLIGHTENMENT_CENTER) {
+                return null;
+            }
+        }*/
+
         MapLocation mLoc = rc.getLocation(), vacantSpot = checkVacantSpot(mLoc);
         if (vacantSpot != null) {
             ArrayList<Direction> route = getShortestRoute(mLoc, vacantSpot, new PassabilityGrid(mLoc, sensorRadius));
@@ -157,12 +163,6 @@ public class GridHelper {
      */
     public static Direction getNextDirection() throws GameActionException {
         // direct away from ECs to not absorb damage by pols
-        for (RobotInfo ri : rc.senseNearbyRobots(AVOID_EC_RADIUS_SQUARED)) {
-            if (ri.team != mTeam && ri.type == RobotType.ENLIGHTENMENT_CENTER) {
-                return ri.location.directionTo(rc.getLocation());
-            }
-        }
-
         ArrayList<Direction> selected = new ArrayList<>();
         RobotInfo[] fellow = rc.senseNearbyRobots(sensorRadius, mTeam);
         for (RobotInfo ri : fellow) {

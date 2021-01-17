@@ -16,8 +16,8 @@ import static gen3.helpers.TerrainHelper.getOptimalLocation;
 
 public class AttackHelper {
 
-    private static final double ATTACK_THRESHOLD_RATIO = 0.6;
-    private static final double ATTACK_AFTER_ROUNDS = 0;
+    private static final double ATTACK_THRESHOLD_RATIO = 0.8;
+    private static final double ATTACK_AFTER_ROUNDS = 5;
 
     private static final HashMap<MapLocation, Integer> roundsNotAttackedEC = new HashMap<>();
 
