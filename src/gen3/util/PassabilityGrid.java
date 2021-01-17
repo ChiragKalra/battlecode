@@ -44,6 +44,10 @@ public class PassabilityGrid {
         return isBlockedOrOutside(new MapLocation(x+center.x, y+center.y));
     }
 
+    public boolean isBlockedOrOutsideIndexed (int x, int y) throws GameActionException {
+        return isBlockedOrOutside(new MapLocation(x+center.x-radius, y+center.y-radius));
+    }
+
     public boolean isBlockedOrOutside (MapLocation ml) throws GameActionException {
         if (center.distanceSquaredTo(ml) > sensorRadius) {
             return true;
@@ -55,16 +59,7 @@ public class PassabilityGrid {
     }
 
     public double get (MapLocation ml) throws GameActionException {
-        if (ml.distanceSquaredTo(center) == 0) {
-            return rc.sensePassability(ml);
-        }
-        if (!center.isWithinDistanceSquared(ml, radiusSquared)) {
-            return 0;
-        }
-        if (!rc.onTheMap(ml)) {
-            return 0;
-        }
-        if (occupied[ml.x - center.x + radius][ml.y - center.y + radius]) {
+        if (isBlockedOrOutside(ml)) {
             return 0;
         }
         return rc.sensePassability(ml);

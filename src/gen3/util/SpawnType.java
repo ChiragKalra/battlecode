@@ -1,6 +1,7 @@
 package gen3.util;
 
 import static gen3.RobotPlayer.rc;
+import static gen3.util.Functions.gaussian;
 import static gen3.util.Functions.sigmoid;
 
 public enum SpawnType {
@@ -40,15 +41,15 @@ public enum SpawnType {
     }
 
     private static double getMuckrakerProbability (int round) {
-        return 1 - sigmoid((round-250)/10.0);
+        return 0.75*gaussian((round-125)/100.0) + 0.25;
     }
 
     private static double getSlandererProbability (int round) {
-        return sigmoid((round-275)/10.0);
+        return 1 - gaussian((round-125)/50.0);
     }
 
     private static double getPoliticianProbability (int round) {
-        return sigmoid((round-250)/45.0);
+        return 0*sigmoid((round-250)/45.0);
     }
 
     private static double getAttackPoliticianProbability (int round) {

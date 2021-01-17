@@ -1,18 +1,16 @@
 package gen3.helpers;
 
 import battlecode.common.*;
+import gen3.flags.MuckrakerFlag;
 import gen3.util.Pair;
-import gen3.util.PassabilityGrid;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import static gen3.Politician.isAttackType;
 import static gen3.RobotPlayer.*;
-import static gen3.helpers.MovementHelper.getRandomDirection;
-import static gen3.helpers.MovementHelper.getShortestRoute;
-import static gen3.helpers.TerrainHelper.getOptimalLocation;
+import static gen3.flags.MuckrakerFlag.getHpFromFlag;
+import static gen3.flags.MuckrakerFlag.isBroadcastingEC;
+import static gen3.helpers.MovementHelper.*;
 
 public class AttackHelper {
 
@@ -96,18 +94,6 @@ public class AttackHelper {
         return false;
     }
 
-    public static Pair<MapLocation, Integer> getNearbyEC(Team team) {
-        // check nearby
-        RobotInfo[] nearby = rc.senseNearbyRobots(sensorRadius, team);
-        for (RobotInfo ri: nearby) {
-            if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
-                return new Pair<>(ri.location, ri.conviction);
-            }
-        }
-        return null;
-    }
-
-    private static ArrayList<Direction> movesToVacant = null;
     /*
      * @return
      *      1. next direction to move to if enlightenment center detected nearby
@@ -116,39 +102,38 @@ public class AttackHelper {
      *
      */
 
-    public static Direction getNextDirection(MapLocation mLoc, MapLocation ec) throws GameActionException {
-        if (!isAttackType || ec == null) {
-            //TODO WALL TYPE POLITICIAN
-            return getRandomDirection();
+    public static Direction getNextDirection(MapLocation attackLocation) throws GameActionException {
+        MapLocation mLoc = rc.getLocation();
+        if (attackLocation == null) {
+            for (RobotInfo ri: rc.senseNearbyRobots()) {
+                if (ri.team != mTeam && ri.type == RobotType.ENLIGHTENMENT_CENTER) {
+                    attackLocation = ri.location;
+                    return mLoc.directionTo(ri.location);
+                }
+            }
+        } else if (mLoc.isAdjacentTo(attackLocation)) {
+            Direction anti = getAntiCrowdingDirection(mLoc);
+            if (anti != null) {
+                return getAntiCrowdingDirection(mLoc);
+            }
         }
-        if (mLoc.isAdjacentTo(ec)) {
-            return getRandomDirection();
-        }
+        return getRandomDirection();
+    }
 
-        // if movesToVacant is not empty return next move
-        if (movesToVacant != null) {
-            if (movesToVacant.isEmpty()) {
-                movesToVacant = null;
-            } else {
-                Direction ret = movesToVacant.get(movesToVacant.size() - 1);
-                // if blockage in path, re-compute path
-                if (rc.canMove(ret)) {
-                    movesToVacant.remove(movesToVacant.size() - 1);
-                    return ret;
+    public static Pair<MapLocation, Integer> checkForAttackCoordinates() throws GameActionException {
+        Pair<MapLocation, Integer> selected = null;
+        //check in all 4 directions
+        for (RobotInfo ri: rc.senseNearbyRobots(sensorRadius, mTeam)) {
+            if (ri.type == RobotType.MUCKRAKER) {
+                int flag = rc.getFlag(ri.getID());
+                if (isBroadcastingEC(flag)) {
+                    int hp = getHpFromFlag(flag);
+                    if (selected == null || hp < selected.value) {
+                        selected = new Pair<>(MuckrakerFlag.getAbsLocFromFlag(flag, ri.location), hp);
+                    }
                 }
             }
         }
-
-        PassabilityGrid passability = new PassabilityGrid(mLoc, sensorRadius);
-        MapLocation ideal = getOptimalLocation(mLoc, ec, passability);
-
-        if (ideal != null) {
-            movesToVacant = getShortestRoute(mLoc, ideal, passability);
-            if (movesToVacant != null) {
-                return getNextDirection(mLoc, ec);
-            }
-        }
-
-        return mLoc.directionTo(ec);
+        return selected;
     }
 }

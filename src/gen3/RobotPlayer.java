@@ -1,6 +1,7 @@
 package gen3;
 
 import battlecode.common.*;
+
 import gen3.flags.EnlightenmentCenterFlag;
 import gen3.flags.PoliticianFlag;
 import gen3.flags.SlandererFlag;
@@ -101,19 +102,13 @@ public strictfp class RobotPlayer {
                         EnlightenmentCenter.move();
                         break;
                     case POLITICIAN:
-                        // dont compute movement/ability if cooldown active
-                        if (rc.isReady()) {
-                            Politician.move();
-                        }
+                        Politician.move();
                         break;
                     case SLANDERER:
                         Slanderer.move();
                         break;
                     case MUCKRAKER:
-                        // dont compute movement/ability if cooldown active
-                        if (rc.isReady()) {
-                            Muckraker.move();
-                        }
+                        Muckraker.move();
                         break;
                 }
                 logger.log("move");
@@ -133,9 +128,9 @@ public strictfp class RobotPlayer {
                         MuckrakerFlag.updateFlag();
                 }
 
-                /*if (roundNumber != rc.getRoundNum() && mType!=RobotType.SLANDERER) {
+                if (roundNumber != rc.getRoundNum() && mType!=RobotType.ENLIGHTENMENT_CENTER) {
                     logger.flush();
-                }*/
+                }
 
                 if (roundNumber == rc.getRoundNum()) {
                     Clock.yield();

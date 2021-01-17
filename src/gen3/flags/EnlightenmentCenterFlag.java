@@ -1,47 +1,29 @@
 package gen3.flags;
 
 import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
 
 import static gen3.RobotPlayer.rc;
-import static gen3.RobotPlayer.spawnerLocation;
 
 
 /*
  # EC Flag
-
- 0-6     - enemy/neutral enlightenment center x
- 7-13    - enemy/neutral enlightenment center y
- 14      - attack/ defense politician
- 15-23   - undecided
+ 23      - attack/ defense politician
 
  */
 
 public class EnlightenmentCenterFlag {
-
-    public static void broadcastAttackCoordinates (MapLocation loc) throws GameActionException {
-        int relX = loc.x - spawnerLocation.x + 63,
-                relY = loc.y - spawnerLocation.y + 63;
-
-        int newFlag = 1 << 14;
-        newFlag += relX;
-        newFlag += relY << 7;
-        rc.setFlag(newFlag);
-    }
-
     public static boolean isAttackType (int flag) {
-        return (flag & (1<<14)) == (1<<14);
+        return (flag & (1<<23)) == (1<<23);
     }
 
     public static void setDefensePoliticianSpawned() throws GameActionException {
         int flag = rc.getFlag(rc.getID());
-        rc.setFlag(flag ^ (1 << 14));
+        rc.setFlag(flag ^ (1 << 23));
     }
 
-    public static MapLocation getAttackCoordinates (int flag) {
-        int relX = (flag) % 128 - 63,
-                relY = (flag >> 7) % 128 - 63;
-        return new MapLocation(relX + spawnerLocation.x, relY + spawnerLocation.y);
+    public static void setAttackPoliticianSpawned() throws GameActionException {
+        int flag = rc.getFlag(rc.getID());
+        rc.setFlag(flag | (1 << 23));
     }
 
     // check for flag changes and set flag

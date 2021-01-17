@@ -6,6 +6,10 @@ public class Functions {
         return 1 / (1 + Math.exp(-x));
     }
 
+    public static double gaussian (double x) {
+        return Math.exp(-x*x);
+    }
+
     public static Object getRandom(Object[] col) {
         return col[(int) (Math.random() * col.length)];
     }

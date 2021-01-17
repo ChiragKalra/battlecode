@@ -8,8 +8,7 @@ import gen3.flags.EnlightenmentCenterFlag;
 import gen3.util.PassabilityGrid;
 import gen3.util.SpawnType;
 
-import static gen3.EnlightenmentCenter.RATIO_UNITS;
-import static gen3.EnlightenmentCenter.wanderingMuckrakers;
+import static gen3.EnlightenmentCenter.*;
 import static gen3.RobotPlayer.*;
 import static gen3.helpers.GridHelper.getDirectionFromAdjacentFlags;
 import static gen3.helpers.MovementHelper.*;
@@ -29,7 +28,6 @@ public class SpawnHelper {
         int xp = SpawnType.Muckraker.minHp;
         if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, xp)) {
             rc.buildRobot(RobotType.MUCKRAKER, dir, xp);
-            wanderingMuckrakers.add(rc.senseRobotAtLocation(rc.getLocation().add(dir)).getID());
             return true;
         }
         return false;
@@ -54,7 +52,7 @@ public class SpawnHelper {
             return false;
         }
         //int xp = slandererHPFloor(Math.max(25, (int)(xpDelta*RATIO_UNITS)));
-        int xp = slandererHPFloor(Math.max(25, 2));
+        int xp = Math.max(21, slandererHPFloor((int)(rc.getInfluence()*RATIO_UNITS)));
         if (rc.canBuildRobot(RobotType.SLANDERER, dir, xp)) {
             rc.buildRobot(RobotType.SLANDERER, dir, xp);
             return true;

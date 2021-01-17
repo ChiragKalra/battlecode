@@ -1,15 +1,13 @@
 package gen3.helpers;
 
 import battlecode.common.*;
-import gen3.util.DirectionFeeder;
+import gen3.flags.MuckrakerFlag;
 import gen3.util.Pair;
-import gen3.util.PassabilityGrid;
 
 import java.util.ArrayList;
 
 import static gen3.RobotPlayer.*;
-import static gen3.flags.MuckrakerFlag.getDirection;
-import static gen3.flags.MuckrakerFlag.isPlaced;
+import static gen3.flags.MuckrakerFlag.*;
 import static gen3.helpers.MovementHelper.*;
 import static gen3.util.Functions.getRandom;
 
@@ -17,9 +15,8 @@ import static gen3.util.Functions.getRandom;
 // muckraker info grid formation helper
 public class GridHelper {
     public static final int MUCKRAKER_GRID_WIDTH = 5;
-    public static final int AVOID_EC_RADIUS_SQUARED = 25;
 
-    private static Direction getAdjacentVacant(MapLocation current) throws GameActionException {
+    private static Direction getAdjacentVacant (MapLocation current) throws GameActionException {
         int mx = current.x, my = current.y;
         MapLocation north = new MapLocation(mx, my + MUCKRAKER_GRID_WIDTH),
             east = new MapLocation(mx + MUCKRAKER_GRID_WIDTH, my),
@@ -31,7 +28,7 @@ public class GridHelper {
         //check in all 4 directions
         MapLocation[] possible = {north, east, south, west};
         for (MapLocation mp: possible) {
-            if (rc.canSenseLocation(mp) && !rc.isLocationOccupied(mp) && isNotNearDetectedEC(mp)) {
+            if (rc.canSenseLocation(mp) && !rc.isLocationOccupied(mp)) {
                 selected = current.directionTo(mp);
                 break;
             }
@@ -72,27 +69,9 @@ public class GridHelper {
         return new Pair<>(adj, false);
     }
 
-    private static final ArrayList<MapLocation> nearestECs = new ArrayList<>();
-    private static boolean isNotNearDetectedEC(MapLocation ml) {
-        for (MapLocation loc: nearestECs) {
-            if (loc.isWithinDistanceSquared(ml, AVOID_EC_RADIUS_SQUARED)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     // check if current position is valid for grid formation
     public static Boolean formsGrid () {
         MapLocation mapLocation = rc.getLocation();
-
-        // direct away from ECs to not absorb damage by politicians
-        /*for (RobotInfo ri : rc.senseNearbyRobots(AVOID_EC_RADIUS_SQUARED)) {
-            if (ri.team != mTeam && ri.type == RobotType.ENLIGHTENMENT_CENTER) {
-                nearestECs.add(ri.location);
-                return false;
-            }
-        }*/
 
         return mapLocation.x % MUCKRAKER_GRID_WIDTH == 0 && mapLocation.y % MUCKRAKER_GRID_WIDTH == 0;
     }
@@ -114,7 +93,7 @@ public class GridHelper {
         //check in all 4 directions
         MapLocation[] possible = {north, east, south, west};
         for (MapLocation mp: possible) {
-            if (rc.canSenseLocation(mp) && !rc.isLocationOccupied(mp) && isNotNearDetectedEC(mp)) {
+            if (rc.canSenseLocation(mp) && !rc.isLocationOccupied(mp)) {
                 return mp;
             }
         }
@@ -127,30 +106,16 @@ public class GridHelper {
      *      2. null if no vacancy nearby
      *
      */
-    private static boolean exploded = false;
-    public static DirectionFeeder getDirectionsToVacancy () throws GameActionException {
-        if (rc.getRoundNum() < 150 && !exploded) {
-            ArrayList<Direction> route = new ArrayList<>();
-            Direction d = spawnerLocation.directionTo(rc.getLocation());
-            for (int i = 0; i < 4*5; i++) {
-                route.add(d);
-            }
-            exploded = true;
-            return new DirectionFeeder(route, false);
+    private static int explodedRadius = 0;
+    public static Direction getDirectionsToVacancy () throws GameActionException {
+        if (rc.getRoundNum() < 150 && explodedRadius < 4*5) {
+            explodedRadius++;
+            return spawnerLocation.directionTo(rc.getLocation());
         }
-
-        /*for (RobotInfo ri : rc.senseNearbyRobots(AVOID_EC_RADIUS_SQUARED)) {
-            if (ri.team != mTeam && ri.type == RobotType.ENLIGHTENMENT_CENTER) {
-                return null;
-            }
-        }*/
 
         MapLocation mLoc = rc.getLocation(), vacantSpot = checkVacantSpot(mLoc);
         if (vacantSpot != null) {
-            ArrayList<Direction> route = getShortestRoute(mLoc, vacantSpot, new PassabilityGrid(mLoc, sensorRadius));
-            if (route != null) {
-                return new DirectionFeeder(route, true);
-            }
+            return mLoc.directionTo(vacantSpot);
         }
         return null;
     }
@@ -194,5 +159,41 @@ public class GridHelper {
             }
         }
         return selected.isEmpty() ? null : (Direction) getRandom(selected.toArray());
+    }
+
+    public static Pair<Pair<Integer, Integer>, Integer> getNearbyEC() {
+        // check nearby
+        MapLocation loc = rc.getLocation();
+        RobotInfo[] nearby = rc.senseNearbyRobots(sensorRadius);
+        for (RobotInfo ri: nearby) {
+            if (ri.team != mTeam && ri.type == RobotType.ENLIGHTENMENT_CENTER) {
+                int x = ri.location.x >= loc.x ? 1 : -1, y = ri.location.y >= loc.y ? 1 : -1;
+                return new Pair<>(new Pair<>(x, y), ri.conviction);
+            }
+        }
+        return null;
+    }
+
+    public static Pair<Pair<Integer, Integer>, Integer> getECFromAdjFlags() throws GameActionException {
+        MapLocation current = rc.getLocation();
+        Pair<Pair<Integer, Integer>, Integer> selected = null;
+
+        //check in all 4 directions
+        for (RobotInfo ri: rc.senseNearbyRobots(sensorRadius, mTeam)) {
+            if (ri.type == RobotType.MUCKRAKER) {
+                int flag = rc.getFlag(ri.getID());
+                if (isBroadcastingEC(flag)) {
+                    int hp = getHpFromFlag(flag);
+                    if (hp >= 0 && (selected == null || hp < selected.value)) {
+                        Pair<Integer, Integer> got = MuckrakerFlag.getRelLocFromFlag(flag);
+                        Direction dir = current.directionTo(ri.location);
+                        got.key += dir.dx;
+                        got.value += dir.dx;
+                        selected = new Pair<>(got, hp);
+                    }
+                }
+            }
+        }
+        return selected;
     }
 }

@@ -97,9 +97,6 @@ public class SpawnHelper {
         for (int i = 0; i < 8; i++) {
             Direction d = directions[i];
             int filterInd = Math.min(Math.abs(dirInd-i), Math.abs(dirInd - 8 + i));
-            if (filterInd == 5) {
-                log("sad");
-            }
             double cur = filter[filterInd]*grid.getRelative(d.dx, d.dy);
             if (cur > factor) {
                 decided = i;
