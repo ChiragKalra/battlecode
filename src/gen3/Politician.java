@@ -3,7 +3,6 @@ package gen3;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.Direction;
-import battlecode.common.RobotController;
 import gen3.util.Pair;
 
 import static gen3.RobotPlayer.rc;
@@ -54,7 +53,13 @@ public strictfp class Politician {
             return;
         }
 
-        int radius = getRadius(rc.getFlag(enlightenmentCenterId));
+        int radius;
+        if (rc.canGetFlag(enlightenmentCenterId)) {
+            radius = getRadius(rc.getFlag(enlightenmentCenterId));
+        } else {
+            isAttackType = true;
+            return;
+        }
         innerRadius = radius * radius + 1;
         outerRadius = (radius + 1) * (radius + 1) + 1;
 

@@ -28,7 +28,7 @@ public strictfp class EnlightenmentCenter {
         if (targetEC !=null && targetEC.value <= rc.getInfluence()*RATIO_SPAWN_BUFF) {
             spawned = spawnAttackPolitician(targetEC.key, targetEC.value);
         }
-        if (roundNumber-roundCaptured<25) {
+        if (roundNumber-roundCaptured<30) {
             spawnDefencePolitician();
         }
         if (!spawned) {

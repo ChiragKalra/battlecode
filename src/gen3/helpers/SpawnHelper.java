@@ -52,9 +52,10 @@ public class SpawnHelper {
         return false;
     }
 
-    // layerQuantity = {0, 0, 8, 8, 16, 24, 24, 32}; TODO MORE
-    private static final int[] sectorQuantity = {0, 0, 8, 16, 32, 56, 80, 112};
+    // layerQuantity = {0, 0, 8, 8, 16, 24, 24, 32, 40, 40, 48, 56, 60, 64, 72, 80};
+    private static final int[] sectorQuantity = {0, 0, 8, 16, 32, 56, 80, 112, 152, 192, 240, 296, 356, 420, 492, 572};
     private static int ccvRotationSlan = 1;
+    private static final int[] slansGen = new int[1801];
     private static int numberOfSlans = 0;
     public static boolean spawnSlanderer() throws GameActionException {
         Direction dir = getOptimalDirection(directions[ccvRotationSlan]);
@@ -73,7 +74,9 @@ public class SpawnHelper {
 
         if (rc.canBuildRobot(RobotType.SLANDERER, dir, xp)) {
             rc.buildRobot(RobotType.SLANDERER, dir, xp);
-            numberOfSlans++;
+            slansGen[roundNumber]++;
+            slansGen[roundNumber+300]--;
+            numberOfSlans += slansGen[roundNumber];
             if (numberOfSlans > sectorQuantity[EnlightenmentCenter.currentRadius-1]) {
                 EnlightenmentCenterFlag.incrementRadius();
             }

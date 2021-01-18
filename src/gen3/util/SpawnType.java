@@ -5,9 +5,9 @@ import static gen3.util.Functions.gaussian;
 
 public enum SpawnType {
     AttackPolitician(0, 21, 1000),
-    DefensePolitician(5, 12, 50),
+    DefensePolitician(1, 12, 50),
     Muckraker(0,1,20),
-    Slanderer(4, 63, 500);
+    Slanderer(0, 86, 5000);
 
     public final int cooldown, minHp, maxHp;
 
