@@ -30,7 +30,7 @@ public class Logger {
 
     public void flush () {
         if (DEBUG) {
-            if (!flushOnlyIfExceeds || roundNumber < rc.getRoundNum()) {
+            if (!flushOnlyIfExceeds || startRN < rc.getRoundNum()) {
                 log("end");
                 output.append("total ")
                         .append(Clock.getBytecodeNum() - start + (rc.getRoundNum() - startRN) * mType.bytecodeLimit);

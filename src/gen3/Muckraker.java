@@ -35,7 +35,7 @@ public strictfp class Muckraker {
 
         // occupy a grid spot if not unplaced
 
-        if (explodeRadius == 0 && rc.getRoundNum() < 150) {
+        if (explodeRadius == 0) {
             spawnDirection = spawnerLocation.directionTo(rc.getLocation());
         }
 
