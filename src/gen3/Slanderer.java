@@ -42,19 +42,22 @@ public strictfp class Slanderer {
         Direction left = straight.rotateLeft();
         Direction right = straight.rotateRight();
 
-        if (tryMoveSlanderer(straight)) {
+        boolean onWallStraight = onWall(rc.getLocation().add(straight));
+        boolean onWallLeft = onWall(rc.getLocation().add(left));
+        boolean onWallRight = onWall(rc.getLocation().add(right));
+
+        if (!onWallStraight && tryMoveSlanderer(straight)) {
             return;
         }
-        if (tryMoveSlanderer(left)) {
+        if (!onWallLeft && tryMoveSlanderer(left)) {
             return;
         }
-        if (tryMoveSlanderer(right)) {
+        if (!onWallRight && tryMoveSlanderer(right)) {
             return;
         }
 
         boolean nearWall = false;
-        if (onWall(rc.getLocation().add(straight)) || onWall(rc.getLocation().add(left)) || 
-            onWall(rc.getLocation().add(right))) {
+        if (onWallStraight || onWallLeft || onWallRight) {
             nearWall = true;
         }
 
@@ -90,9 +93,9 @@ public strictfp class Slanderer {
     }
 
     private static boolean tryMoveSlanderer(Direction dir) throws GameActionException {
-        if (onWall(rc.getLocation().add(dir))) {
-            return false;
-        }
+        // if (onWall(rc.getLocation().add(dir))) {
+        //     return false;
+        // }
     	if (rc.canMove(dir)) {
     		rc.move(dir);
     		return true;
