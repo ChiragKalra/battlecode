@@ -26,6 +26,10 @@ public class EnlightenmentCenterFlag {
 
     // check for flag changes and set flag
     public static void updateFlag() throws GameActionException {
-
+    	int prevFlag = rc.getFlag(rc.getID());
+    	int newFlag = ((prevFlag >> 5) << 5) | currentRadius;
+    	if (prevFlag != newFlag) {
+    		rc.setFlag(newFlag);
+    	}
     }
 }
