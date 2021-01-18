@@ -7,7 +7,7 @@ public enum SpawnType {
     AttackPolitician(0, 21, 1000),
     DefensePolitician(5, 12, 50),
     Muckraker(0,1,20),
-    Slanderer(7, 63, 500);
+    Slanderer(4, 63, 500);
 
     public final int cooldown, minHp, maxHp;
 
@@ -44,7 +44,7 @@ public enum SpawnType {
     }
 
     private static double getPoliticianProbability (int round) {
-        return 0.05*getSlandererProbability(round-25) + round/1250.0;
+        return 0.05*getSlandererProbability(round-25) + round/3000.0;
     }
 
 }

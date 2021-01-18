@@ -12,7 +12,7 @@ import static gen2.Politician.isAttackType;
 
 public strictfp class RobotPlayer {
     // toggle logging before competitive matches
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
     public static void log (String s) {
         if (DEBUG) {
             System.out.println(s);
@@ -79,7 +79,7 @@ public strictfp class RobotPlayer {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
 
         while (rc.getRoundNum() <= GameConstants.GAME_MAX_NUMBER_OF_ROUNDS) {
@@ -143,7 +143,7 @@ public strictfp class RobotPlayer {
                 }
             } catch (Exception e) {
                 if (DEBUG) {
-                    e.printStackTrace();
+                   // e.printStackTrace();
                 }
             }
         }

@@ -177,7 +177,7 @@ public class MovementHelper {
         }
         MapLocation[] ret = new MapLocation[ptr];
         for (int i = 0; i < ptr; i++) {
-            ret[i++] = new MapLocation(center.x + relativeLocations[i].x, center.y + relativeLocations[i].y);
+            ret[i] = new MapLocation(center.x + relativeLocations[i].x, center.y + relativeLocations[i].y);
         }
         return ret;
     }

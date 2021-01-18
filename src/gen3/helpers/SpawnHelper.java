@@ -2,6 +2,7 @@ package gen3.helpers;
 
 import battlecode.common.*;
 
+import gen3.EnlightenmentCenter;
 import gen3.flags.EnlightenmentCenterFlag;
 import gen3.util.PassabilityGrid;
 import gen3.util.SpawnType;
@@ -51,8 +52,8 @@ public class SpawnHelper {
         return false;
     }
 
-    private static final int[] sectorQuantity = {0, 0, 8, 8, 16, 24, 24, 32};
-    //private static final int[] sectorQuantity = {0, 0, 8, 8, 16, 24, 24, 32};
+    // layerQuantity = {0, 0, 8, 8, 16, 24, 24, 32}; TODO MORE
+    private static final int[] sectorQuantity = {0, 0, 8, 16, 32, 56, 80, 112};
     private static int ccvRotationSlan = 1;
     private static int numberOfSlans = 0;
     public static boolean spawnSlanderer() throws GameActionException {
@@ -73,10 +74,9 @@ public class SpawnHelper {
         if (rc.canBuildRobot(RobotType.SLANDERER, dir, xp)) {
             rc.buildRobot(RobotType.SLANDERER, dir, xp);
             numberOfSlans++;
-            /* TODO
-            if (numberOfSlans > sectorQuantity[EnlightenmentCenterFlag.currentRadius-1]) {
+            if (numberOfSlans > sectorQuantity[EnlightenmentCenter.currentRadius-1]) {
                 EnlightenmentCenterFlag.incrementRadius();
-            }*/
+            }
             return true;
         }
         return false;
