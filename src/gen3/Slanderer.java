@@ -16,6 +16,9 @@ public strictfp class Slanderer {
         	return;
         }
 
+        if (spawnerLocation == null) {
+            return;
+        }
         int distanceFromSpawner = rc.getLocation().distanceSquaredTo(spawnerLocation);
         if (distanceFromSpawner >= WALL_RADIUS_MIN && distanceFromSpawner <= WALL_RADIUS_MAX) {
         	return;
