@@ -1,9 +1,6 @@
 package gen3;
 
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
-import battlecode.common.RobotInfo;
-import gen3.flags.MuckrakerFlag;
+import battlecode.common.*;
 
 import static gen3.RobotPlayer.*;
 import static gen3.helpers.GridHelper.*;
@@ -24,6 +21,15 @@ public strictfp class Muckraker {
                 }
             }
         }
+
+
+        /*
+        not making enough muckrakers to block spawn
+        MapLocation got = AttackHelper.getNearbyEnemyEc();
+        if (got != null) {
+            tryMove(rc.getLocation().directionTo(got));
+            return;
+        }*/
 
         // occupy a grid spot if not unplaced
         if (!placed) {

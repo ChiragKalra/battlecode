@@ -128,9 +128,8 @@ public strictfp class RobotPlayer {
                         MuckrakerFlag.updateFlag();
                 }
 
-                if (mType!=RobotType.ENLIGHTENMENT_CENTER) {
-                    logger.flush();
-                }
+                logger.flush();
+
 
                 if (roundNumber == rc.getRoundNum()) {
                     Clock.yield();

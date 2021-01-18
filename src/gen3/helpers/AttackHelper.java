@@ -77,7 +77,7 @@ public class AttackHelper {
 
     public static int shouldAttackDefensive () {
         RobotInfo[] nearby = rc.senseNearbyRobots(actionRadius, enemyTeam);
-        int[] check = {1, 2, 4, 5, 8, 9, 10};
+        int[] check = {1, 2, 4, 5, 8, 9};
         MapLocation location = rc.getLocation();
 
         for (int rad : check) {

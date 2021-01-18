@@ -44,7 +44,7 @@ public enum SpawnType {
     }
 
     private static double getPoliticianProbability (int round) {
-        return 0.05*getSlandererProbability(round);
+        return 0*getSlandererProbability(round);
     }
 
 }
