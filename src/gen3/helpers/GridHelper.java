@@ -29,8 +29,7 @@ public class GridHelper {
         //check in all 4 directions
         MapLocation[] possible = {north, east, south, west};
         for (MapLocation mp: possible) {
-            if (rc.canSenseLocation(mp) && !rc.isLocationOccupied(mp) &&
-                    !spawnerLocation.isWithinDistanceSquared(mp, sensorRadius)) {
+            if (rc.canSenseLocation(mp) && !rc.isLocationOccupied(mp)) {
                 selected = current.directionTo(mp);
                 break;
             }
@@ -75,12 +74,6 @@ public class GridHelper {
     public static Boolean formsGrid () {
         MapLocation mapLocation = rc.getLocation();
 
-        for (RobotInfo ri: rc.senseNearbyRobots(sensorRadius, mTeam)) {
-            if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
-                return false;
-            }
-        }
-
         return mapLocation.x % MUCKRAKER_GRID_WIDTH == 0 && mapLocation.y % MUCKRAKER_GRID_WIDTH == 0;
     }
 
@@ -101,8 +94,7 @@ public class GridHelper {
         //check in all 4 directions
         MapLocation[] possible = {north, east, south, west};
         for (MapLocation mp: possible) {
-            if (rc.canSenseLocation(mp) && !rc.isLocationOccupied(mp) &&
-                    !spawnerLocation.isWithinDistanceSquared(mp, sensorRadius)) {
+            if (rc.canSenseLocation(mp) && !rc.isLocationOccupied(mp)) {
                 return mp;
             }
         }
@@ -216,7 +208,7 @@ public class GridHelper {
                         got.value += dir.dx;
                         if (!captured.contains(got)) {
                             selected = new Pair<>(got, hp);
-                            if (hp <= 0 && broadcastingCaptured == null) {
+                            if (hp < 0 && broadcastingCaptured == null) {
                                 broadcastingCaptured = got;
                             }
                         }

@@ -79,25 +79,20 @@ public class AttackHelper {
     public static int shouldAttackDefensive () {
         int[] check = {1, 2, 4, 5, 8, 9};
 
-        int empRad = 0, mostKills = 0, mostDamage = 0;
+        int empRad = 0, mostKills = 0;
         for (int rad : check) {
             RobotInfo[] nearby = rc.senseNearbyRobots(rad);
             if (nearby.length == 0) continue;
             int damage = (int) (rc.getConviction()*rc.getEmpowerFactor(mTeam, 0)-10),
-                    each = damage/nearby.length, kills = 0, damageDone = 0;
+                    each = damage/nearby.length, kills = 0;
             for (RobotInfo ri: nearby) {
                 if (ri.team != mTeam && ri.type == RobotType.MUCKRAKER) {
                     if (ri.conviction <= each) {
                         kills++;
-                        damageDone += ri.conviction;
-                    } else {
-                        damageDone += each;
                     }
                 }
             }
             if (kills > mostKills) {
-                empRad = rad;
-            } else if (kills == mostKills && damageDone > mostDamage) {
                 empRad = rad;
             }
         }
@@ -132,7 +127,7 @@ public class AttackHelper {
                 int flag = rc.getFlag(ri.getID());
                 if (isBroadcastingEC(flag)) {
                     int hp = getHpFromFlag(flag);
-                    if (selected == null || hp < selected.value && hp > 0) {
+                    if (selected == null || hp < selected.value) {
                         selected = new Pair<>(MuckrakerFlag.getAbsLocFromFlag(flag, ri.location), hp);
                     }
                 }

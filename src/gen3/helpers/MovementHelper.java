@@ -2,6 +2,7 @@ package gen3.helpers;
 
 import battlecode.common.*;
 import gen3.util.Functions;
+import gen3.util.Logger;
 import gen3.util.PassabilityGrid;
 
 import java.util.*;
@@ -158,11 +159,12 @@ public class MovementHelper {
             ptr = 0;
             for (int x = 1; x <= rad; x++) {
                 int limY = (int) Math.sqrt(radiusSquared - x*x);
-                relativeLocations[ptr++] = new MapLocation(x, limY);
-                relativeLocations[ptr++] = new MapLocation(x, -limY);
-                relativeLocations[ptr++] = new MapLocation(-x, limY);
-                relativeLocations[ptr++] = new MapLocation(-x, -limY);
-
+                if (x != limY) {
+                    relativeLocations[ptr++] = new MapLocation(x, limY);
+                    relativeLocations[ptr++] = new MapLocation(x, -limY);
+                    relativeLocations[ptr++] = new MapLocation(-x, limY);
+                    relativeLocations[ptr++] = new MapLocation(-x, -limY);
+                }
                 int c = radiusSquared - (x*x + 2*x + 1);
                 for (int y = 1-limY; y*y > c && y < 0; y++) {
                     relativeLocations[ptr++] = new MapLocation(x, y);
@@ -171,15 +173,11 @@ public class MovementHelper {
                     relativeLocations[ptr++] = new MapLocation(-x, -y);
                 }
             }
-            relativeLocations[ptr++] = new MapLocation(rad, 0);
-            relativeLocations[ptr++] = new MapLocation(-rad, 0);
-            relativeLocations[ptr++] = new MapLocation(0, rad);
-            relativeLocations[ptr++] = new MapLocation(0, -rad);
             cachedRadius = radiusSquared;
         }
         MapLocation[] ret = new MapLocation[ptr];
         for (int i = 0; i < ptr; i++) {
-            ret[i] = new MapLocation(center.x + relativeLocations[i].x, center.y + relativeLocations[i].y);
+            ret[i++] = new MapLocation(center.x + relativeLocations[i].x, center.y + relativeLocations[i].y);
         }
         return ret;
     }

@@ -12,14 +12,10 @@ import static gen3.util.SpawnType.getOptimalType;
 
 public strictfp class EnlightenmentCenter {
 
-    public static int currentRadius = 3;
-
-    public static double RATIO_BID = 0.1;
+    public static double RATIO_BID = 0.08;
     public static double RATIO_UNITS = 0.03;
     public static double RATIO_SPAWN_BUFF = 0.8;
 
-
-    private static int roundCaptured = 1;
     public static Pair<MapLocation, Integer> targetEC;
 
 
@@ -27,9 +23,6 @@ public strictfp class EnlightenmentCenter {
         boolean spawned = false;
         if (targetEC !=null && targetEC.value <= rc.getInfluence()*RATIO_SPAWN_BUFF) {
             spawned = spawnAttackPolitician(targetEC.key, targetEC.value);
-        }
-        if (roundNumber-roundCaptured<30) {
-            spawnDefencePolitician();
         }
         if (!spawned) {
             SpawnType got = getOptimalType();
@@ -50,9 +43,7 @@ public strictfp class EnlightenmentCenter {
     }
 
 
-    public static void init() {
-        roundCaptured = rc.getRoundNum();
-    }
+    public static void init() { }
 
     public static void move() throws GameActionException {
 
@@ -74,6 +65,8 @@ public strictfp class EnlightenmentCenter {
                 MovementHelper.getCircumferencePoints(rc.getLocation(), i * i + 1);
             }
         }*/
+
+
 
 
         if (rc.isReady()) {

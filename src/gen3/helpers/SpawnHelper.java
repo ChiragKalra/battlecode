@@ -2,7 +2,6 @@ package gen3.helpers;
 
 import battlecode.common.*;
 
-import gen3.EnlightenmentCenter;
 import gen3.flags.EnlightenmentCenterFlag;
 import gen3.util.PassabilityGrid;
 import gen3.util.SpawnType;
@@ -52,10 +51,9 @@ public class SpawnHelper {
         return false;
     }
 
-    // layerQuantity = {0, 0, 8, 8, 16, 24, 24, 32, 40, 40, 48, 56, 60, 64, 72, 80};
-    private static final int[] sectorQuantity = {0, 0, 8, 16, 32, 56, 80, 112, 152, 192, 240, 296, 356, 420, 492, 572};
+    private static final int[] sectorQuantity = {0, 0, 8, 8, 16, 24, 24, 32};
+    //private static final int[] sectorQuantity = {0, 0, 8, 8, 16, 24, 24, 32};
     private static int ccvRotationSlan = 1;
-    private static final int[] slansGen = new int[1801];
     private static int numberOfSlans = 0;
     public static boolean spawnSlanderer() throws GameActionException {
         Direction dir = getOptimalDirection(directions[ccvRotationSlan]);
@@ -67,19 +65,18 @@ public class SpawnHelper {
             return false;
         }
         //int xp = slandererHPFloor(Math.max(25, (int)(xpDelta*RATIO_UNITS)));
-        int xp = slandererHPFloor((int)(rc.getInfluence()*RATIO_UNITS*3));
+        int xp = slandererHPFloor((int)(rc.getInfluence()*RATIO_UNITS));
         xp = Math.max(slandererHPFloor(SpawnType.Slanderer.minHp), xp);
         xp = Math.min(slandererHPFloor(SpawnType.Slanderer.maxHp), xp);
 
 
         if (rc.canBuildRobot(RobotType.SLANDERER, dir, xp)) {
             rc.buildRobot(RobotType.SLANDERER, dir, xp);
-            slansGen[roundNumber]++;
-            slansGen[roundNumber+300]--;
-            numberOfSlans += slansGen[roundNumber];
-            if (numberOfSlans > sectorQuantity[EnlightenmentCenter.currentRadius-1]) {
+            numberOfSlans++;
+            /* TODO
+            if (numberOfSlans > sectorQuantity[EnlightenmentCenterFlag.currentRadius-1]) {
                 EnlightenmentCenterFlag.incrementRadius();
-            }
+            }*/
             return true;
         }
         return false;
