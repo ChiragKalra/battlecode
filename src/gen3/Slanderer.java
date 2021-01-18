@@ -6,7 +6,7 @@ import battlecode.common.MapLocation;
 
 import static gen3.RobotPlayer.*;
 import static gen3.flags.EnlightenmentCenterFlag.getRadius;
-import static gen3.helpers.DefenseHelper.*;
+import static gen3.helpers.FarmHelper.*;
 import static gen3.helpers.MovementHelper.getCircumferencePoints;
 
 public strictfp class Slanderer {
