@@ -42,4 +42,12 @@ public class DefenseHelper {
     public static boolean outsideWall(MapLocation ml) {
     	return ml.distanceSquaredTo(spawnerLocation) > outerRadius;
     }
+
+    public static boolean forceMove(Direction dir) throws GameActionException {
+    	if (rc.canMove(dir)) {
+    		rc.move(dir);
+    		return true;
+    	}
+    	return false;
+    }
 }

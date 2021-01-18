@@ -61,13 +61,33 @@ public strictfp class Politician {
         innerPoints = getCircumferencePoints(spawnerLocation, innerRadius);
         outerPoints = getCircumferencePoints(spawnerLocation, outerRadius);
 
-        if (onWall(rc.getLocation()) && !isTunnelPoint(rc.getLocation())) {
-            return;
-        }
-
         Direction straight = rc.getLocation().directionTo(spawnerLocation).opposite();
         Direction left = straight.rotateLeft();
         Direction right = straight.rotateRight();
+
+        if (onWall(rc.getLocation()) && !isTunnelPoint(rc.getLocation())) {
+            return;
+        }
+        if (outsideWall(rc.getLocation())) {
+            Direction opposite = straight.opposite();
+            Direction oppleft = opposite.rotateLeft();
+            Direction oppright = opposite.rotateRight();
+
+            if (forceMove(oppright)) {
+                return;
+            }
+            if (forceMove(oppleft)) {
+                return;
+            }
+            if (forceMove(oppright.rotateRight())) {
+                return;
+            }
+            if (forceMove(oppleft.rotateLeft())) {
+                return;
+            }
+
+            return;
+        }
 
         if (tryMoveWall(straight)) {
             return;
@@ -76,6 +96,26 @@ public strictfp class Politician {
             return;
         }
         if (tryMoveWall(right)) {
+            return;
+        }
+
+        if (onWall(rc.getLocation())) {
+            if (forceMove(straight)) {
+                return;
+            }
+            if (forceMove(left)) {
+                return;
+            }
+            if (forceMove(right)) {
+                return;
+            }
+            if (forceMove(left.rotateLeft())) {
+                return;
+            }
+            if (forceMove(right.rotateRight())) {
+                return;
+            }
+
             return;
         }
 
