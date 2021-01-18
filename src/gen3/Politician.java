@@ -17,7 +17,6 @@ public strictfp class Politician {
         isAttackType = rc.getInfluence() > SpawnType.DefensePolitician.maxHp;
     }
 
-
     private static MapLocation locToEmp = null;
     private static void moveOffense () throws GameActionException {
         if (shouldAttackOffensive()) {
@@ -30,11 +29,13 @@ public strictfp class Politician {
                 tryMove(rc.getLocation().directionTo(locToEmp));
             } else {
                 Pair<MapLocation, Integer> got = checkForAttackCoordinates();
-                if (got != null) {
+                if (got != null && got.value >= 0) {
                     MapLocation attackLocation = got.key;
                     if (attackLocation == null || tryMove(rc.getLocation().directionTo(attackLocation))) {
                         tryMove(getNextDirection(attackLocation));
                     }
+                } else {
+                    tryMove(getNextDirection(null));
                 }
             }
         }

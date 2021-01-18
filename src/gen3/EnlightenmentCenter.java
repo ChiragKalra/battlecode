@@ -20,7 +20,7 @@ public strictfp class EnlightenmentCenter {
 
     private static boolean spawnOptimal() throws GameActionException {
         boolean spawned = false;
-        if (targetEC !=null && targetEC.value >= 0 && targetEC.value <= rc.getInfluence()*RATIO_SPAWN_BUFF) {
+        if (targetEC !=null && targetEC.value <= rc.getInfluence()*RATIO_SPAWN_BUFF) {
             spawned = spawnAttackPolitician(targetEC.key, targetEC.value);
         }
         if (!spawned) {
@@ -58,7 +58,7 @@ public strictfp class EnlightenmentCenter {
         }
 
         Pair<MapLocation, Integer> got = checkForAttackCoordinates();
-        if (got != null) {
+        if (got != null && got.value >= 0) {
             targetEC = got;
         }
     }

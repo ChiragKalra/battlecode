@@ -39,7 +39,7 @@ public class MuckrakerFlag {
     public static MapLocation getAbsLocFromFlag (int flag, MapLocation muck) {
         int relX = (flag >> 5) % 32 - 13,
                 relY = (flag >> 10) % 32 - 13;
-        return new MapLocation(relX*5 + muck.x+3, relY*5 + muck.y + 3);
+        return new MapLocation((relX-1)*5 + muck.x+3, (relY-1)*5 + muck.y + 3);
     }
 
     public static Pair<Integer, Integer> getRelLocFromFlag (int flag) {
