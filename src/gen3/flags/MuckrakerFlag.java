@@ -67,7 +67,6 @@ public class MuckrakerFlag {
 
             Pair<Pair<Integer, Integer>, Integer> got = getNearbyEC();
             if (got != null) {
-                log("saw: "+got.key.key+","+got.key.value+" = "+got.value);
                 newFlag += 1<<4;
                 int relX = (got.key.key+13) << 5,
                         relY = (got.key.value+13) << 10,
@@ -76,7 +75,6 @@ public class MuckrakerFlag {
             } else {
                 got = getECFromAdjFlags();
                 if (got != null) {
-                    log("adj flag: "+got.key.key+","+got.key.value+" = "+got.value);
                     newFlag += 1<<4;
                     int relX = (got.key.key+13) << 5,
                             relY = (got.key.value+13) << 10;
