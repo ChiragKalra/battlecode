@@ -59,9 +59,10 @@ public strictfp class EnlightenmentCenter {
 
         //indicator dots near EC to show point on the circumference of radius squared
 
-        for (int i = 1; i<=7 ; i++) {
-            for (MapLocation ml : MovementHelper.getCircumferencePoints(rc.getLocation(), i*i+1)) {
-                rc.setIndicatorDot(ml, colors[i-1][0], colors[i-1][1], colors[i-1][2]);
+        if (roundNumber == 1) {
+            Logger logger = new Logger("circim", false);
+            for (int i = 1; i <= 7; i++) {
+                MovementHelper.getCircumferencePoints(rc.getLocation(), i * i + 1);
             }
         }*/
 

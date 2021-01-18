@@ -152,18 +152,19 @@ public class MovementHelper {
     private static MapLocation[] relativeLocations;
     private static int cachedRadius = 0, ptr = 0;
 
-    public static MapLocation[] getCircumferencePoints(MapLocation center, int radiusSquared) {
-        Logger logger = new Logger("circum", true);
+    public static MapLocation[] getCircumferencePoints (MapLocation center, int radiusSquared) {
         int rad = (int) Math.sqrt(radiusSquared);
         if (relativeLocations == null || cachedRadius != radiusSquared) {
             relativeLocations = new MapLocation[300];
             ptr = 0;
             for (int x = 1; x <= rad; x++) {
                 int limY = (int) Math.sqrt(radiusSquared - x*x);
-                relativeLocations[ptr++] = new MapLocation(x, limY);
-                relativeLocations[ptr++] = new MapLocation(x, -limY);
-                relativeLocations[ptr++] = new MapLocation(-x, limY);
-                relativeLocations[ptr++] = new MapLocation(-x, -limY);
+                if (x != limY) {
+                    relativeLocations[ptr++] = new MapLocation(x, limY);
+                    relativeLocations[ptr++] = new MapLocation(x, -limY);
+                    relativeLocations[ptr++] = new MapLocation(-x, limY);
+                    relativeLocations[ptr++] = new MapLocation(-x, -limY);
+                }
                 int c = radiusSquared - (x*x + 2*x + 1);
                 for (int y = 1-limY; y*y > c && y < 0; y++) {
                     relativeLocations[ptr++] = new MapLocation(x, y);
@@ -172,18 +173,12 @@ public class MovementHelper {
                     relativeLocations[ptr++] = new MapLocation(-x, -y);
                 }
             }
-            relativeLocations[ptr++] = new MapLocation(0, rad);
-            relativeLocations[ptr++] = new MapLocation(0, -rad);
-            relativeLocations[ptr++] = new MapLocation(rad, 0);
-            relativeLocations[ptr++] = new MapLocation(-rad, 0);
             cachedRadius = radiusSquared;
         }
-        logger.log("main");
         MapLocation[] ret = new MapLocation[ptr];
         for (int i = 0; i < ptr; i++) {
-            ret[i] = new MapLocation(center.x + relativeLocations[i].x, center.y + relativeLocations[i].y);
+            ret[i++] = new MapLocation(center.x + relativeLocations[i].x, center.y + relativeLocations[i].y);
         }
-        logger.flush();
         return ret;
     }
 

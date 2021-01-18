@@ -52,6 +52,7 @@ public class SpawnHelper {
     }
 
     private static final int[] sectorQuantity = {0, 0, 8, 8, 16, 24, 24, 32};
+    //private static final int[] sectorQuantity = {0, 0, 8, 8, 16, 24, 24, 32};
     private static int ccvRotationSlan = 1;
     private static int numberOfSlans = 0;
     public static boolean spawnSlanderer() throws GameActionException {
