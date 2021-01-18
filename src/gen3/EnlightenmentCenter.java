@@ -14,7 +14,7 @@ public strictfp class EnlightenmentCenter {
 
     public static int currentRadius = 3;
 
-    public static double RATIO_BID = 0.08;
+    public static double RATIO_BID = 0.1;
     public static double RATIO_UNITS = 0.03;
     public static double RATIO_SPAWN_BUFF = 0.8;
 

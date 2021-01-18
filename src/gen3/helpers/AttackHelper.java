@@ -132,7 +132,7 @@ public class AttackHelper {
                 int flag = rc.getFlag(ri.getID());
                 if (isBroadcastingEC(flag)) {
                     int hp = getHpFromFlag(flag);
-                    if (selected == null || hp < selected.value) {
+                    if (selected == null || hp < selected.value && hp > 0) {
                         selected = new Pair<>(MuckrakerFlag.getAbsLocFromFlag(flag, ri.location), hp);
                     }
                 }

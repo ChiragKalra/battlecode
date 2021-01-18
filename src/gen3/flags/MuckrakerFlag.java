@@ -72,9 +72,11 @@ public class MuckrakerFlag {
                         relY = (got.key.value+13) << 10,
                         hp = Math.min(511, (int)Math.ceil((got.value+HP_LOSS_RATIO)/(double)HP_LOSS_RATIO));
                 newFlag += relX + relY + (hp << 15);
+                //log("yeah"+got.key.key+','+got.key.value+'='+got.value);
             } else {
                 got = getECFromAdjFlags();
                 if (got != null ) {
+                    //log("yeah"+got.key.key+','+got.key.value+'='+got.value);
                     newFlag += 1 << 4;
                     int relX = (got.key.key + 13) << 5,
                             relY = (got.key.value + 13) << 10,

@@ -30,7 +30,7 @@ public class GridHelper {
         MapLocation[] possible = {north, east, south, west};
         for (MapLocation mp: possible) {
             if (rc.canSenseLocation(mp) && !rc.isLocationOccupied(mp) &&
-                    spawnerLocation.isWithinDistanceSquared(mp, sensorRadius)) {
+                    !spawnerLocation.isWithinDistanceSquared(mp, sensorRadius)) {
                 selected = current.directionTo(mp);
                 break;
             }
@@ -102,7 +102,7 @@ public class GridHelper {
         MapLocation[] possible = {north, east, south, west};
         for (MapLocation mp: possible) {
             if (rc.canSenseLocation(mp) && !rc.isLocationOccupied(mp) &&
-                    spawnerLocation.isWithinDistanceSquared(mp, sensorRadius)) {
+                    !spawnerLocation.isWithinDistanceSquared(mp, sensorRadius)) {
                 return mp;
             }
         }
@@ -216,7 +216,7 @@ public class GridHelper {
                         got.value += dir.dx;
                         if (!captured.contains(got)) {
                             selected = new Pair<>(got, hp);
-                            if (hp < 0 && broadcastingCaptured == null) {
+                            if (hp <= 0 && broadcastingCaptured == null) {
                                 broadcastingCaptured = got;
                             }
                         }

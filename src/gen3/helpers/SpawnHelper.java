@@ -67,7 +67,7 @@ public class SpawnHelper {
             return false;
         }
         //int xp = slandererHPFloor(Math.max(25, (int)(xpDelta*RATIO_UNITS)));
-        int xp = slandererHPFloor((int)(rc.getInfluence()*RATIO_UNITS));
+        int xp = slandererHPFloor((int)(rc.getInfluence()*RATIO_UNITS*3));
         xp = Math.max(slandererHPFloor(SpawnType.Slanderer.minHp), xp);
         xp = Math.min(slandererHPFloor(SpawnType.Slanderer.maxHp), xp);
 
