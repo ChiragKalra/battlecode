@@ -23,7 +23,7 @@ public class SpawnHelper {
             return false;
         }
 
-        int xp = (int)(rc.getInfluence()*RATIO_UNITS);
+        int xp = (int)(rc.getInfluence()*RATIO_UNITS/4);
         xp = Math.max(SpawnType.Muckraker.minHp, xp);
         xp = Math.min(SpawnType.Muckraker.maxHp, xp);
 
@@ -71,12 +71,13 @@ public class SpawnHelper {
     }
 
     public static boolean spawnDefencePolitician() throws GameActionException {
-        Direction dir = getOptimalDirection(null);
+        Direction dir = getOptimalDirection(directions[(ccvRotation + 2)%8]);
         if (dir == null ) {
             return false;
         }
-        //int xp = slandererHPFloor(Math.max((int) (xpDelta * RATIO_UNITS), 25));
-        int xp = slandererHPFloor(Math.max(25, 2));
+        int xp = (int)(rc.getInfluence()*RATIO_UNITS);
+        xp = Math.max(SpawnType.DefensePolitician.minHp, xp);
+        xp = Math.min(SpawnType.DefensePolitician.maxHp, xp);
         if (rc.canBuildRobot(RobotType.POLITICIAN, dir, xp)) {
             rc.buildRobot(RobotType.POLITICIAN, dir, xp);
             return true;
