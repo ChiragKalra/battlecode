@@ -15,6 +15,7 @@ import static gen3.util.Functions.getRandom;
 // muckraker info grid formation helper
 public class GridHelper {
     public static final int MUCKRAKER_GRID_WIDTH = 5;
+    public static final int ROUND_BROADCAST_CAPTURED = 13;
 
     private static Direction getAdjacentVacant (MapLocation current) throws GameActionException {
         int mx = current.x, my = current.y;
@@ -161,21 +162,43 @@ public class GridHelper {
         return selected.isEmpty() ? null : (Direction) getRandom(selected.toArray());
     }
 
+    private static int lastRoundSeen = -1;
     public static Pair<Pair<Integer, Integer>, Integer> getNearbyEC() {
         // check nearby
         MapLocation loc = rc.getLocation();
         RobotInfo[] nearby = rc.senseNearbyRobots(sensorRadius);
+        Pair<Integer, Integer> mEc = null;
         for (RobotInfo ri: nearby) {
-            if (ri.team != mTeam && ri.type == RobotType.ENLIGHTENMENT_CENTER) {
+            if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
                 int x = ri.location.x >= loc.x ? 1 : -1, y = ri.location.y >= loc.y ? 1 : -1;
-                return new Pair<>(new Pair<>(x, y), ri.conviction);
+                mEc = new Pair<>(x, y);
+                if (ri.team != mTeam) {
+                    lastRoundSeen = roundNumber;
+                    return new Pair<>(mEc, ri.conviction);
+                }
             }
+        }
+        if (mEc != null && lastRoundSeen != -1 && Math.abs(lastRoundSeen-roundNumber) <= ROUND_BROADCAST_CAPTURED) {
+            return new Pair<>(mEc, -HP_LOSS_RATIO);
         }
         return null;
     }
 
+    private static final ArrayList<Pair<Integer, Integer>> captured = new ArrayList<>();
+    private static Pair<Integer, Integer> broadcastingCaptured = null;
+    private static int roundsBroadcasted = 0;
     public static Pair<Pair<Integer, Integer>, Integer> getECFromAdjFlags() throws GameActionException {
+        if (broadcastingCaptured != null) {
+            roundsBroadcasted++;
+            if (roundsBroadcasted > ROUND_BROADCAST_CAPTURED) {
+                captured.add(broadcastingCaptured);
+                broadcastingCaptured = null;
+                roundsBroadcasted = 0;
+            }
+        }
+
         MapLocation current = rc.getLocation();
+
         Pair<Pair<Integer, Integer>, Integer> selected = null;
 
         //check in all 4 directions
@@ -184,12 +207,17 @@ public class GridHelper {
                 int flag = rc.getFlag(ri.getID());
                 if (isBroadcastingEC(flag)) {
                     int hp = getHpFromFlag(flag);
-                    if (hp >= 0 && (selected == null || hp < selected.value)) {
+                    if (selected == null || hp < selected.value) {
                         Pair<Integer, Integer> got = MuckrakerFlag.getRelLocFromFlag(flag);
                         Direction dir = current.directionTo(ri.location);
                         got.key += dir.dx;
                         got.value += dir.dx;
-                        selected = new Pair<>(got, hp);
+                        if (!captured.contains(got)) {
+                            selected = new Pair<>(got, hp);
+                            if (hp < 0 && broadcastingCaptured == null) {
+                                broadcastingCaptured = got;
+                            }
+                        }
                     }
                 }
             }

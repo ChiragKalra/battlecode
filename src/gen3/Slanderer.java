@@ -2,7 +2,6 @@ package gen3;
 
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
-import battlecode.common.RobotInfo;
 import static gen3.RobotPlayer.*;
 
 public strictfp class Slanderer {
@@ -18,7 +17,6 @@ public strictfp class Slanderer {
         }
 
         int distanceFromSpawner = rc.getLocation().distanceSquaredTo(spawnerLocation);
-        System.out.println(distanceFromSpawner);
         if (distanceFromSpawner >= WALL_RADIUS_MIN && distanceFromSpawner <= WALL_RADIUS_MAX) {
         	return;
         }

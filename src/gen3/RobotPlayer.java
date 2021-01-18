@@ -85,7 +85,7 @@ public strictfp class RobotPlayer {
         while (rc.getRoundNum() <= GameConstants.GAME_MAX_NUMBER_OF_ROUNDS) {
             try {
                 roundNumber = rc.getRoundNum();
-                Logger logger = new Logger("full");
+                Logger logger = new Logger("full", true);
 
                 // slanderer will convert to politician in 300 rounds, watch for changes
                 if (mType != rc.getType()) {
@@ -128,7 +128,7 @@ public strictfp class RobotPlayer {
                         MuckrakerFlag.updateFlag();
                 }
 
-                if (roundNumber != rc.getRoundNum() && mType!=RobotType.ENLIGHTENMENT_CENTER) {
+                if (mType!=RobotType.ENLIGHTENMENT_CENTER) {
                     logger.flush();
                 }
 

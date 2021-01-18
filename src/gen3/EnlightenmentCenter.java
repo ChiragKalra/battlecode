@@ -16,8 +16,6 @@ public strictfp class EnlightenmentCenter {
     public static double RATIO_UNITS = 0.03;
     public static double RATIO_SPAWN_BUFF = 0.8;
 
-    private static int mCooldown = 0;
-
     public static Pair<MapLocation, Integer> targetEC;
 
     private static boolean spawnOptimal() throws GameActionException {
@@ -38,11 +36,6 @@ public strictfp class EnlightenmentCenter {
                     spawned = spawnSlanderer();
                     break;
             }
-            if (spawned) {
-                mCooldown += got.cooldown;
-            }
-        } else  {
-            mCooldown += SpawnType.AttackPolitician.cooldown;
         }
 
         return spawned;
@@ -52,11 +45,8 @@ public strictfp class EnlightenmentCenter {
     public static void init() { }
 
     public static void move() throws GameActionException {
-        if (mCooldown > 0) {
-            mCooldown--;
-        }
 
-        if (rc.isReady() && mCooldown < 1) {
+        if (rc.isReady()) {
             spawnOptimal();
         }
 

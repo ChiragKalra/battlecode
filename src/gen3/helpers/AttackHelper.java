@@ -5,7 +5,6 @@ import gen3.flags.MuckrakerFlag;
 import gen3.util.Pair;
 
 import java.util.HashMap;
-import java.util.HashSet;
 
 import static gen3.RobotPlayer.*;
 import static gen3.flags.MuckrakerFlag.getHpFromFlag;
@@ -14,8 +13,8 @@ import static gen3.helpers.MovementHelper.*;
 
 public class AttackHelper {
 
-    private static final double ATTACK_THRESHOLD_RATIO = 0.8;
-    private static final double ATTACK_AFTER_ROUNDS = 5;
+    private static final double EMP_ATTACK_THRESHOLD_RATIO = 0.9;
+    private static final double EMP_AFTER_ROUNDS = 5;
 
     private static final HashMap<MapLocation, Integer> roundsNotAttackedEC = new HashMap<>();
 
@@ -44,26 +43,8 @@ public class AttackHelper {
         return sum.directionTo(curr);
     }
 
-
-    private static final HashSet<MapLocation> captured = new HashSet<>();
-    public static boolean targetAlreadyCaptured(MapLocation target) throws GameActionException {
-        if (captured.contains(target)) {
-            return true;
-        }
-        if (target.isWithinDistanceSquared(rc.getLocation(), sensorRadius)) {
-            RobotInfo ri = rc.senseRobotAtLocation(target);
-            if (ri != null) {
-                if (ri.team == mTeam) {
-                    captured.add(target);
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public static boolean shouldAttack() {
-        RobotInfo[] nearby = rc.senseNearbyRobots(actionRadius);
+    public static boolean shouldAttackOffensive() {
+        RobotInfo[] nearby = rc.senseNearbyRobots(1);
         if (nearby.length == 0) {
             return false;
         }
@@ -82,16 +63,32 @@ public class AttackHelper {
                 done += Math.min(ri.influence-ri.conviction, each);
             }
         }
-        boolean attacking = done/(double) damage > ATTACK_THRESHOLD_RATIO;
+        boolean attacking = done/(double) damage > EMP_ATTACK_THRESHOLD_RATIO;
         if (attacking) return true;
         if (detectedEC != null) {
             int got = roundsNotAttackedEC.getOrDefault(detectedEC, 0) + 1;
-            if (got > ATTACK_AFTER_ROUNDS) {
+            if (got > EMP_AFTER_ROUNDS) {
                 return true;
             }
             roundsNotAttackedEC.put(detectedEC, got);
         }
         return false;
+    }
+
+    public static int shouldAttackDefensive () {
+        RobotInfo[] nearby = rc.senseNearbyRobots(actionRadius, enemyTeam);
+        int[] check = {1, 2, 4, 5, 8, 9, 10};
+        MapLocation location = rc.getLocation();
+
+        for (int rad : check) {
+            for (RobotInfo ri : nearby) {
+                if (location.isWithinDistanceSquared(ri.location, rad)
+                        && ri.type == RobotType.MUCKRAKER) {
+                    return rad;
+                }
+            }
+        }
+        return 0;
     }
 
     /*
@@ -102,19 +99,13 @@ public class AttackHelper {
      *
      */
 
-    public static Direction getNextDirection(MapLocation attackLocation) throws GameActionException {
+    public static Direction getNextDirection(MapLocation attackLocation) {
         MapLocation mLoc = rc.getLocation();
         if (attackLocation == null) {
             for (RobotInfo ri: rc.senseNearbyRobots()) {
                 if (ri.team != mTeam && ri.type == RobotType.ENLIGHTENMENT_CENTER) {
-                    attackLocation = ri.location;
                     return mLoc.directionTo(ri.location);
                 }
-            }
-        } else if (mLoc.isAdjacentTo(attackLocation)) {
-            Direction anti = getAntiCrowdingDirection(mLoc);
-            if (anti != null) {
-                return getAntiCrowdingDirection(mLoc);
             }
         }
         return getRandomDirection();

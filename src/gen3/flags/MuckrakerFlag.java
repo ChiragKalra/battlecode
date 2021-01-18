@@ -22,7 +22,7 @@ import static gen3.helpers.MovementHelper.directions;
  */
 
 public class MuckrakerFlag {
-    private static final int HP_LOSS_RATIO = 10;
+    public static final int HP_LOSS_RATIO = 10;
 
     public static boolean isPlaced (int flag) {
         return (flag & 1) == 1;
@@ -74,11 +74,12 @@ public class MuckrakerFlag {
                 newFlag += relX + relY + (hp << 15);
             } else {
                 got = getECFromAdjFlags();
-                if (got != null) {
-                    newFlag += 1<<4;
-                    int relX = (got.key.key+13) << 5,
-                            relY = (got.key.value+13) << 10;
-                    newFlag += relX + relY;
+                if (got != null ) {
+                    newFlag += 1 << 4;
+                    int relX = (got.key.key + 13) << 5,
+                            relY = (got.key.value + 13) << 10,
+                            hp = Math.min(511, (int) Math.ceil((got.value + HP_LOSS_RATIO) / (double) HP_LOSS_RATIO));
+                    newFlag += relX + relY + (hp << 15);
                 }
             }
         }

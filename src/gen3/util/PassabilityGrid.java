@@ -58,6 +58,10 @@ public class PassabilityGrid {
         return occupied[ml.x - center.x + radius][ml.y - center.y + radius];
     }
 
+    public boolean isBlocked (MapLocation ml) {
+        return occupied[ml.x - center.x + radius][ml.y - center.y + radius];
+    }
+
     public double get (MapLocation ml) throws GameActionException {
         if (isBlockedOrOutside(ml)) {
             return 0;

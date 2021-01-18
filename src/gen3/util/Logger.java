@@ -9,13 +9,15 @@ public class Logger {
     private int prev, prevRN;
     private final StringBuilder pre = new StringBuilder(), output = new StringBuilder();
     private int totalLogs = 0;
+    private final boolean flushOnlyIfExceeds;
 
     // LogCounts is total number of logs for a class including total.
-    public Logger (String title) {
+    public Logger (String title, boolean flushOnlyIfExceeds) {
         start = prev = Clock.getBytecodeNum();
         startRN = prevRN = rc.getRoundNum();
         pre.append("Log_Start@@").append(prevRN).append(" ");
         output.append(" ").append(title).append('\n');
+        this.flushOnlyIfExceeds = flushOnlyIfExceeds;
     }
 
     public void log (String event) {
@@ -28,11 +30,13 @@ public class Logger {
 
     public void flush () {
         if (DEBUG) {
-            log("end");
-            output.append("total ")
-                    .append(Clock.getBytecodeNum()-start + (rc.getRoundNum()-startRN)*mType.bytecodeLimit);
-            pre.append(totalLogs).append(output.toString());
-            System.out.println(pre.toString());
+            if (!flushOnlyIfExceeds || roundNumber < rc.getRoundNum()) {
+                log("end");
+                output.append("total ")
+                        .append(Clock.getBytecodeNum() - start + (rc.getRoundNum() - startRN) * mType.bytecodeLimit);
+                pre.append(totalLogs).append(output.toString());
+                System.out.println(pre.toString());
+            }
         }
     }
 }

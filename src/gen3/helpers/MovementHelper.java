@@ -1,15 +1,13 @@
 package gen3.helpers;
 
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
+import battlecode.common.*;
 import gen3.util.Functions;
+import gen3.util.Logger;
 import gen3.util.PassabilityGrid;
 
 import java.util.*;
 
-import static gen3.RobotPlayer.actionRadius;
-import static gen3.RobotPlayer.rc;
+import static gen3.RobotPlayer.*;
 import static gen3.util.Functions.convolveCircularly;
 
 public class MovementHelper {
@@ -33,9 +31,11 @@ public class MovementHelper {
     };
     public static final List<Direction> directionList = Arrays.asList(directions);
 
+
     public static Direction getRandomDirection() {
         return (Direction) Functions.getRandom(directions);
     }
+
 
     public static Direction vectorAddition(Direction ... dirs) {
         MapLocation yeah = new MapLocation(0,0);
@@ -44,6 +44,72 @@ public class MovementHelper {
         }
         return (new MapLocation(0,0)).directionTo(yeah);
     }
+
+
+    public static boolean tryMove (Direction dir) throws GameActionException {
+        if (rc.canMove(dir)) {
+            rc.move(dir);
+            return true;
+        } else if (rc.getCooldownTurns() < 1) {
+            int dirInt = directionList.indexOf(dir);
+            // if blocked by another robot, find the next best direction
+            for (int i = 1; i<5; i++) {
+                if (Math.random() < 0.5) {
+                    Direction got = directions[Math.floorMod(dirInt + i, 8)];
+                    if (rc.canMove(got)) {
+                        rc.move(got);
+                        return true;
+                    }
+                } else {
+                    Direction got = directions[Math.floorMod(dirInt - i, 8)];
+                    if (rc.canMove(got)) {
+                        rc.move(got);
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+
+    public static MapLocation getOptimalLocationToEmpower () throws GameActionException {
+        MapLocation ec = null;
+        RobotInfo[] nearby = rc.senseNearbyRobots(9);
+        for (RobotInfo ri: nearby) {
+            if (ri.team != mTeam && ri.type == RobotType.ENLIGHTENMENT_CENTER) {
+                ec = ri.location;
+                break;
+            }
+        }
+        if (ec == null) {
+            return null;
+        }
+
+        MapLocation current = rc.getLocation();
+
+        for (int i = 0; i < 8; i+=2) {
+            MapLocation potential = ec.add(directions[i]);
+            if (rc.onTheMap(potential) && !rc.isLocationOccupied(potential)) {
+                boolean is = true;
+                for (int j = 0; j < 8; j+=2) {
+                    if (Math.abs(i-j) == 4) {
+                        continue;
+                    }
+                    MapLocation check = potential.add(directions[i]);
+                    if (!current.equals(check) && rc.onTheMap(check) && check.x % 5 == 0 && check.y % 5 == 0) {
+                        is = false;
+                        break;
+                    }
+                }
+                if (is) {
+                    return potential;
+                }
+            }
+        }
+        return null;
+    }
+
 
     public static Direction getAntiCrowdingDirection(MapLocation current) throws GameActionException {
         byte[] occupied = new byte[8], total = new byte[8];
@@ -82,29 +148,34 @@ public class MovementHelper {
         return directions[(maxInd+4)%8];
     }
 
-    public static boolean tryMove (Direction dir) throws GameActionException {
-        if (rc.canMove(dir)) {
-            rc.move(dir);
-            return true;
-        } else if (rc.getCooldownTurns() < 1) {
-            int dirInt = directionList.indexOf(dir);
-            // if blocked by another robot, find the next best direction
-            for (int i = 1; i<5; i++) {
-                if (Math.random() < 0.5) {
-                    Direction got = directions[Math.floorMod(dirInt + i, 8)];
-                    if (rc.canMove(got)) {
-                        rc.move(got);
-                        return true;
+
+    private static ArrayList<MapLocation> relativeLocations;
+    private static int cachedRadius = 0;
+    public static MapLocation[] getCircumferencePoints(MapLocation center, int radiusSquared) {
+        int rad = (int) Math.sqrt(radiusSquared);
+        if (relativeLocations == null || cachedRadius != radiusSquared) {
+            relativeLocations = new ArrayList<>();
+            for (int x = -rad; x <= rad; x++) {
+                int limY = (int) Math.sqrt(radiusSquared - x*x);
+                if (Math.abs(x) == rad) {
+                    for (int y = -limY; y <= limY; y++) {
+                        relativeLocations.add(new MapLocation(x, y));
                     }
                 } else {
-                    Direction got = directions[Math.floorMod(dirInt - i, 8)];
-                    if (rc.canMove(got)) {
-                        rc.move(got);
-                        return true;
-                    }
+                    relativeLocations.add(new MapLocation(x, limY));
+                    relativeLocations.add(new MapLocation(x, -limY));
                 }
             }
+            cachedRadius = radiusSquared;
         }
-        return false;
+        MapLocation[] ret = new MapLocation[relativeLocations.size()];
+        for (int i = 0; i < relativeLocations.size(); i++) {
+            ret[i] = new MapLocation(
+                    center.x + relativeLocations.get(i).x,
+                    center.y + relativeLocations.get(i).y
+            );
+        }
+        return ret;
     }
+
 }
