@@ -2,6 +2,7 @@ package gen3.helpers;
 
 import battlecode.common.*;
 
+import gen3.flags.EnlightenmentCenterFlag;
 import gen3.util.PassabilityGrid;
 import gen3.util.SpawnType;
 
@@ -40,6 +41,9 @@ public class SpawnHelper {
             return false;
         }
         int xp = Math.max(hp + 11, (int)(rc.getInfluence()*RATIO_UNITS));
+        if (xp % 2 == 0) {
+            xp++;
+        }
         if (rc.canBuildRobot(RobotType.POLITICIAN, dir, xp)) {
             rc.buildRobot(RobotType.POLITICIAN, dir, xp);
             return true;
@@ -47,12 +51,15 @@ public class SpawnHelper {
         return false;
     }
 
-    private static int ccvRotation = 1;
+    private static final int[] sectorQuantity = {0, 0, 8, 8, 16, 24, 24, 32};
+    //private static final int[] sectorQuantity = {0, 0, 8, 8, 16, 24, 24, 32};
+    private static int ccvRotationSlan = 1;
+    private static int numberOfSlans = 0;
     public static boolean spawnSlanderer() throws GameActionException {
-        Direction dir = getOptimalDirection(directions[ccvRotation]);
-        ccvRotation += 2;
-        if (ccvRotation > 7) {
-            ccvRotation = 1;
+        Direction dir = getOptimalDirection(directions[ccvRotationSlan]);
+        ccvRotationSlan += 2;
+        if (ccvRotationSlan > 7) {
+            ccvRotationSlan = 1;
         }
         if (dir == null ) {
             return false;
@@ -65,19 +72,32 @@ public class SpawnHelper {
 
         if (rc.canBuildRobot(RobotType.SLANDERER, dir, xp)) {
             rc.buildRobot(RobotType.SLANDERER, dir, xp);
+            numberOfSlans++;
+            /* TODO
+            if (numberOfSlans > sectorQuantity[EnlightenmentCenterFlag.currentRadius-1]) {
+                EnlightenmentCenterFlag.incrementRadius();
+            }*/
             return true;
         }
         return false;
     }
 
+    private static int ccvRotationPol = 3;
     public static boolean spawnDefencePolitician() throws GameActionException {
-        Direction dir = getOptimalDirection(directions[(ccvRotation + 2)%8]);
+        Direction dir = getOptimalDirection(directions[ccvRotationPol]);
+        ccvRotationPol += 2;
+        if (ccvRotationPol > 7) {
+            ccvRotationPol = 1;
+        }
         if (dir == null ) {
             return false;
         }
         int xp = (int)(rc.getInfluence()*RATIO_UNITS);
         xp = Math.max(SpawnType.DefensePolitician.minHp, xp);
         xp = Math.min(SpawnType.DefensePolitician.maxHp, xp);
+        if (xp % 2 == 1) {
+            xp++;
+        }
         if (rc.canBuildRobot(RobotType.POLITICIAN, dir, xp)) {
             rc.buildRobot(RobotType.POLITICIAN, dir, xp);
             return true;

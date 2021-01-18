@@ -149,31 +149,35 @@ public class MovementHelper {
     }
 
 
-    private static ArrayList<MapLocation> relativeLocations;
-    private static int cachedRadius = 0;
-    public static MapLocation[] getCircumferencePoints(MapLocation center, int radiusSquared) {
+    private static MapLocation[] relativeLocations;
+    private static int cachedRadius = 0, ptr = 0;
+
+    public static MapLocation[] getCircumferencePoints (MapLocation center, int radiusSquared) {
         int rad = (int) Math.sqrt(radiusSquared);
         if (relativeLocations == null || cachedRadius != radiusSquared) {
-            relativeLocations = new ArrayList<>();
-            for (int x = -rad; x <= rad; x++) {
+            relativeLocations = new MapLocation[300];
+            ptr = 0;
+            for (int x = 1; x <= rad; x++) {
                 int limY = (int) Math.sqrt(radiusSquared - x*x);
-                if (Math.abs(x) == rad) {
-                    for (int y = -limY; y <= limY; y++) {
-                        relativeLocations.add(new MapLocation(x, y));
-                    }
-                } else {
-                    relativeLocations.add(new MapLocation(x, limY));
-                    relativeLocations.add(new MapLocation(x, -limY));
+                if (x != limY) {
+                    relativeLocations[ptr++] = new MapLocation(x, limY);
+                    relativeLocations[ptr++] = new MapLocation(x, -limY);
+                    relativeLocations[ptr++] = new MapLocation(-x, limY);
+                    relativeLocations[ptr++] = new MapLocation(-x, -limY);
+                }
+                int c = radiusSquared - (x*x + 2*x + 1);
+                for (int y = 1-limY; y*y > c && y < 0; y++) {
+                    relativeLocations[ptr++] = new MapLocation(x, y);
+                    relativeLocations[ptr++] = new MapLocation(x, -y);
+                    relativeLocations[ptr++] = new MapLocation(-x, y);
+                    relativeLocations[ptr++] = new MapLocation(-x, -y);
                 }
             }
             cachedRadius = radiusSquared;
         }
-        MapLocation[] ret = new MapLocation[relativeLocations.size()];
-        for (int i = 0; i < relativeLocations.size(); i++) {
-            ret[i] = new MapLocation(
-                    center.x + relativeLocations.get(i).x,
-                    center.y + relativeLocations.get(i).y
-            );
+        MapLocation[] ret = new MapLocation[ptr];
+        for (int i = 0; i < ptr; i++) {
+            ret[i++] = new MapLocation(center.x + relativeLocations[i].x, center.y + relativeLocations[i].y);
         }
         return ret;
     }

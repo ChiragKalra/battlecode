@@ -11,6 +11,7 @@ import static gen3.flags.MuckrakerFlag.getHpFromFlag;
 import static gen3.flags.MuckrakerFlag.isBroadcastingEC;
 import static gen3.helpers.MovementHelper.*;
 
+
 public class AttackHelper {
 
     private static final double EMP_ATTACK_THRESHOLD_RATIO = 0.9;
@@ -64,7 +65,7 @@ public class AttackHelper {
             }
         }
         boolean attacking = done/(double) damage > EMP_ATTACK_THRESHOLD_RATIO;
-        if (attacking) return true;
+        if (attacking && !(detectedEC == null && nearby.length == 1)) return true;
         if (detectedEC != null) {
             int got = roundsNotAttackedEC.getOrDefault(detectedEC, 0) + 1;
             if (got > EMP_AFTER_ROUNDS) {
@@ -76,19 +77,26 @@ public class AttackHelper {
     }
 
     public static int shouldAttackDefensive () {
-        RobotInfo[] nearby = rc.senseNearbyRobots(actionRadius, enemyTeam);
-        int[] check = {1, 2, 4, 5, 8, 9, 10};
-        MapLocation location = rc.getLocation();
+        int[] check = {1, 2, 4, 5, 8, 9};
 
+        int empRad = 0, mostKills = 0;
         for (int rad : check) {
-            for (RobotInfo ri : nearby) {
-                if (location.isWithinDistanceSquared(ri.location, rad)
-                        && ri.type == RobotType.MUCKRAKER) {
-                    return rad;
+            RobotInfo[] nearby = rc.senseNearbyRobots(rad);
+            if (nearby.length == 0) continue;
+            int damage = (int) (rc.getConviction()*rc.getEmpowerFactor(mTeam, 0)-10),
+                    each = damage/nearby.length, kills = 0;
+            for (RobotInfo ri: nearby) {
+                if (ri.team != mTeam && ri.type == RobotType.MUCKRAKER) {
+                    if (ri.conviction <= each) {
+                        kills++;
+                    }
                 }
             }
+            if (kills > mostKills) {
+                empRad = rad;
+            }
         }
-        return 0;
+        return empRad;
     }
 
     /*

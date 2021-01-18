@@ -5,7 +5,6 @@ import battlecode.common.MapLocation;
 import battlecode.common.Direction;
 import battlecode.common.RobotController;
 import gen3.util.Pair;
-import gen3.util.SpawnType;
 
 import static gen3.RobotPlayer.rc;
 import static gen3.helpers.AttackHelper.*;

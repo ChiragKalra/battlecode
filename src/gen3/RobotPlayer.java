@@ -90,7 +90,7 @@ public strictfp class RobotPlayer {
                 // slanderer will convert to politician in 300 rounds, watch for changes
                 if (mType != rc.getType()) {
                     mType = rc.getType();
-                    // TODO decide
+                    // Decide weather newly formed pol is defense politician or attack politician
                     isAttackType = true;
                     detectionRadius = mType.detectionRadiusSquared;
                     actionRadius = mType.actionRadiusSquared;
@@ -108,7 +108,9 @@ public strictfp class RobotPlayer {
                         Slanderer.move();
                         break;
                     case MUCKRAKER:
-                        Muckraker.move();
+                        if (rc.isReady()) {
+                            Muckraker.move();
+                        }
                         break;
                 }
                 logger.log("move");
@@ -128,9 +130,8 @@ public strictfp class RobotPlayer {
                         MuckrakerFlag.updateFlag();
                 }
 
-                if (mType!=RobotType.ENLIGHTENMENT_CENTER) {
-                    logger.flush();
-                }
+                logger.flush();
+
 
                 if (roundNumber == rc.getRoundNum()) {
                     Clock.yield();

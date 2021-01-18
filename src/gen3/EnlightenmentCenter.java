@@ -18,6 +18,7 @@ public strictfp class EnlightenmentCenter {
 
     public static Pair<MapLocation, Integer> targetEC;
 
+
     private static boolean spawnOptimal() throws GameActionException {
         boolean spawned = false;
         if (targetEC !=null && targetEC.value <= rc.getInfluence()*RATIO_SPAWN_BUFF) {
@@ -45,6 +46,28 @@ public strictfp class EnlightenmentCenter {
     public static void init() { }
 
     public static void move() throws GameActionException {
+
+        /*int[][] colors = {
+                {0, 0, 255},
+                {255, 255, 255},
+                {0, 255, 255},
+                {255, 0, 255},
+                {255, 255, 0},
+                {255, 0, 0},
+                {125, 0, 125},
+        };
+
+        //indicator dots near EC to show point on the circumference of radius squared
+
+        if (roundNumber == 1) {
+            Logger logger = new Logger("circim", false);
+            for (int i = 1; i <= 7; i++) {
+                MovementHelper.getCircumferencePoints(rc.getLocation(), i * i + 1);
+            }
+        }*/
+
+
+
 
         if (rc.isReady()) {
             spawnOptimal();
