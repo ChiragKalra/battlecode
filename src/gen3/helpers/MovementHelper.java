@@ -183,7 +183,7 @@ public class MovementHelper {
         for (int i = 0; i < ptr; i++) {
             ret[i] = new MapLocation(center.x + relativeLocations[i].x, center.y + relativeLocations[i].y);
         }
-        //logger.flush();
+        logger.flush();
         return ret;
     }
 

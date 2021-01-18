@@ -3,7 +3,6 @@ package gen3;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import gen3.util.Pair;
-import gen3.util.SpawnType;
 
 import static gen3.RobotPlayer.rc;
 import static gen3.helpers.AttackHelper.*;
@@ -14,7 +13,7 @@ public strictfp class Politician {
     public static boolean isAttackType = false;
 
     public static void init() {
-        isAttackType = rc.getInfluence() > SpawnType.DefensePolitician.maxHp;
+        isAttackType = rc.getInfluence() % 2 == 1 ;
     }
 
     private static MapLocation locToEmp = null;

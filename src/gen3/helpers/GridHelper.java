@@ -107,17 +107,7 @@ public class GridHelper {
      *      2. null if no vacancy nearby
      *
      */
-    private static int explodedRadius = 0;
-    private static Direction spawnDirection = null;
     public static Direction getDirectionsToVacancy () throws GameActionException {
-        if (rc.getRoundNum() < 250 && explodedRadius < 4*5) {
-            explodedRadius++;
-            if (spawnDirection == null) {
-                spawnDirection = spawnerLocation.directionTo(rc.getLocation());
-            }
-            return spawnDirection;
-        }
-
         MapLocation mLoc = rc.getLocation(), vacantSpot = checkVacantSpot(mLoc);
         if (vacantSpot != null) {
             return mLoc.directionTo(vacantSpot);

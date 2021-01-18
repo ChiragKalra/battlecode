@@ -9,6 +9,8 @@ import static gen3.helpers.MovementHelper.tryMove;
 
 public strictfp class Muckraker {
     public static boolean placed = false;
+    private static int explodeRadius = 0;
+    private static Direction spawnDirection = null;
 
     public static void move() throws GameActionException {
         // check for slanderers
@@ -32,7 +34,15 @@ public strictfp class Muckraker {
         }*/
 
         // occupy a grid spot if not unplaced
-        if (!placed) {
+
+        if (explodeRadius == 0 && rc.getRoundNum() < 150) {
+            spawnDirection = spawnerLocation.directionTo(rc.getLocation());
+        }
+
+        if (explodeRadius < 4*5 && spawnDirection != null) {
+            tryMove(spawnDirection);
+            explodeRadius++;
+        } else if (!placed) {
             Direction dir = getDirectionsToVacancy();
             if (dir != null) {
                 tryMove(dir);

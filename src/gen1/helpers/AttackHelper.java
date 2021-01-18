@@ -70,7 +70,6 @@ public class AttackHelper {
         // check nearby
         MapLocation found = checkNearby();
         if (found != null) {
-            // TODO maybe replace with better empty spot finding closes to spawner + short algo
             return mLoc.directionTo(found);
         }
 
