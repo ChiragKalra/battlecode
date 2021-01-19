@@ -20,15 +20,14 @@ public class EnlightenmentCenterFlag {
     // check for flag changes and set flag
     private static int blockedRounds = 0;
     public static void updateFlag() throws GameActionException {
-        if (rc.senseNearbyRobots(25).length > 16) {
+        if (rc.senseNearbyRobots(10).length >= 15) {
             blockedRounds++;
         } else {
             blockedRounds = 0;
         }
 
-        if (blockedRounds >= 10) {
+        if (blockedRounds >= 10 && currentRadius<64) {
             currentRadius++;
-            currentRadius = min(currentRadius, 63);
             blockedRounds = 0;
         }
 

@@ -29,16 +29,18 @@ public strictfp class EnlightenmentCenter {
         }
         if (!spawned) {
             SpawnType got = getOptimalType();
-            switch (got) {
-                case Muckraker:
-                    spawned = spawnMuckraker();
-                    break;
-                case DefensePolitician:
-                    spawned = spawnDefencePolitician();
-                    break;
-                case Slanderer:
-                    spawned = spawnSlanderer();
-                    break;
+            if (got != null) {
+                switch (got) {
+                    case Muckraker:
+                        spawned = spawnMuckraker();
+                        break;
+                    case DefensePolitician:
+                        spawned = spawnDefencePolitician();
+                        break;
+                    case Slanderer:
+                        spawned = spawnSlanderer();
+                        break;
+                }
             }
         }
         return spawned;
@@ -56,7 +58,7 @@ public strictfp class EnlightenmentCenter {
         }
 
         int bet = (int) (rc.getInfluence() * RATIO_BID * Math.pow(1.05, rc.getInfluence()/1000.0));
-        if (rc.getRoundNum() >= 250 && rc.canBid(bet) && rc.getTeamVotes() <= GameConstants.GAME_MAX_NUMBER_OF_ROUNDS/2) {
+        if (rc.getRoundNum() >= 150 && rc.canBid(bet) && rc.getTeamVotes() <= GameConstants.GAME_MAX_NUMBER_OF_ROUNDS/2) {
             rc.bid(bet);
         } else if (rc.getTeamVotes() > GameConstants.GAME_MAX_NUMBER_OF_ROUNDS/2) {
             RATIO_UNITS += RATIO_BID;
