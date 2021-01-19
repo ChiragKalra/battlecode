@@ -18,15 +18,22 @@ public class EnlightenmentCenterFlag {
 	}
 
     // check for flag changes and set flag
+    private static int blockedRounds = 0;
     public static void updateFlag() throws GameActionException {
-		if (rc.senseNearbyRobots(5).length > 16) {
-			currentRadius++;
-		}
+        if (rc.senseNearbyRobots(25).length > 16) {
+            blockedRounds++;
+        } else {
+            blockedRounds = 0;
+        }
 
-    	int prevFlag = rc.getFlag(rc.getID());
-    	int newFlag = ((prevFlag >> 5) << 5) | currentRadius;
-    	if (prevFlag != newFlag) {
-    		rc.setFlag(newFlag);
-    	}
+        if (blockedRounds >= 10) {
+          currentRadius++;
+        }
+
+        int prevFlag = rc.getFlag(rc.getID());
+        int newFlag = ((prevFlag >> 5) << 5) | currentRadius;
+        if (prevFlag != newFlag) {
+            rc.setFlag(newFlag);
+        }
     }
 }

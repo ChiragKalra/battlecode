@@ -4,19 +4,16 @@ import battlecode.common.*;
 
 import static gen4.RobotPlayer.rc;
 import static gen4.RobotPlayer.spawnerLocation;
-import static gen4.Slanderer.innerRadius;
-import static gen4.Slanderer.outerRadius;
 
 public class DefenseHelper {
 
 	public static boolean isTunnelPoint(MapLocation ml) {
-		return ml.x == spawnerLocation.x || ml.y == spawnerLocation.y || 
-				Math.abs(ml.x - spawnerLocation.x) == Math.abs(ml.y - spawnerLocation.y);
+		return ml.x == spawnerLocation.x || ml.y == spawnerLocation.y;
 	}
 
-	public static boolean tryMoveWall(Direction dir) throws GameActionException {
+	public static boolean tryMoveWall(Direction dir, int outerRadius) throws GameActionException {
 		MapLocation ml = rc.getLocation().add(dir);
-		if (outsideWall(ml)) {
+		if (outsideWall(ml, outerRadius)) {
 			return false;
 		}
 
@@ -27,12 +24,11 @@ public class DefenseHelper {
     	return false;
     }
 
-	public static boolean onWall(MapLocation ml) throws GameActionException {
+	public static boolean onWall(MapLocation ml, int innerRadius, int outerRadius) throws GameActionException {
 		return isWallOfRadius(spawnerLocation, ml, innerRadius) || isWallOfRadius(spawnerLocation, ml, outerRadius);
-		//return contains(innerPoints, ml) || contains(outerPoints, ml);
 	}
 
-	public static boolean isWallOfRadius (MapLocation center, MapLocation ml, int rs) {
+	public static boolean isWallOfRadius(MapLocation center, MapLocation ml, int rs) {
 		if (!center.isWithinDistanceSquared(ml, rs)) return false;
 		int x = Math.abs(ml.x-center.x), y = (int) Math.sqrt(rs-x*x);
 		int abs = Math.abs(ml.y - center.y);
@@ -40,7 +36,7 @@ public class DefenseHelper {
 		return (x*x + 2*x + 1) + abs*abs > rs && y > abs;
 	}
 
-    public static boolean outsideWall(MapLocation ml) {
+    public static boolean outsideWall(MapLocation ml, int outerRadius) {
     	return ml.distanceSquaredTo(spawnerLocation) > outerRadius;
     }
 

@@ -42,7 +42,8 @@ public strictfp class Politician {
         }
     }
 
-    public static int innerRadius, outerRadius;
+    private static int innerRadius, outerRadius;
+
     public static void moveDefense () throws GameActionException {
         int rad = shouldAttackDefensive();
         if (rad != 0) {
@@ -55,8 +56,10 @@ public strictfp class Politician {
             radius = getRadius(rc.getFlag(enlightenmentCenterId));
         } else {
             isAttackType = true;
+            moveAttack();
             return;
         }
+
         innerRadius = radius * radius + 1;
         outerRadius = (radius + 1) * (radius + 1) + 1;
 
@@ -64,42 +67,15 @@ public strictfp class Politician {
         Direction left = straight.rotateLeft();
         Direction right = straight.rotateRight();
 
-        if (onWall(rc.getLocation()) && !isTunnelPoint(rc.getLocation())) {
-            return;
-        }
-        if (outsideWall(rc.getLocation())) {
-            Direction opposite = straight.opposite();
-            Direction oppleft = opposite.rotateLeft();
-            Direction oppright = opposite.rotateRight();
-
-            if (forceMove(oppright)) {
+        if (onWall(rc.getLocation(), innerRadius, outerRadius)) {
+            if (!isTunnelPoint(rc.getLocation())) {
                 return;
             }
-            if (forceMove(oppleft)) {
+            
+            if (forceMove(left.rotateLeft())) {
                 return;
             }
-            if (forceMove(oppright.rotateRight())) {
-                return;
-            }
-            if (forceMove(oppleft.rotateLeft())) {
-                return;
-            }
-
-            return;
-        }
-
-        if (tryMoveWall(straight)) {
-            return;
-        }
-        if (tryMoveWall(left)) {
-            return;
-        }
-        if (tryMoveWall(right)) {
-            return;
-        }
-
-        if (onWall(rc.getLocation())) {
-            if (forceMove(straight)) {
+            if (forceMove(right.rotateRight())) {
                 return;
             }
             if (forceMove(left)) {
@@ -108,30 +84,72 @@ public strictfp class Politician {
             if (forceMove(right)) {
                 return;
             }
-            if (forceMove(left.rotateLeft())) {
-                return;
-            }
-            if (forceMove(right.rotateRight())) {
+            if (forceMove(straight)) {
                 return;
             }
 
             return;
         }
 
+        if (outsideWall(rc.getLocation(), outerRadius)) {
+            Direction opposite = straight.opposite();
+            Direction oppLeft = opposite.rotateLeft();
+            Direction oppRight = opposite.rotateRight();
+
+            if (forceMove(oppRight)) {
+                return;
+            }
+            if (forceMove(oppLeft)) {
+                return;
+            }
+            if (forceMove(oppRight.rotateRight())) {
+                return;
+            }
+            if (forceMove(oppLeft.rotateLeft())) {
+                return;
+            }
+
+            if (isTunnelPoint(rc.getLocation())) {
+                if (forceMove(left)) {
+                    return;
+                }
+                if (forceMove(right)) {
+                    return;
+                }
+                if (forceMove(straight)) {
+                    return;
+                }
+            } else if (forceMove(opposite)) {
+                return;
+            }
+
+            return;
+        }
+
+        if (tryMoveWall(straight, outerRadius)) {
+            return;
+        }
+        if (tryMoveWall(left, outerRadius)) {
+            return;
+        }
+        if (tryMoveWall(right, outerRadius)) {
+            return;
+        }
+
         for (int i = 0; i < 2; ++i) {
             left = left.rotateLeft();
-            if (tryMoveWall(left)) {
+            if (tryMoveWall(left, outerRadius)) {
                 return;
             }
 
             right = right.rotateRight();
-            if (tryMoveWall(right)) {
+            if (tryMoveWall(right, outerRadius)) {
                 return;
             }
         }
 
         left = left.rotateLeft();
-        tryMoveWall(left);
+        tryMoveWall(left, outerRadius);
     }
 
     public static void move() throws GameActionException {

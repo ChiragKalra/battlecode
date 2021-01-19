@@ -12,11 +12,7 @@ import static gen4.helpers.FarmHelper.*;
 import static gen4.helpers.MovementHelper.getCircumferencePoints;
 
 public strictfp class Slanderer {
-    private static final int WALL_RADIUS_MIN = 18;
-    private static final int WALL_RADIUS_MAX = 30;
-
     public static int innerRadius, outerRadius;
-    public static MapLocation[] innerPoints, outerPoints;
 
     public static void move() throws GameActionException {
         if (!rc.isReady()) {
@@ -37,16 +33,13 @@ public strictfp class Slanderer {
         innerRadius = radius * radius + 1;
         outerRadius = (radius + 1) * (radius + 1) + 1;
 
-        innerPoints = getCircumferencePoints(spawnerLocation, innerRadius);
-        outerPoints = getCircumferencePoints(spawnerLocation, outerRadius);
-
         Direction straight = rc.getLocation().directionTo(spawnerLocation).opposite();
         Direction left = straight.rotateLeft();
         Direction right = straight.rotateRight();
 
-        boolean onWallStraight = onWall(rc.getLocation().add(straight));
-        boolean onWallLeft = onWall(rc.getLocation().add(left));
-        boolean onWallRight = onWall(rc.getLocation().add(right));
+        boolean onWallStraight = onWall(rc.getLocation().add(straight), innerRadius, outerRadius);
+        boolean onWallLeft = onWall(rc.getLocation().add(left), innerRadius, outerRadius);
+        boolean onWallRight = onWall(rc.getLocation().add(right), innerRadius, outerRadius);
 
         boolean nearWall = false;
         if (onWallStraight || onWallLeft || onWallRight) {
