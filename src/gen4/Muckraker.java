@@ -1,10 +1,10 @@
-package gen3;
+package gen4;
 
 import battlecode.common.*;
 
-import static gen3.RobotPlayer.*;
-import static gen3.helpers.GridHelper.*;
-import static gen3.helpers.MovementHelper.tryMove;
+import static gen4.RobotPlayer.*;
+import static gen4.helpers.GridHelper.*;
+import static gen4.helpers.MovementHelper.tryMove;
 
 
 public strictfp class Muckraker {

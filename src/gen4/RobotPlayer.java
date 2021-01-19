@@ -1,18 +1,18 @@
-package gen3;
+package gen4;
 
 import battlecode.common.*;
 
-import gen3.flags.EnlightenmentCenterFlag;
-import gen3.flags.PoliticianFlag;
-import gen3.flags.SlandererFlag;
-import gen3.flags.MuckrakerFlag;
-import gen3.util.Logger;
+import gen4.flags.EnlightenmentCenterFlag;
+import gen4.flags.PoliticianFlag;
+import gen4.flags.SlandererFlag;
+import gen4.flags.MuckrakerFlag;
+import gen4.util.Logger;
 
-import static gen3.Politician.isAttackType;
+import static gen4.Politician.isAttackType;
 
 public strictfp class RobotPlayer {
     // toggle logging before competitive matches
-    public static final boolean DEBUG = false;
+    public static final boolean DEBUG = true;
     public static void log (String s) {
         if (DEBUG) {
             System.out.println(s);
