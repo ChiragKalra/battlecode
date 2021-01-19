@@ -6,6 +6,8 @@ import battlecode.common.MapLocation;
 
 import static gen4.RobotPlayer.*;
 import static gen4.flags.EnlightenmentCenterFlag.getRadius;
+import static gen4.helpers.DefenseHelper.isTunnelPoint;
+import static gen4.helpers.DefenseHelper.onWall;
 import static gen4.helpers.FarmHelper.*;
 import static gen4.helpers.MovementHelper.getCircumferencePoints;
 
