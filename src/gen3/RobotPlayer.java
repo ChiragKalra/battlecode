@@ -12,7 +12,7 @@ import static gen3.Politician.isAttackType;
 
 public strictfp class RobotPlayer {
     // toggle logging before competitive matches
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
     public static void log (String s) {
         if (DEBUG) {
             System.out.println(s);
@@ -130,7 +130,7 @@ public strictfp class RobotPlayer {
                         MuckrakerFlag.updateFlag();
                 }
 
-                logger.flush();
+                //logger.flush();
 
 
                 if (roundNumber == rc.getRoundNum()) {
@@ -138,7 +138,7 @@ public strictfp class RobotPlayer {
                 }
             } catch (Exception e) {
                 if (DEBUG) {
-                    e.printStackTrace();
+                    //e.printStackTrace();
                 }
             }
         }
