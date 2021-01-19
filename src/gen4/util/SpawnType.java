@@ -5,7 +5,7 @@ import static gen4.RobotPlayer.rc;
 
 public enum SpawnType {
     AttackPolitician(0, 26, 5000),
-    DefensePolitician(0, 16, 25),
+    DefensePolitician(0, 14, 25),
     Muckraker(0,1,5),
     Slanderer(0, 41, 5000);
 
@@ -48,18 +48,21 @@ public enum SpawnType {
 
     private static double getMuckrakerProbability (int round) {
         if (round < 75) return 0.9;
-        return 0;
+        if (round < 250 && round > 200) return 0;
+        return 0.0;
     }
 
     private static double getSlandererProbability (int round) {
         if (round < 150) return 0;
+        if (round < 225 && round > 200) return 0;
         return 0.1;
     }
 
     private static double getDefensePoliticianProbability (int round) {
         if (round < 75) return 0.1;
-        if (round < 475) return 1;
-        if (round < 800) return 0.1;
+        if (round < 200) return 1;
+        if (round < 250 && round > 200) return 0;
+        if (round < 400) return 0.3;
         return 0.5;
     }
 

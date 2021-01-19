@@ -127,7 +127,7 @@ public strictfp class Slanderer {
                 } else {
                     RobotInfo robot = rc.senseRobotAtLocation(adjacentLocation);
                     // a slanderer already present next to muckraker
-                    if (robot.getTeam() == mTeam && robot.getType() == RobotType.SLANDERER) {
+                    if (robot != null && robot.getTeam() == mTeam && robot.getType() == RobotType.SLANDERER) {
                         return null;
                     }
                 }

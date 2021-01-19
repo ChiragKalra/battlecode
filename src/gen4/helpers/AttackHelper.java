@@ -62,7 +62,7 @@ public class AttackHelper {
             int damage = (int) (rc.getConviction()*rc.getEmpowerFactor(mTeam, 0)-10),
                     each = damage/nearby.length, kills = 0, damageDone = 0;
             for (RobotInfo ri: nearby) {
-                if (ri.team != mTeam && ri.type == RobotType.MUCKRAKER) {
+                if (ri.team != mTeam) {
                     if (ri.conviction < each) {
                         kills++;
                         damageDone += ri.conviction+1;
