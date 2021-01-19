@@ -14,7 +14,7 @@ import static gen4.EnlightenmentCenter.currentRadius;
 public class EnlightenmentCenterFlag {
 
 	public static int getRadius(int flag) {
-		return flag & 31;
+		return flag & 63;
 	}
 
     // check for flag changes and set flag
@@ -26,13 +26,13 @@ public class EnlightenmentCenterFlag {
             blockedRounds = 0;
         }
 
-        if (blockedRounds >= 20 && currentRadius<64) {
+        if (blockedRounds >= 10 && currentRadius<64) {
             currentRadius++;
             blockedRounds = 0;
         }
 
         int prevFlag = rc.getFlag(rc.getID());
-        int newFlag = ((prevFlag >> 5) << 5) | currentRadius;
+        int newFlag = ((prevFlag >> 6) << 6) | currentRadius;
         if (prevFlag != newFlag) {
             rc.setFlag(newFlag);
         }
