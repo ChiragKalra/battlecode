@@ -51,14 +51,15 @@ public class SpawnHelper {
     }
 
     // layerQuantity = { 0, 8, 12, 16, 20, 28, 32, 40, 44, 48, 56, 60, 68, 72, 76, 84, };
-    private static final int[] sectorQuantity = { 0, 8, 20, 36, 56, 84, 116, 156, 200, 248, 304, 364, 432, 504, 580, 664, };
+    // private static final int[] sectorQuantity = { 0, 8, 20, 36, 56, 84, 116, 156, 200, 248, 304, 364, 432, 504, 580, 664, };
+    private static int spawnDirectionSlan = 0;
     public static boolean spawnSlanderer() throws GameActionException {
-        Direction dir = getOptimalDirection(null);
+        Direction dir = getOptimalDirection(directions[(spawnDirectionSlan++)%8]);
         if (dir == null ) {
             return false;
         }
         //int xp = slandererHPFloor(Math.max(25, (int)(xpDelta*RATIO_UNITS)));
-        int xp = slandererHPFloor((int)(rc.getInfluence()*0.1)),
+        int xp = slandererHPFloor((int)(rc.getInfluence()*0.8)),
             minXp = slandererHPFloor(SpawnType.Slanderer.minHp),
             maxXp = slandererHPFloor(SpawnType.Slanderer.maxHp);
         xp = Math.max(minXp, xp);
@@ -75,12 +76,14 @@ public class SpawnHelper {
         return false;
     }
 
+
+    private static int spawnDirectionDefPol = 0;
     public static boolean spawnDefencePolitician() throws GameActionException {
-        Direction dir = getOptimalDirection(null);
+        Direction dir = getOptimalDirection(directions[(spawnDirectionDefPol++)%8]);
         if (dir == null ) {
             return false;
         }
-        int xp = (int)(rc.getInfluence()*RATIO_UNITS);
+        int xp = (int)(rc.getInfluence()*0.005);
         xp = Math.max(SpawnType.DefensePolitician.minHp, xp);
         xp = Math.min(SpawnType.DefensePolitician.maxHp, xp);
         if (xp % 2 == 1) {
