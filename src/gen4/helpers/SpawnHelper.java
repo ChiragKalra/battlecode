@@ -88,7 +88,7 @@ public class SpawnHelper {
             minXp = slandererHPFloor(SpawnType.Slanderer.minHp),
             maxXp = (int) (slandererHPFloor(SpawnType.Slanderer.maxHp)*earlyGameFactor);
         xp = Math.max(minXp, xp);
-        xp = Math.min(maxXp, xp);
+        xp = Math.min(maxXp == 0 ? minXp : maxXp, xp);
 
 
         if (rc.canBuildRobot(RobotType.SLANDERER, dir, xp)) {
@@ -108,7 +108,7 @@ public class SpawnHelper {
         if (dir == null ) {
             return false;
         }
-        int xp = (int)(rc.getInfluence()*0.005);
+        int xp = (int)(rc.getInfluence()*0.03);
         xp = Math.max(SpawnType.DefensePolitician.minHp, xp);
         xp = Math.min(SpawnType.DefensePolitician.maxHp, xp);
         if (xp % 2 == 1) {

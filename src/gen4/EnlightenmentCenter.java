@@ -17,7 +17,7 @@ public strictfp class EnlightenmentCenter {
 
     public static double RATIO_BID = 0.08;
     public static double RATIO_UNITS = 0.02;
-    public static double RATIO_SPAWN_BUFF = 0;
+    public static double RATIO_SPAWN_BUFF = 0.4;
 
     public static int roundCaptured = 1;
     public static double ratioDirectionsBlocked = 0;
@@ -26,7 +26,9 @@ public strictfp class EnlightenmentCenter {
 
     private static boolean spawnOptimal() throws GameActionException {
         boolean spawned = false;
-        if (targetEC !=null && targetEC.value <= rc.getInfluence()*RATIO_SPAWN_BUFF) {
+        if (targetEC !=null && targetEC.value <= rc.getInfluence()*RATIO_SPAWN_BUFF &&
+                roundNumber-roundCaptured > 800
+        ) {
             spawned = spawnAttackPolitician(targetEC.key, targetEC.value);
         }
         if (!spawned) {
@@ -58,7 +60,7 @@ public strictfp class EnlightenmentCenter {
         MapLocation cur = rc.getLocation();
         for (int i = 0; i < 8; i++) {
             Direction dir = directions[i];
-            if (!rc.onTheMap(cur.translate(dir.dx*3, dir.dy*3))) {
+            if (!rc.onTheMap(cur.translate(dir.dx*2, dir.dy*2))) {
                 ratioDirectionsBlocked++;
             }
         }
@@ -71,8 +73,8 @@ public strictfp class EnlightenmentCenter {
             spawnOptimal();
         }
 
-        int bet = (int) (rc.getInfluence() * RATIO_BID * Math.pow(1.08, rc.getInfluence()/1000.0));
-        if (rc.getRoundNum() >= 150 && rc.canBid(bet) && rc.getTeamVotes() <= GameConstants.GAME_MAX_NUMBER_OF_ROUNDS/2) {
+        int bet = (int) (rc.getInfluence() * RATIO_BID * Math.pow(1.07, rc.getInfluence()/1000.0));
+        if (rc.getRoundNum() >= 250 && rc.canBid(bet) && rc.getTeamVotes() <= GameConstants.GAME_MAX_NUMBER_OF_ROUNDS/2) {
             rc.bid(bet);
         } else if (rc.getTeamVotes() > GameConstants.GAME_MAX_NUMBER_OF_ROUNDS/2) {
             RATIO_UNITS += RATIO_BID;

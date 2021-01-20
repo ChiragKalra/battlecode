@@ -33,21 +33,17 @@ public strictfp class Politician {
         } else {
             Pair<MapLocation, Integer> got = checkForAttackCoordinates();
             if (got != null && got.value >= 0) {
-                MapLocation attackLocation = got.key;
-                if (attackLocation == null || tryMove(rc.getLocation().directionTo(attackLocation))) {
-                    tryMove(getNextDirection(attackLocation));
-                }
+                tryMove(rc.getLocation().directionTo(got.key));
             } else {
-                tryMove(getNextDirection(null));
+                //tryMove(getNextDirection(null));
+                moveDefense();
             }
         }
     }
 
-    private static int innerRadius, outerRadius;
-
     public static void moveDefense () throws GameActionException {
         int rad = shouldAttackDefensive();
-        if (rad != 0) {
+        if (rad != 0 && isAttackType) {
             rc.empower(rad);
             return;
         }
@@ -61,8 +57,8 @@ public strictfp class Politician {
             return;
         }
 
-        innerRadius = radius * radius + 1;
-        outerRadius = (radius + 1) * (radius + 1) + 1;
+        int innerRadius = radius * radius + 1;
+        int outerRadius = (radius + 1) * (radius + 1) + 1;
 
         Direction straight = rc.getLocation().directionTo(spawnerLocation).opposite();
         Direction left = straight.rotateLeft();
@@ -155,7 +151,7 @@ public strictfp class Politician {
 
     public static void move() throws GameActionException {
         if (rc.isReady()) {
-
+            init();
             // move modes
             if (isAttackType) {
                 moveAttack();

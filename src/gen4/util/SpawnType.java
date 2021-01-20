@@ -53,8 +53,9 @@ public enum SpawnType {
     }
 
     private static double getSlandererProbability (int round) {
-        if (round < 150) return 0;
+        if (round < 150) return 0.03;
         if (round < 225 && round > 200) return 0;
+        if (round < 500) return 0.2;
         return 0.1;
     }
 
@@ -63,7 +64,7 @@ public enum SpawnType {
         if (round < 200) return 1;
         if (round < 250 && round > 200) return 0;
         if (round < 400) return 0.3;
-        return 0.5;
+        return 0.6;
     }
 
 }

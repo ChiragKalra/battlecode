@@ -1,0 +1,14 @@
+Isolated (Farm):
+Andromeda,Branches
+
+
+Isolated but late game combat likely (Farm and Combat):
+Cow,CrownJewels,GridLock,Illusion,NotAPuzzle,SlowMusic
+
+
+Close enough (Full Combat):
+Arena,Bog,Chevron,Corridor,FiveOfHearts,Rainbow,Snowflake
+
+
+Too close (Early Combat):
+ExesAndOhs,CrossStitch
