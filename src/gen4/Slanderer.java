@@ -1,10 +1,10 @@
 package gen4;
 
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
+import battlecode.common.*;
 
 import static gen4.RobotPlayer.*;
 import static gen4.flags.EnlightenmentCenterFlag.getRadius;
+import static gen4.flags.EnlightenmentCenterFlag.getShiftDirection;
 import static gen4.helpers.DefenseHelper.*;
 
 
@@ -154,6 +154,12 @@ public strictfp class Slanderer {
             if (forceMoveWall(right)) {
                 return;
             }
+        }
+    }
+
+    public static void init() throws GameActionException {
+        if (rc.canGetFlag(enlightenmentCenterId)) {
+            tunnelShift = getShiftDirection(rc.getFlag(enlightenmentCenterId));
         }
     }
 }

@@ -72,7 +72,7 @@ public strictfp class RobotPlayer {
                     Politician.init();
                     break;
                 case SLANDERER:
-                    // Slanderer.init();
+                    Slanderer.init();
                     break;
                 case MUCKRAKER:
                     // Muckraker.init();

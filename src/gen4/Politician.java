@@ -1,13 +1,12 @@
 package gen4;
 
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
+import battlecode.common.*;
 import gen4.util.Pair;
 import gen4.util.SpawnType;
 
 import static gen4.RobotPlayer.*;
 import static gen4.flags.EnlightenmentCenterFlag.getRadius;
+import static gen4.flags.EnlightenmentCenterFlag.getShiftDirection;
 import static gen4.helpers.AttackHelper.*;
 import static gen4.helpers.DefenseHelper.*;
 import static gen4.helpers.MovementHelper.*;
@@ -48,6 +47,12 @@ public strictfp class Politician {
             return;
         }
 
+        /*for (RobotInfo ri: rc.senseNearbyRobots(actionRadius, mTeam)) {
+            if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
+                enlightenmentCenterId = ri.getID();
+            }
+        }
+*/
         int radius;
         if (rc.canGetFlag(enlightenmentCenterId)) {
             radius = getRadius(rc.getFlag(enlightenmentCenterId));
@@ -161,7 +166,10 @@ public strictfp class Politician {
         }
     }
 
-    public static void init() {
-        isAttackType = rc.getConviction() >= SpawnType.AttackPolitician.minHp;
+    public static void init() throws GameActionException {
+        isAttackType = rc.getConviction() >= SpawnType.AttackPolitician.minHp || spawnerLocation == null;
+        if (rc.canGetFlag(enlightenmentCenterId)) {
+            tunnelShift = getShiftDirection(rc.getFlag(enlightenmentCenterId));
+        }
     }
 }

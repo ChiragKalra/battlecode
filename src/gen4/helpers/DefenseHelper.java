@@ -7,8 +7,10 @@ import static gen4.RobotPlayer.spawnerLocation;
 
 public class DefenseHelper {
 
+	public static Direction tunnelShift = Direction.CENTER;
+
 	public static boolean isTunnelPoint(MapLocation ml) {
-		return ml.x == spawnerLocation.x || ml.y == spawnerLocation.y;
+		return ml.x == spawnerLocation.x + tunnelShift.dx || ml.y == spawnerLocation.y + tunnelShift.dy;
 	}
 
 	public static boolean forceMoveWall(Direction dir) throws GameActionException {
@@ -32,7 +34,7 @@ public class DefenseHelper {
     	return false;
     }
 
-	public static boolean onWall(MapLocation ml, int innerRadius, int outerRadius) throws GameActionException {
+	public static boolean onWall(MapLocation ml, int innerRadius, int outerRadius)  {
 		return isWallOfRadius(spawnerLocation, ml, innerRadius) || isWallOfRadius(spawnerLocation, ml, outerRadius);
 	}
 

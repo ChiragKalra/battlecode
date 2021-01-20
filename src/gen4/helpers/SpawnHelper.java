@@ -12,7 +12,7 @@ import static gen4.util.Functions.sigmoid;
 
 public class SpawnHelper {
 
-    private static final int LIMIT_WALL_RADIUS = 21;
+    private static final int LIMIT_WALL_RADIUS = 50;
 
     private static int slandererHPFloor (int hp) {
         double func = (0.02 + 0.03*Math.exp(-0.001*hp))*hp;
