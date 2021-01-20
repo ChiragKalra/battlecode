@@ -71,7 +71,7 @@ public strictfp class EnlightenmentCenter {
             spawnOptimal();
         }
 
-        int bet = (int) (rc.getInfluence() * RATIO_BID * Math.pow(1.07, rc.getInfluence()/1000.0));
+        int bet = (int) (rc.getInfluence() * RATIO_BID * Math.pow(1.08, rc.getInfluence()/1000.0));
         if (rc.getRoundNum() >= 150 && rc.canBid(bet) && rc.getTeamVotes() <= GameConstants.GAME_MAX_NUMBER_OF_ROUNDS/2) {
             rc.bid(bet);
         } else if (rc.getTeamVotes() > GameConstants.GAME_MAX_NUMBER_OF_ROUNDS/2) {
