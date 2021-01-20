@@ -15,9 +15,6 @@ public class MovementHelper {
     public static final double RATIO_CROWDING = 0.33;
     public static final int RADIUS_CROWDING = actionRadius;
 
-    // adjacent direction preference factor
-    public static final double[] DIRECTION_FACTOR = {.5, .25, .125, .0625, 0.03125};
-
     public static final Direction[] directions = {
             Direction.NORTH,
             Direction.NORTHEAST,
@@ -53,18 +50,10 @@ public class MovementHelper {
             int dirInt = directionList.indexOf(dir);
             // if blocked by another robot, find the next best direction
             for (int i = 1; i<5; i++) {
-                if (Math.random() < 0.5) {
-                    Direction got = directions[Math.floorMod(dirInt + i, 8)];
-                    if (rc.canMove(got)) {
-                        rc.move(got);
-                        return true;
-                    }
-                } else {
-                    Direction got = directions[Math.floorMod(dirInt - i, 8)];
-                    if (rc.canMove(got)) {
-                        rc.move(got);
-                        return true;
-                    }
+                Direction got = directions[Math.floorMod(dirInt + (Math.random() < 0.5 ? -i : i), 8)];
+                if (rc.canMove(got)) {
+                    rc.move(got);
+                    return true;
                 }
             }
         }

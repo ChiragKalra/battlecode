@@ -35,15 +35,15 @@ public strictfp class Politician {
             if (got != null && got.value >= 0) {
                 tryMove(rc.getLocation().directionTo(got.key));
             } else {
-                //tryMove(getNextDirection(null));
-                moveDefense();
+                tryMove(getNextDirection(null));
+                //moveDefense();
             }
         }
     }
 
     public static void moveDefense () throws GameActionException {
         int rad = shouldAttackDefensive();
-        if (rad != 0 && isAttackType) {
+        if (rad != 0 && !isAttackType) {
             rc.empower(rad);
             return;
         }
