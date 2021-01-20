@@ -6,10 +6,8 @@ import battlecode.common.MapLocation;
 
 import static gen4.RobotPlayer.*;
 import static gen4.flags.EnlightenmentCenterFlag.getRadius;
-import static gen4.helpers.DefenseHelper.isTunnelPoint;
-import static gen4.helpers.DefenseHelper.onWall;
+import static gen4.helpers.DefenseHelper.*;
 import static gen4.helpers.FarmHelper.*;
-import static gen4.helpers.MovementHelper.getCircumferencePoints;
 
 public strictfp class Slanderer {
     public static int innerRadius, outerRadius;
@@ -27,6 +25,26 @@ public strictfp class Slanderer {
         if (rc.canGetFlag(enlightenmentCenterId)) {
             radius = getRadius(rc.getFlag(enlightenmentCenterId));
         } else {
+            // TODO: move away from muckrakers
+            Direction opposite = rc.getLocation().directionTo(spawnerLocation).opposite();
+            Direction oppLeft = opposite.rotateLeft();
+            Direction oppRight = opposite.rotateRight();
+            if (forceMove(opposite)) {
+                return;
+            }
+            if (forceMove(oppLeft)) {
+                return;
+            }
+            if (forceMove(oppRight)) {
+                return;
+            }
+            if (forceMove(oppLeft.rotateLeft())) {
+                return;
+            }
+            if (forceMove(oppRight.rotateRight())) {
+                return;
+            }
+
             return;
         }
 
@@ -40,12 +58,8 @@ public strictfp class Slanderer {
         boolean onWallStraight = onWall(rc.getLocation().add(straight), innerRadius, outerRadius);
         boolean onWallLeft = onWall(rc.getLocation().add(left), innerRadius, outerRadius);
         boolean onWallRight = onWall(rc.getLocation().add(right), innerRadius, outerRadius);
-
-        boolean nearWall = false;
-        if (onWallStraight || onWallLeft || onWallRight) {
-            nearWall = true;
-        }
-
+        
+        boolean nearWall = onWallStraight || onWallLeft || onWallRight;
         if (nearWall) {
             if (isTunnelPoint(rc.getLocation())) {
                 for (int i = 0; i < 2; ++i) {
