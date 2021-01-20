@@ -42,6 +42,9 @@ public strictfp class EnlightenmentCenter {
                         spawned = spawnSlanderer();
                         break;
                 }
+                if (!spawned && rc.senseNearbyRobots(sensorRadius, enemyTeam).length>0) {
+                    spawned = spawnDefencePolitician();
+                }
             }
         }
         return spawned;
@@ -52,7 +55,7 @@ public strictfp class EnlightenmentCenter {
         roundCaptured = rc.getRoundNum();
 
         MapLocation cur = rc.getLocation();
-        for (int i = 1; i < 8; i+=2) {
+        for (int i = 0; i < 8; i++) {
             Direction dir = directions[i];
             if (!rc.onTheMap(cur.translate(dir.dx*3, dir.dy*3))) {
                 directionsBlocked++;

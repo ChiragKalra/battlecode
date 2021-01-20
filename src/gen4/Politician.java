@@ -18,8 +18,9 @@ public strictfp class Politician {
     private static MapLocation locToEmp = null;
 
     public static void moveAttack() throws GameActionException {
-        if (shouldAttackOffensive()) {
-            rc.empower(1);
+        int rad = shouldAttackOffensive();
+        if (rad != 0) {
+            rc.empower(rad);
             return;
         }
 
@@ -49,6 +50,12 @@ public strictfp class Politician {
         if (rad != 0) {
             rc.empower(rad);
             return;
+        } else {
+            rad = shouldAttackOffensive();
+            if (rad != 0) {
+                rc.empower(rad);
+                return;
+            }
         }
 
         int radius;

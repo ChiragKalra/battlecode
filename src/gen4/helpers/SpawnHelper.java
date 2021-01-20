@@ -24,12 +24,12 @@ public class SpawnHelper {
     private static final int[] roundExpanded = new int[64];
     private static int blockedRounds = 0;
     public static boolean shouldIncrementWallRadius() {
-        if (rc.senseNearbyRobots(10).length >= 14) {
+        double blockedFactor = 1-directionsBlocked/8.0;
+        if (rc.senseNearbyRobots(10).length >= 14*blockedFactor) {
             blockedRounds++;
         } else {
             blockedRounds = 0;
         }
-        double blockedFactor = 4/(4.0-directionsBlocked);
         boolean ans = blockedRounds >= 10 && currentRadius<63 &&
                 roundNumber-roundExpanded[currentRadius-1] >= 6*currentRadius*blockedFactor ;
         if (ans) {
@@ -75,7 +75,7 @@ public class SpawnHelper {
     private static int spawnDirectionSlan = 0;
     public static boolean spawnSlanderer() throws GameActionException {
         Direction dir = getOptimalDirection(directions[(spawnDirectionSlan++)%8]);
-        if (dir == null ) {
+        if (dir == null || rc.senseNearbyRobots(sensorRadius, enemyTeam).length>0) {
             return false;
         }
         //int xp = slandererHPFloor(Math.max(25, (int)(xpDelta*RATIO_UNITS)));

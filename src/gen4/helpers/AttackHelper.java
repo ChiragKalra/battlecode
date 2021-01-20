@@ -20,12 +20,16 @@ public class AttackHelper {
     private static final HashMap<MapLocation, Integer> roundsNotAttackedEC = new HashMap<>();
 
 
-    public static boolean shouldAttackOffensive() {
+    public static int shouldAttackOffensive() {
         RobotInfo[] nearby = rc.senseNearbyRobots(1);
         if (nearby.length == 0) {
-            return false;
+            return 0;
         }
-        int damage = (int) (rc.getConviction()*rc.getEmpowerFactor(mTeam, 0)-10),
+        double empFac = rc.getEmpowerFactor(mTeam, 0);
+        if (empFac > 1000) {
+            return actionRadius;
+        }
+        int damage = (int) (rc.getConviction()*empFac-10),
                 each = damage/nearby.length, done = 0;
         MapLocation detectedEC = null;
         for (RobotInfo ri: nearby) {
@@ -41,25 +45,29 @@ public class AttackHelper {
             }
         }
         boolean attacking = done/(double) damage > EMP_ATTACK_THRESHOLD_RATIO;
-        if (attacking && !(detectedEC == null && nearby.length == 1)) return true;
+        if (attacking && !(detectedEC == null && nearby.length == 1)) return 1;
         if (detectedEC != null) {
             int got = roundsNotAttackedEC.getOrDefault(detectedEC, 0) + 1;
             if (got > EMP_AFTER_ROUNDS) {
-                return true;
+                return 1;
             }
             roundsNotAttackedEC.put(detectedEC, got);
         }
-        return false;
+        return 1;
     }
 
     public static int shouldAttackDefensive () {
         int[] check = {1, 2, 4, 5, 8, 9};
 
+        double empFac = rc.getEmpowerFactor(mTeam, 0);
+        if (empFac > 1000) {
+            return actionRadius;
+        }
         int empRad = 0, mostKills = 0, mostDamage = 0;
         for (int rad : check) {
             RobotInfo[] nearby = rc.senseNearbyRobots(rad);
             if (nearby.length == 0) continue;
-            int damage = (int) (rc.getConviction()*rc.getEmpowerFactor(mTeam, 0)-10),
+            int damage = (int) (rc.getConviction()*empFac-10),
                     each = damage/nearby.length, kills = 0, damageDone = 0;
             for (RobotInfo ri: nearby) {
                 if (ri.team != mTeam) {

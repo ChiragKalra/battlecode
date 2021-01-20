@@ -39,7 +39,7 @@ public strictfp class Muckraker {
             spawnDirection = spawnerLocation.directionTo(rc.getLocation());
         }
 
-        if (explodeRadius < 4*5 && spawnDirection != null) {
+        if (explodeRadius < 3*5 && spawnDirection != null) {
             tryMove(spawnDirection);
             explodeRadius++;
         } else if (!placed) {

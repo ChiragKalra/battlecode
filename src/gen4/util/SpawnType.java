@@ -4,7 +4,7 @@ import static gen4.EnlightenmentCenter.roundCaptured;
 import static gen4.RobotPlayer.rc;
 
 public enum SpawnType {
-    AttackPolitician(0, 26, 5000),
+    AttackPolitician(0, 26, 2000),
     DefensePolitician(0, 14, 25),
     Muckraker(0,1,5),
     Slanderer(0, 41, 5000);
@@ -49,7 +49,7 @@ public enum SpawnType {
     private static double getMuckrakerProbability (int round) {
         if (round < 75) return 0.9;
         if (round < 250 && round > 200) return 0;
-        return 0.0;
+        return 0.05;
     }
 
     private static double getSlandererProbability (int round) {
