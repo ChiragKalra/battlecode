@@ -97,16 +97,16 @@ public strictfp class Politician {
             Direction oppLeft = opposite.rotateLeft();
             Direction oppRight = opposite.rotateRight();
 
-            if (forceMove(oppRight)) {
+            if (forceMoveWall(oppRight)) {
                 return;
             }
-            if (forceMove(oppLeft)) {
+            if (forceMoveWall(oppLeft)) {
                 return;
             }
-            if (forceMove(oppRight.rotateRight())) {
+            if (forceMoveWall(oppRight.rotateRight())) {
                 return;
             }
-            if (forceMove(oppLeft.rotateLeft())) {
+            if (forceMoveWall(oppLeft.rotateLeft())) {
                 return;
             }
 
@@ -120,7 +120,7 @@ public strictfp class Politician {
                 if (forceMove(straight)) {
                     return;
                 }
-            } else if (forceMove(opposite)) {
+            } else if (forceMoveWall(opposite)) {
                 return;
             }
 

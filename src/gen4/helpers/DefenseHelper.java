@@ -11,6 +11,14 @@ public class DefenseHelper {
 		return ml.x == spawnerLocation.x || ml.y == spawnerLocation.y;
 	}
 
+	public static boolean forceMoveWall(Direction dir) throws GameActionException {
+		if (!isTunnelPoint(rc.getLocation().add(dir)) && rc.canMove(dir)) {
+			rc.move(dir);
+			return true;
+		}
+		return false;
+	}
+
 	public static boolean tryMoveWall(Direction dir, int outerRadius) throws GameActionException {
 		MapLocation ml = rc.getLocation().add(dir);
 		if (outsideWall(ml, outerRadius)) {
