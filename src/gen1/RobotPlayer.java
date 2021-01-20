@@ -6,7 +6,7 @@ import static gen1.Muckraker.*;
 
 public strictfp class RobotPlayer {
     // toggle logging before competitive matches
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
 
     public static final int MAX_GENERATED_INFLUENCE = 22364;
 
@@ -110,7 +110,7 @@ public strictfp class RobotPlayer {
                 round++;
                 Clock.yield();
             } catch (Exception e) {
-                e.printStackTrace();
+                //e.printStackTrace();
             }
         }
     }

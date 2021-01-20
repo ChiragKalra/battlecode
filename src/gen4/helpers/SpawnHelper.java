@@ -26,7 +26,7 @@ public class SpawnHelper {
     private static int blockedRounds = 0;
     public static boolean shouldIncrementWallRadius() {
         double blockedFactor = 1-ratioDirectionsBlocked;
-        if (rc.senseNearbyRobots(10).length > 12*blockedFactor + 6) {
+        if (rc.senseNearbyRobots(10).length >= 12*blockedFactor + 2) {
             blockedRounds++;
         } else {
             blockedRounds = 0;
