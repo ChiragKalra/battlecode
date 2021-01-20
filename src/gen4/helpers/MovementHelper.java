@@ -15,9 +15,6 @@ public class MovementHelper {
     public static final double RATIO_CROWDING = 0.33;
     public static final int RADIUS_CROWDING = actionRadius;
 
-    // adjacent direction preference factor
-    public static final double[] DIRECTION_FACTOR = {.5, .25, .125, .0625, 0.03125};
-
     public static final Direction[] directions = {
             Direction.NORTH,
             Direction.NORTHEAST,
@@ -46,35 +43,33 @@ public class MovementHelper {
 
 
     public static boolean tryMove (Direction dir) throws GameActionException {
-        if (rc.canMove(dir)) {
+        MapLocation ml = rc.getLocation();
+        double left = rc.canMove(dir.rotateLeft()) ? rc.sensePassability(ml.add(dir.rotateLeft())) : 0,
+            straight = rc.canMove(dir) ? rc.sensePassability(ml.add(dir)) : 0,
+            right = rc.canMove(dir.rotateRight()) ? rc.sensePassability(ml.add(dir.rotateRight())) : 0;
+
+        if (straight > 0 && straight >= right && straight >= left) {
             rc.move(dir);
+            return true;
+        } else if (left > 0 && left >= right && straight <= left) {
+            rc.move(dir.rotateLeft());
+            return true;
+        } else if (right > 0 && straight <= right && right >= left) {
+            rc.move(dir.rotateRight());
             return true;
         } else if (rc.getCooldownTurns() < 1) {
             int dirInt = directionList.indexOf(dir);
             // if blocked by another robot, find the next best direction
-            for (int i = 1; i<5; i++) {
-                if (Math.random() < 0.5) {
-                    Direction got = directions[Math.floorMod(dirInt + i, 8)];
-                    if (rc.canMove(got)) {
-                        rc.move(got);
-                        return true;
-                    }
-                    got = directions[Math.floorMod(dirInt - i, 8)];
-                    if (rc.canMove(got)) {
-                        rc.move(got);
-                        return true;
-                    }
-                } else {
-                    Direction got = directions[Math.floorMod(dirInt - i, 8)];
-                    if (rc.canMove(got)) {
-                        rc.move(got);
-                        return true;
-                    }
-                    got = directions[Math.floorMod(dirInt + i, 8)];
-                    if (rc.canMove(got)) {
-                        rc.move(got);
-                        return true;
-                    }
+            for (int i = 2; i<5; i++) {
+                Direction got = directions[Math.floorMod(dirInt + i, 8)];
+                if (rc.canMove(got)) {
+                    rc.move(got);
+                    return true;
+                }
+                got = directions[Math.floorMod(dirInt - i, 8)];
+                if (rc.canMove(got)) {
+                    rc.move(got);
+                    return true;
                 }
             }
         }
