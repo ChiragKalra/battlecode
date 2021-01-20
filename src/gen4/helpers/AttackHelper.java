@@ -53,7 +53,7 @@ public class AttackHelper {
             }
             roundsNotAttackedEC.put(detectedEC, got);
         }
-        return 1;
+        return 0;
     }
 
     public static int shouldAttackDefensive () {

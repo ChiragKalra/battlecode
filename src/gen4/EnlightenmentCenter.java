@@ -19,7 +19,8 @@ public strictfp class EnlightenmentCenter {
     public static double RATIO_UNITS = 0.02;
     public static double RATIO_SPAWN_BUFF = 0;
 
-    public static int roundCaptured = 1, directionsBlocked = 0;
+    public static int roundCaptured = 1;
+    public static double ratioDirectionsBlocked = 0;
     public static Pair<MapLocation, Integer> targetEC;
 
 
@@ -55,12 +56,13 @@ public strictfp class EnlightenmentCenter {
         roundCaptured = rc.getRoundNum();
 
         MapLocation cur = rc.getLocation();
-        for (int i = 0; i < 8; i++) {
+        for (int i = 1; i < 8; i+=2) {
             Direction dir = directions[i];
             if (!rc.onTheMap(cur.translate(dir.dx*3, dir.dy*3))) {
-                directionsBlocked++;
+                ratioDirectionsBlocked++;
             }
         }
+        ratioDirectionsBlocked /= 4;
     }
 
     public static void move() throws GameActionException {

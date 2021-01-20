@@ -4,10 +4,10 @@ import static gen4.EnlightenmentCenter.roundCaptured;
 import static gen4.RobotPlayer.rc;
 
 public enum SpawnType {
-    AttackPolitician(0, 26, 2000),
+    AttackPolitician(0, 26, 10000),
     DefensePolitician(0, 14, 25),
     Muckraker(0,1,5),
-    Slanderer(0, 41, 5000);
+    Slanderer(0, 41, 10000);
 
     public final int cooldown, minHp, maxHp;
 

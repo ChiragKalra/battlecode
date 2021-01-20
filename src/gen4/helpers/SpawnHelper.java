@@ -24,14 +24,14 @@ public class SpawnHelper {
     private static final int[] roundExpanded = new int[64];
     private static int blockedRounds = 0;
     public static boolean shouldIncrementWallRadius() {
-        double blockedFactor = 1-directionsBlocked/8.0;
-        if (rc.senseNearbyRobots(10).length >= 14*blockedFactor) {
+        double blockedFactor = 1-ratioDirectionsBlocked;
+        if (rc.senseNearbyRobots(10).length > 18*blockedFactor) {
             blockedRounds++;
         } else {
             blockedRounds = 0;
         }
         boolean ans = blockedRounds >= 10 && currentRadius<63 &&
-                roundNumber-roundExpanded[currentRadius-1] >= 6*currentRadius*blockedFactor ;
+                roundNumber-roundExpanded[currentRadius-1] > 9*currentRadius*blockedFactor ;
         if (ans) {
             roundExpanded[currentRadius+1] = roundNumber;
             blockedRounds = 0;
@@ -39,8 +39,10 @@ public class SpawnHelper {
         return ans;
     }
 
+    private static int spawnDirectionMuck = 0;
     public static boolean spawnMuckraker() throws GameActionException {
-        Direction dir = getOptimalDirection(getDirectionFromAdjacentFlags(rc.getLocation()));
+        Direction got = getDirectionFromAdjacentFlags(rc.getLocation()),
+                dir = getOptimalDirection(got != null ? got : directions[(spawnDirectionMuck++)%8]);
         if (dir == null ) {
             return false;
         }

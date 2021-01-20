@@ -50,12 +50,6 @@ public strictfp class Politician {
         if (rad != 0) {
             rc.empower(rad);
             return;
-        } else {
-            rad = shouldAttackOffensive();
-            if (rad != 0) {
-                rc.empower(rad);
-                return;
-            }
         }
 
         int radius;
