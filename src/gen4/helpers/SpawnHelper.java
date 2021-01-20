@@ -25,14 +25,21 @@ public class SpawnHelper {
     private static final int[] roundExpanded = new int[LIMIT_WALL_RADIUS+1];
     private static int blockedRounds = 0;
     public static boolean shouldIncrementWallRadius() {
-        double blockedFactor = 1-ratioDirectionsBlocked;
-        if (rc.senseNearbyRobots(10).length >= 12*blockedFactor + 2) {
+        int capacity  = 20;
+        switch (directionsBlocked) {
+            case 2:
+                capacity = 12;
+                break;
+            case 3:
+                capacity = 7;
+        }
+        if (rc.senseNearbyRobots(10).length >= capacity-2) {
             blockedRounds++;
         } else {
             blockedRounds = 0;
         }
         boolean ans = blockedRounds >= 10 && currentRadius<LIMIT_WALL_RADIUS &&
-                roundNumber-roundExpanded[currentRadius-1] > 8*currentRadius*blockedFactor ;
+                roundNumber-roundExpanded[currentRadius-1] > 8*currentRadius*capacity/20 ;
         if (ans) {
             roundExpanded[currentRadius+1] = roundNumber;
             blockedRounds = 0;
