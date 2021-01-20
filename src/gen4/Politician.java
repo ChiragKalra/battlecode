@@ -166,6 +166,6 @@ public strictfp class Politician {
     }
 
     public static void init() {
-        isAttackType = rc.getInfluence() >= SpawnType.AttackPolitician.minHp;
+        isAttackType = rc.getConviction() >= SpawnType.AttackPolitician.minHp;
     }
 }

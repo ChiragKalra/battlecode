@@ -56,13 +56,13 @@ public strictfp class EnlightenmentCenter {
         roundCaptured = rc.getRoundNum();
 
         MapLocation cur = rc.getLocation();
-        for (int i = 1; i < 8; i+=2) {
+        for (int i = 0; i < 8; i++) {
             Direction dir = directions[i];
             if (!rc.onTheMap(cur.translate(dir.dx*3, dir.dy*3))) {
                 ratioDirectionsBlocked++;
             }
         }
-        ratioDirectionsBlocked /= 4;
+        ratioDirectionsBlocked /= 8;
     }
 
     public static void move() throws GameActionException {
@@ -71,7 +71,7 @@ public strictfp class EnlightenmentCenter {
             spawnOptimal();
         }
 
-        int bet = (int) (rc.getInfluence() * RATIO_BID * Math.pow(1.05, rc.getInfluence()/1000.0));
+        int bet = (int) (rc.getInfluence() * RATIO_BID * Math.pow(1.07, rc.getInfluence()/1000.0));
         if (rc.getRoundNum() >= 150 && rc.canBid(bet) && rc.getTeamVotes() <= GameConstants.GAME_MAX_NUMBER_OF_ROUNDS/2) {
             rc.bid(bet);
         } else if (rc.getTeamVotes() > GameConstants.GAME_MAX_NUMBER_OF_ROUNDS/2) {

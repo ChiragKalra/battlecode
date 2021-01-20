@@ -9,8 +9,11 @@ import static gen4.EnlightenmentCenter.*;
 import static gen4.RobotPlayer.*;
 import static gen4.helpers.GridHelper.getDirectionFromAdjacentFlags;
 import static gen4.helpers.MovementHelper.*;
+import static gen4.util.Functions.sigmoid;
 
 public class SpawnHelper {
+
+    private static final int LIMIT_WALL_RADIUS = 21;
 
     private static int slandererHPFloor (int hp) {
         double func = (0.02 + 0.03*Math.exp(-0.001*hp))*hp;
@@ -21,7 +24,7 @@ public class SpawnHelper {
 
     // layerQuantity = { 0, 8, 12, 16, 20, 28, 32, 40, 44, 48, 56, 60, 68, 72, 76, 84, };
     // private static final int[] sectorQuantity = { 0, 8, 20, 36, 56, 84, 116, 156, 200, 248, 304, 364, 432, 504, 580, 664, };
-    private static final int[] roundExpanded = new int[64];
+    private static final int[] roundExpanded = new int[LIMIT_WALL_RADIUS+1];
     private static int blockedRounds = 0;
     public static boolean shouldIncrementWallRadius() {
         double blockedFactor = 1-ratioDirectionsBlocked;
@@ -30,7 +33,7 @@ public class SpawnHelper {
         } else {
             blockedRounds = 0;
         }
-        boolean ans = blockedRounds >= 10 && currentRadius<63 &&
+        boolean ans = blockedRounds >= 10 && currentRadius<LIMIT_WALL_RADIUS &&
                 roundNumber-roundExpanded[currentRadius-1] > 9*currentRadius*blockedFactor ;
         if (ans) {
             roundExpanded[currentRadius+1] = roundNumber;
@@ -80,10 +83,10 @@ public class SpawnHelper {
         if (dir == null || rc.senseNearbyRobots(sensorRadius, enemyTeam).length>0) {
             return false;
         }
-        //int xp = slandererHPFloor(Math.max(25, (int)(xpDelta*RATIO_UNITS)));
+        double earlyGameFactor = sigmoid((roundNumber-roundCaptured-800)/150.0);
         int xp = slandererHPFloor((int)(rc.getInfluence()*0.8)),
             minXp = slandererHPFloor(SpawnType.Slanderer.minHp),
-            maxXp = slandererHPFloor(SpawnType.Slanderer.maxHp);
+            maxXp = (int) (slandererHPFloor(SpawnType.Slanderer.maxHp)*earlyGameFactor);
         xp = Math.max(minXp, xp);
         xp = Math.min(maxXp, xp);
 
