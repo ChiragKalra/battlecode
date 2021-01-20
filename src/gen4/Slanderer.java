@@ -2,12 +2,11 @@ package gen4;
 
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
 
 import static gen4.RobotPlayer.*;
 import static gen4.flags.EnlightenmentCenterFlag.getRadius;
 import static gen4.helpers.DefenseHelper.*;
-import static gen4.helpers.FarmHelper.*;
+
 
 public strictfp class Slanderer {
     public static int innerRadius, outerRadius;
@@ -55,60 +54,106 @@ public strictfp class Slanderer {
         Direction left = straight.rotateLeft();
         Direction right = straight.rotateRight();
 
-        boolean onWallStraight = onWall(rc.getLocation().add(straight), innerRadius, outerRadius);
-        boolean onWallLeft = onWall(rc.getLocation().add(left), innerRadius, outerRadius);
-        boolean onWallRight = onWall(rc.getLocation().add(right), innerRadius, outerRadius);
-        
-        boolean nearWall = onWallStraight || onWallLeft || onWallRight;
+        if (onWall(rc.getLocation(), innerRadius, outerRadius)) {
+            Direction opposite = rc.getLocation().directionTo(spawnerLocation);
+            Direction oppLeft = opposite.rotateLeft();
+            Direction oppRight = opposite.rotateRight();
+            if (forceMoveWall(opposite)) {
+                return;
+            }
+            if (forceMoveWall(oppRight)) {
+                return;
+            }
+            if (forceMoveWall(oppLeft)) {
+                return;
+            }
+            if (forceMoveWall(oppRight.rotateRight())) {
+                return;
+            }
+            if (forceMoveWall(oppLeft.rotateLeft())) {
+                return;
+            }
+
+            /*if (isTunnelPoint(rc.getLocation())) {
+                if (forceMove(straight)) {
+                    return;
+                }
+                if (forceMove(left)) {
+                    return;
+                }
+                if (forceMove(right)) {
+                    return;
+                }
+            }*/
+
+            return;
+        }
+
+        if (outsideWall(rc.getLocation(), outerRadius)) {
+            if (forceMove(straight)) {
+                return;
+            }
+            if (forceMove(left)) {
+                return;
+            }
+            if (forceMove(right)) {
+                return;
+            }
+
+            return;
+        }
+
+        boolean nearWall = onWall(rc.getLocation().add(straight), innerRadius, outerRadius) ||
+                onWall(rc.getLocation().add(left), innerRadius, outerRadius) ||
+                onWall(rc.getLocation().add(right), innerRadius, outerRadius);
         if (nearWall) {
             if (isTunnelPoint(rc.getLocation())) {
                 for (int i = 0; i < 2; ++i) {
                     left = left.rotateLeft();
-                    if (tryMoveSlanderer(left)) {
+                    if (forceMove(left)) {
                         return;
                     }
 
                     right = right.rotateRight();
-                    if (tryMoveSlanderer(right)) {
+                    if (forceMove(right)) {
                         return;
                     }
+                }
+
+                if (forceMoveWall(straight.rotateLeft())) {
+                    return;
+                }
+                if (forceMoveWall(straight.rotateRight())) {
+                    return;
+                }
+                if (forceMoveWall(straight.opposite())) {
+                    return;
                 }
             }
 
             return;
         }
 
-        if (!onWallStraight && tryMoveSlanderer(straight)) {
+        if (forceMoveWall(straight)) {
             return;
         }
-        if (!onWallLeft && tryMoveSlanderer(left)) {
+        if (forceMoveWall(left)) {
             return;
         }
-        if (!onWallRight && tryMoveSlanderer(right)) {
+        if (forceMoveWall(right)) {
             return;
         }
 
         for (int i = 0; i < 2; ++i) {
             left = left.rotateLeft();
-            if (tryMoveSlanderer(left)) {
+            if (forceMoveWall(left)) {
                 return;
             }
 
             right = right.rotateRight();
-            if (tryMoveSlanderer(right)) {
+            if (forceMoveWall(right)) {
                 return;
             }
         }
-    }
-
-    private static boolean tryMoveSlanderer(Direction dir) throws GameActionException {
-        // if (onWall(rc.getLocation().add(dir))) {
-        //     return false;
-        // }
-        if (rc.canMove(dir)) {
-            rc.move(dir);
-            return true;
-        }
-        return false;
     }
 }

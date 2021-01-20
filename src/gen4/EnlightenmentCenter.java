@@ -57,14 +57,26 @@ public strictfp class EnlightenmentCenter {
     public static void init() throws GameActionException {
         roundCaptured = rc.getRoundNum();
 
+        MapLocation now = rc.getLocation();
+        boolean shiftedTunnelX = now.x%5 == 0,
+                shiftedTunnelY = now.y%5 == 0;
+
+        int edgeX = 0, edgeY = 0;
         MapLocation cur = rc.getLocation();
         for (int i = 0; i < 8; i++) {
             Direction dir = directions[i];
             if (!rc.onTheMap(cur.translate(dir.dx*2, dir.dy*2))) {
                 ratioDirectionsBlocked++;
+                if (i % 2 == 0) {
+                    edgeX = dir.dx;
+                }
             }
         }
         ratioDirectionsBlocked /= 8;
+
+        /*if (roundCaptured == 1) {
+            rc.buildRobot(RobotType.SLANDERER, getOptimalDirection(null), 130);
+        }*/
     }
 
     public static void move() throws GameActionException {

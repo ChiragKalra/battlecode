@@ -2,7 +2,6 @@ package gen4.helpers;
 
 import battlecode.common.*;
 
-import gen4.util.PassabilityGrid;
 import gen4.util.SpawnType;
 
 import static gen4.EnlightenmentCenter.*;
@@ -21,20 +20,19 @@ public class SpawnHelper {
     }
 
 
-
     // layerQuantity = { 0, 8, 12, 16, 20, 28, 32, 40, 44, 48, 56, 60, 68, 72, 76, 84, };
     // private static final int[] sectorQuantity = { 0, 8, 20, 36, 56, 84, 116, 156, 200, 248, 304, 364, 432, 504, 580, 664, };
     private static final int[] roundExpanded = new int[LIMIT_WALL_RADIUS+1];
     private static int blockedRounds = 0;
     public static boolean shouldIncrementWallRadius() {
         double blockedFactor = 1-ratioDirectionsBlocked;
-        if (rc.senseNearbyRobots(10).length > 18*blockedFactor) {
+        if (rc.senseNearbyRobots(10).length > 12*blockedFactor + 6) {
             blockedRounds++;
         } else {
             blockedRounds = 0;
         }
         boolean ans = blockedRounds >= 10 && currentRadius<LIMIT_WALL_RADIUS &&
-                roundNumber-roundExpanded[currentRadius-1] > 9*currentRadius*blockedFactor ;
+                roundNumber-roundExpanded[currentRadius-1] > 8*currentRadius*blockedFactor ;
         if (ans) {
             roundExpanded[currentRadius+1] = roundNumber;
             blockedRounds = 0;
@@ -77,9 +75,9 @@ public class SpawnHelper {
         return false;
     }
 
-    private static int spawnDirectionSlan = 0;
+    private static int spawnDirectionSlan = 1;
     public static boolean spawnSlanderer() throws GameActionException {
-        Direction dir = getOptimalDirection(directions[(spawnDirectionSlan++)%8]);
+        Direction dir = getOptimalDirection(directions[(spawnDirectionSlan+=2)%8]);
         if (dir == null || rc.senseNearbyRobots(sensorRadius, enemyTeam).length>0) {
             return false;
         }
@@ -124,15 +122,38 @@ public class SpawnHelper {
 
     public static Direction getOptimalDirection (Direction to) throws GameActionException {
         MapLocation current = rc.getLocation();
-        if (!rc.isLocationOccupied(current.add(to))) {
+        if (to == null) {
+            to = Direction.SOUTHEAST;
+        }
+        MapLocation ml = current.add(to);
+        if (rc.onTheMap(ml) && !rc.isLocationOccupied(ml)) {
             return to;
         } else {
             int dirInt = directionList.indexOf(to);
             // if blocked by another robot, find the next best direction
             for (int i = 1; i<5; i++) {
-                Direction got = directions[Math.floorMod(dirInt + (Math.random() < 0.5 ? -i : i), 8)];
-                if (!rc.isLocationOccupied(current.add(got))) {
-                    return got;
+                if (Math.random() < 0.5) {
+                    Direction got = directions[Math.floorMod(dirInt + i, 8)];
+                    ml = current.add(got);
+                    if (rc.onTheMap(ml) && !rc.isLocationOccupied(ml)) {
+                        return got;
+                    }
+                    got = directions[Math.floorMod(dirInt - i, 8)];
+                    ml = current.add(got);
+                    if (rc.onTheMap(ml) && !rc.isLocationOccupied(ml)) {
+                        return got;
+                    }
+                } else {
+                    Direction got = directions[Math.floorMod(dirInt - i, 8)];
+                    ml = current.add(got);
+                    if (rc.onTheMap(ml) && !rc.isLocationOccupied(ml)) {
+                        return got;
+                    }
+                    got = directions[Math.floorMod(dirInt + i, 8)];
+                    ml = current.add(got);
+                    if (rc.onTheMap(ml) && !rc.isLocationOccupied(ml)) {
+                        return got;
+                    }
                 }
             }
         }
