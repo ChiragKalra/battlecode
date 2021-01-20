@@ -17,6 +17,28 @@ public class SpawnHelper {
         return (int) Math.ceil(Math.floor(func)/func*hp);
     }
 
+
+
+    // layerQuantity = { 0, 8, 12, 16, 20, 28, 32, 40, 44, 48, 56, 60, 68, 72, 76, 84, };
+    // private static final int[] sectorQuantity = { 0, 8, 20, 36, 56, 84, 116, 156, 200, 248, 304, 364, 432, 504, 580, 664, };
+    private static final int[] roundExpanded = new int[64];
+    private static int blockedRounds = 0;
+    public static boolean shouldIncrementWallRadius() {
+        if (rc.senseNearbyRobots(10).length >= 14) {
+            blockedRounds++;
+        } else {
+            blockedRounds = 0;
+        }
+        double blockedFactor = 4/(4.0-directionsBlocked);
+        boolean ans = blockedRounds >= 10 && currentRadius<63 &&
+                roundNumber-roundExpanded[currentRadius-1] >= 6*currentRadius*blockedFactor ;
+        if (ans) {
+            roundExpanded[currentRadius+1] = roundNumber;
+            blockedRounds = 0;
+        }
+        return ans;
+    }
+
     public static boolean spawnMuckraker() throws GameActionException {
         Direction dir = getOptimalDirection(getDirectionFromAdjacentFlags(rc.getLocation()));
         if (dir == null ) {

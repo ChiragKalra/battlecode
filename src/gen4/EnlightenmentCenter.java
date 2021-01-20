@@ -6,6 +6,7 @@ import gen4.util.SpawnType;
 
 import static gen4.RobotPlayer.*;
 import static gen4.helpers.AttackHelper.checkForAttackCoordinates;
+import static gen4.helpers.MovementHelper.directions;
 import static gen4.helpers.SpawnHelper.*;
 import static gen4.util.SpawnType.getOptimalType;
 
@@ -18,7 +19,7 @@ public strictfp class EnlightenmentCenter {
     public static double RATIO_UNITS = 0.02;
     public static double RATIO_SPAWN_BUFF = 0;
 
-    public static int roundCaptured = 1;
+    public static int roundCaptured = 1, directionsBlocked = 0;
     public static Pair<MapLocation, Integer> targetEC;
 
 
@@ -47,8 +48,16 @@ public strictfp class EnlightenmentCenter {
     }
 
 
-    public static void init() {
+    public static void init() throws GameActionException {
         roundCaptured = rc.getRoundNum();
+
+        MapLocation cur = rc.getLocation();
+        for (int i = 1; i < 8; i+=2) {
+            Direction dir = directions[i];
+            if (!rc.onTheMap(cur.translate(dir.dx*3, dir.dy*3))) {
+                directionsBlocked++;
+            }
+        }
     }
 
     public static void move() throws GameActionException {
