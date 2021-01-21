@@ -15,6 +15,8 @@ import static gen5.util.Functions.getRandom;
 // muckraker info grid formation helper
 public class GridHelper {
     public static final int MUCKRAKER_GRID_WIDTH = 5;
+    public static final int MUCKRAKER_GRID_X = 1;
+    public static final int MUCKRAKER_GRID_Y = 3;
     public static final int ROUND_BROADCAST_CAPTURED = 13;
 
     private static Direction getAdjacentVacant (MapLocation current) throws GameActionException {
@@ -74,25 +76,24 @@ public class GridHelper {
     public static Boolean formsGrid () {
         MapLocation mapLocation = rc.getLocation();
 
-        return mapLocation.x % MUCKRAKER_GRID_WIDTH == 0 && mapLocation.y % MUCKRAKER_GRID_WIDTH == 0;
+        return mapLocation.x % MUCKRAKER_GRID_WIDTH == MUCKRAKER_GRID_X &&
+                mapLocation.y % MUCKRAKER_GRID_WIDTH == MUCKRAKER_GRID_Y;
     }
 
     // check for vacant grid spot in the sensor radius
     private static MapLocation checkVacantSpot(MapLocation mLoc) throws GameActionException {
         int mx = mLoc.x, my = mLoc.y;
 
-        int modX = Math.floorMod(-mx, MUCKRAKER_GRID_WIDTH),
-                modY = Math.floorMod(-my, MUCKRAKER_GRID_WIDTH),
-                remX = (-mx) % MUCKRAKER_GRID_WIDTH,
-                remY = (-my) % MUCKRAKER_GRID_WIDTH;
+        int modX = Math.floorMod(MUCKRAKER_GRID_X-mx, MUCKRAKER_GRID_WIDTH),
+                modY = Math.floorMod(MUCKRAKER_GRID_Y-my, MUCKRAKER_GRID_WIDTH);
 
-        MapLocation north = new MapLocation(mx + remX, my + modY),
-                east = new MapLocation(mx + modX, my + remY),
-                south = new MapLocation(mx + remX, my - MUCKRAKER_GRID_WIDTH + modY),
-                west = new MapLocation(mx - MUCKRAKER_GRID_WIDTH + modX, my + remY);
+        MapLocation ne = new MapLocation(mx + modX, my + modY),
+                se = new MapLocation(mx + modX, my + modY - MUCKRAKER_GRID_WIDTH),
+                sw = new MapLocation(mx + modX - MUCKRAKER_GRID_WIDTH, my + modY - MUCKRAKER_GRID_WIDTH),
+                nw = new MapLocation(mx + modX - MUCKRAKER_GRID_WIDTH, my + modY);
 
         //check in all 4 directions
-        MapLocation[] possible = {north, east, south, west};
+        MapLocation[] possible = {ne, se, sw, nw};
         for (MapLocation mp: possible) {
             if (rc.canSenseLocation(mp) && !rc.isLocationOccupied(mp)) {
                 return mp;

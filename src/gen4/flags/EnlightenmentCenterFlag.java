@@ -11,8 +11,8 @@ import static gen4.helpers.MovementHelper.*;
 
 /*
  # EC flag
- 0-4	- wall radius
- 5-8    - tunnel reference shift direction
+ 0-5	- wall radius
+ 6-9    - tunnel reference shift direction
  9-23	- vacant
  */
 
@@ -23,7 +23,7 @@ public class EnlightenmentCenterFlag {
 	}
 
 	public static Direction getShiftDirection(int flag) {
-	    int dirInt = (flag >> 5) & 15;
+	    int dirInt = (flag >> 6) & 15;
 	    if (dirInt == 8) return Direction.CENTER;
 		return directions[dirInt];
 	}
@@ -43,7 +43,7 @@ public class EnlightenmentCenterFlag {
         if (shiftedTunnel != Direction.CENTER) {
             shiftInt = directionList.indexOf(shiftedTunnel);
         }
-        newFlag += shiftInt << 5;
+        newFlag += shiftInt << 6;
 
         if (prevFlag != newFlag) {
             rc.setFlag(newFlag);

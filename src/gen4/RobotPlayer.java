@@ -12,7 +12,7 @@ import static gen4.Politician.isAttackType;
 
 public strictfp class RobotPlayer {
     // toggle logging before competitive matches
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
     public static void log (String s) {
         if (DEBUG) {
             System.out.println(s);

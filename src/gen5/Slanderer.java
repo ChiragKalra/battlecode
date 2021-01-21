@@ -44,10 +44,11 @@ public strictfp class Slanderer {
         Direction antiMuck = getAntiMuckDirection();
         if (antiMuck != null) {
             MovementHelper.tryMove(antiMuck, false);
-            return ;
+            return;
         }
 
         if (spawnerLocation == null) {
+            MovementHelper.tryMove(MovementHelper.getRandomDirection(), false);
             return;
         }
 

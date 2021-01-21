@@ -6,7 +6,7 @@ import static gen5.util.Functions.sigmoid;
 
 public enum SpawnType {
     AttackPolitician(0, 61, 10000),
-    DefensePolitician(0, 16, 60),
+    DefensePolitician(0, 1, 60),
     Muckraker(0,1,5),
     Slanderer(0, 21, 10000);
 
@@ -55,7 +55,7 @@ public enum SpawnType {
     private static double getSlandererProbability (int round) {
         if (round < 500) return 0;
         if (roundCaptured == 1) return 0;
-        return 0.3;
+        return 0;
     }
 
     private static double getDefensePoliticianProbability (int round) {

@@ -17,7 +17,7 @@ public class DefenseHelper {
 			roundCached = roundNumber;
 		}
 		for (RobotInfo info: nearby) {
-			if (info.type == RobotType.ENLIGHTENMENT_CENTER) {
+			if (info.type == RobotType.ENLIGHTENMENT_CENTER && spawnerLocation != info.location) {
 				return true;
 			}
 		}

@@ -1,6 +1,7 @@
 package gen5;
 
 import battlecode.common.*;
+import gen5.helpers.GridHelper;
 import gen5.util.Pair;
 import gen5.util.SpawnType;
 
@@ -8,7 +9,6 @@ import static gen5.RobotPlayer.*;
 import static gen5.helpers.AttackHelper.checkForAttackCoordinates;
 import static gen5.helpers.MovementHelper.directions;
 import static gen5.helpers.SpawnHelper.*;
-import static gen5.util.Functions.gaussian;
 import static gen5.util.Functions.sigmoid;
 import static gen5.util.SpawnType.getOptimalType;
 
@@ -17,7 +17,7 @@ public strictfp class EnlightenmentCenter {
 
     public static int currentRadius = 3;
 
-    public static double RATIO_BID = 0.04;
+    public static double RATIO_BID = 0.08;
     public static double RATIO_UNITS = 0.02;
 
     public static int roundCaptured = 1;
@@ -30,12 +30,7 @@ public strictfp class EnlightenmentCenter {
         boolean spawned = false;
         int roundsMine = roundNumber - roundCaptured;
         if (roundNumber % 17 == 1 && roundsMine > 100*sigmoid((roundCaptured-750)/200.0)) {
-            int xp = slandererHPFloor((int)(rc.getInfluence()*(1-0.5*sigmoid((roundNumber-500)/100.0))));
-            Direction dir = getOptimalDirection(null);
-            if (dir != null && xp > 0) {
-                rc.buildRobot(RobotType.SLANDERER, dir, xp);
-                spawned = true;
-            }
+            spawned = spawnSlanderer();
         }
        /*
         if (targetEC !=null && targetEC.value <= rc.getInfluence()*RATIO_SPAWN_BUFF &&
@@ -52,10 +47,10 @@ public strictfp class EnlightenmentCenter {
                         break;
                     case DefensePolitician:
                         spawned = spawnDefencePolitician();
-                        break;
+                        break;/*
                     case Slanderer:
                         spawned = spawnSlanderer();
-                        break;
+                        break;*/
                 }
                 if (!spawned && rc.senseNearbyRobots(sensorRadius, enemyTeam).length>0) {
                     spawned = spawnDefencePolitician();
@@ -91,10 +86,10 @@ public strictfp class EnlightenmentCenter {
                 }
             }
         }
-        if (now.x%5 == 0) {
+        if (now.x%5 == GridHelper.MUCKRAKER_GRID_X) {
             dx = -edgeX;
         }
-        if (now.y%5 == 0) {
+        if (now.y%5 == GridHelper.MUCKRAKER_GRID_X) {
             dy = -edgeY;
         }
         switch (dx) {
@@ -147,6 +142,8 @@ public strictfp class EnlightenmentCenter {
             rc.bid(bet);
         } else if (rc.getTeamVotes() > GameConstants.GAME_MAX_NUMBER_OF_ROUNDS/2) {
             RATIO_UNITS += RATIO_BID;
+        } else if (rc.getRoundNum() < 250 && rc.canBid(1)){
+            rc.bid(1);
         }
 
         Pair<MapLocation, Integer> got = checkForAttackCoordinates();

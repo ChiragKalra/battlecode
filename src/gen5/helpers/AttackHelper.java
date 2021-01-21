@@ -46,8 +46,8 @@ public class AttackHelper {
             return 0;
         }
         double empFac = rc.getEmpowerFactor(mTeam, 0);
-        if (empFac > 100) {
-            return actionRadius;
+        if (empFac > 10000) {
+            empFac = 10000;
         }
         int damage = (int) (rc.getConviction()*empFac-10),
                 each = damage/nearby.length, done = 0;
@@ -56,6 +56,9 @@ public class AttackHelper {
             if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
                 done += each;
                 detectedEC = ri.location;
+                if (empFac > 100) {
+                    return actionRadius;
+                }
             } else if (ri.team != mTeam) {
                 done += Math.min(ri.conviction, each);
             } else  {
@@ -76,6 +79,9 @@ public class AttackHelper {
 
     public static int shouldAttackDefensive () {
 
+        if (rc.getConviction() < 14) {
+            return 0;
+        }
         /*
         TODO check if 3 layers on wall, dont attack
         if (spawnerLocation != null) {
@@ -90,8 +96,8 @@ public class AttackHelper {
         int[] check = {1, 2, 4, 5, 8, 9};
 
         double empFac = rc.getEmpowerFactor(mTeam, 0);
-        if (empFac > 1000) {
-            return actionRadius;
+        if (empFac > 10000) {
+            empFac = 10000;
         }
         int empRad = 0, mostKills = 0, mostDamage = 0;
         for (int rad : check) {
