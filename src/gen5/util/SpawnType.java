@@ -5,10 +5,10 @@ import static gen5.RobotPlayer.rc;
 import static gen5.util.Functions.sigmoid;
 
 public enum SpawnType {
-    AttackPolitician(0, 61, 10000),
-    DefensePolitician(0, 1, 60),
+    AttackPolitician(0, 61, 1000),
+    DefensePolitician(0, 16, 60),
     Muckraker(0,1,5),
-    Slanderer(0, 21, 10000);
+    Slanderer(0, 21, 1000);
 
     public final int cooldown, minHp, maxHp;
 
