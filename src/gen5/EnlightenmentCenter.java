@@ -138,7 +138,7 @@ public strictfp class EnlightenmentCenter {
 
         double factor = Math.min(Math.pow(1.1, rc.getInfluence()/5000.0), 2);
         int bet = (int) (rc.getInfluence() * RATIO_BID * factor);
-        if (rc.getRoundNum() >= 250 && rc.canBid(bet) && rc.getTeamVotes() <= GameConstants.GAME_MAX_NUMBER_OF_ROUNDS/2) {
+        if (rc.getRoundNum() >= 150 && rc.canBid(bet) && rc.getTeamVotes() <= GameConstants.GAME_MAX_NUMBER_OF_ROUNDS/2) {
             rc.bid(bet);
         } else if (rc.getTeamVotes() > GameConstants.GAME_MAX_NUMBER_OF_ROUNDS/2) {
             RATIO_UNITS += RATIO_BID;
