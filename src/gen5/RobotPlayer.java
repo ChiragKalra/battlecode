@@ -80,15 +80,16 @@ public strictfp class RobotPlayer {
             // set spawner location for relative movement
             setEnlightenmentCenterLocation();
 
-            // init special variables
-            switch (mType) {
-                case ENLIGHTENMENT_CENTER:
-                    EnlightenmentCenter.init();
+            if (spawnType == null) {
+                EnlightenmentCenter.init();
+            } else switch (spawnType) {
+                case DefensePolitician:
+                    DefensePolitician.init();
                     break;
-                case SLANDERER:
+                case Slanderer:
                     Slanderer.init();
                     break;
-                case MUCKRAKER:
+                case Muckraker:
                     // Muckraker.init();
             }
 

@@ -45,7 +45,7 @@ public class AttackHelper {
         if (nearby.length == 0) {
             return 0;
         }
-        double empFac = rc.getEmpowerFactor(mTeam, 0);
+        double empFac = rc.getEmpowerFactor(mTeam, 0), selfEmpFac = 1;
         if (empFac > 10000) {
             empFac = 10000;
         }
@@ -59,14 +59,17 @@ public class AttackHelper {
                 if (empFac > 100) {
                     return actionRadius;
                 }
+                if (ri.team == mTeam) {
+                    selfEmpFac = 1.1112;
+                }
             } else if (ri.team != mTeam) {
                 done += Math.min(ri.conviction, each);
             } else  {
                 done += Math.min(ri.influence-ri.conviction+1, each);
             }
         }
-        boolean attacking = done/(double) damage > EMP_ATTACK_THRESHOLD_RATIO;
-        if (attacking && !(detectedEC == null && nearby.length == 1)) return 1;
+        boolean attacking = done/(double) damage > EMP_ATTACK_THRESHOLD_RATIO*selfEmpFac;
+        if (attacking) return 1;
         if (detectedEC != null) {
             int got = roundsNotAttackedEC.getOrDefault(detectedEC, 0) + 1;
             if (got > EMP_AFTER_ROUNDS) {

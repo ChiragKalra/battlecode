@@ -132,5 +132,8 @@ public strictfp class DefensePolitician {
     }
 
     public static void init() throws GameActionException {
+        if (rc.canGetFlag(enlightenmentCenterId)) {
+            tunnelShift = getShiftDirection(rc.getFlag(enlightenmentCenterId));
+        }
     }
 }
