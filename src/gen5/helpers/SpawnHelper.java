@@ -11,7 +11,7 @@ import static gen5.helpers.MovementHelper.*;
 
 public class SpawnHelper {
 
-    private static final int LIMIT_WALL_RADIUS = 25;
+    private static final int LIMIT_WALL_RADIUS = 24;
 
     public static int slandererHPFloor (int hp) {
         double func = (0.02 + 0.03*Math.exp(-0.001*hp))*hp;
@@ -78,7 +78,7 @@ public class SpawnHelper {
             return false;
         }
 
-        int xp = (int)(rc.getInfluence()*RATIO_UNITS/4);
+        int xp = (int)(rc.getInfluence()*RATIO_UNITS/2);
         xp = Math.max(SpawnType.GridPolitician.minHp, xp);
         xp = Math.min(SpawnType.GridPolitician.maxHp, xp);
 

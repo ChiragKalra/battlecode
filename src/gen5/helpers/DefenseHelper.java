@@ -13,7 +13,7 @@ public class DefenseHelper {
 
 	public static boolean isTunnelPoint(MapLocation ml) {
 		if (roundCached < roundNumber || nearby == null) {
-			nearby = rc.senseNearbyRobots(ml, 2, null);
+			nearby = rc.senseNearbyRobots(ml, 5, null);
 			roundCached = roundNumber;
 		}
 		for (RobotInfo info: nearby) {

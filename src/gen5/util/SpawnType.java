@@ -2,6 +2,7 @@ package gen5.util;
 
 import battlecode.common.MapLocation;
 
+import static gen5.RobotPlayer.rc;
 import static gen5.RobotPlayer.roundNumber;
 
 
@@ -9,7 +10,8 @@ public enum SpawnType {
     AttackPolitician( 61, 1000),
     DefensePolitician(15, 60),
     GridPolitician( 1, 1),
-    Muckraker(1,500),
+    Muckraker(1, 5),
+    BuffMuckraker(1000,1000),
     Slanderer(21, 1000);
 
     public final int minHp, maxHp;
@@ -23,13 +25,13 @@ public enum SpawnType {
         if (roundNumber < 4) {
             if (roundNumber == 1) return SpawnType.Slanderer;
             return SpawnType.DefensePolitician;
-        } else if (roundNumber < 120) {
+        } else /*if (roundNumber < 120) {
             switch (roundNumber % 6) {
                 case 1: return SpawnType.DefensePolitician;
                 case 3: return SpawnType.Slanderer;
-                case 5: return SpawnType.GridPolitician;
+                default : return SpawnType.GridPolitician;
             }
-        } else {
+        } else*/ {
             switch (roundNumber % 11) {
                 case 2:
                 case 7:
@@ -37,19 +39,23 @@ public enum SpawnType {
                     return SpawnType.Slanderer;
                 case 3:
                 case 6:
-                    if (targetEc != null) {
-                        return SpawnType.Muckraker;
+                    if (targetEc != null && Math.random() > 0.5) {
+                        if (rc.getConviction() > 3000 && Math.random() < 0.002) {
+                            return SpawnType.BuffMuckraker;
+                        } else {
+                            return SpawnType.Muckraker;
+                        }
                     }
                     return SpawnType.GridPolitician;
                 default:
-                    if (targetEc != null) {
+                    if (targetEc != null && roundNumber < 400) {
                         return SpawnType.AttackPolitician;
                     }
                     return SpawnType.DefensePolitician;
             }
         }
 
-        return SpawnType.DefensePolitician;
+        //return SpawnType.DefensePolitician;
     }
 
 }

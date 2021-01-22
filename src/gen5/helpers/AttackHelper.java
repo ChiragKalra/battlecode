@@ -14,7 +14,7 @@ import static gen5.helpers.MovementHelper.*;
 
 public class AttackHelper {
 
-    private static final double EMP_ATTACK_THRESHOLD_RATIO = 0.9;
+    private static final double EMP_ATTACK_THRESHOLD_RATIO = 0.75;
     private static final double EMP_AFTER_ROUNDS = 4;
 
     private static final HashMap<MapLocation, Integer> roundsNotAttackedEC = new HashMap<>();
@@ -81,10 +81,6 @@ public class AttackHelper {
     }
 
     public static int shouldAttackDefensive () {
-
-        if (rc.getConviction() < 14) {
-            return 0;
-        }
         /*
         TODO check if 3 layers on wall, dont attack
         if (spawnerLocation != null) {
@@ -109,10 +105,10 @@ public class AttackHelper {
             int damage = (int) (rc.getConviction()*empFac-10),
                     each = damage/nearby.length, kills = 0, damageDone = 0;
             for (RobotInfo ri: nearby) {
-                if (ri.team != mTeam && ri.type == RobotType.MUCKRAKER) {
+                if (ri.team != mTeam && ri.type != RobotType.ENLIGHTENMENT_CENTER && ri.conviction <= rc.getConviction()*3) {
                     if (ri.conviction < each) {
                         kills++;
-                        damageDone += ri.conviction+1;
+                        damageDone += ri.conviction + 1;
                     } else {
                         damageDone += each;
                     }
@@ -127,6 +123,7 @@ public class AttackHelper {
                 mostKills = kills;
                 mostDamage = damage;
             }
+
         }
         return empRad;
     }
