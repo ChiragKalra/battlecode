@@ -14,7 +14,7 @@ import static gen5.util.SpawnType.getOptimalType;
 
 public strictfp class EnlightenmentCenter {
 
-    public static int currentRadius = 5;
+    public static int currentRadius = 3;
 
     public static double RATIO_BID = 0.033;
     public static double RATIO_UNITS = 0.02;
