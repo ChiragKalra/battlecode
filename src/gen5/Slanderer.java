@@ -52,7 +52,7 @@ public strictfp class Slanderer {
             return;
         }
 
-        System.out.println("No muck");
+        //System.out.println("No muck");
 
         int radius;
         if (rc.canGetFlag(enlightenmentCenterId)) {
@@ -122,7 +122,7 @@ public strictfp class Slanderer {
             return;
         }
 
-        System.out.println("Not on wall");
+        //System.out.println("Not on wall");
 
         if (outsideWall(rc.getLocation(), outerRadius)) {
             if (forceMove(straight)) {
@@ -138,15 +138,15 @@ public strictfp class Slanderer {
             return;
         }
 
-        System.out.println("Not outside wall");
+        //System.out.println("Not outside wall");
 
         boolean nearWall = onWall(rc.getLocation().add(straight), innerRadius, outerRadius) ||
                 onWall(rc.getLocation().add(left), innerRadius, outerRadius) ||
                 onWall(rc.getLocation().add(right), innerRadius, outerRadius);
         if (nearWall) {
             if (isTunnelPoint(rc.getLocation())) {
-                System.out.println(rc.getLocation().x + ' ' + rc.getLocation().y);
-                System.out.println(isTunnelPoint(rc.getLocation()));
+                //System.out.println(rc.getLocation().x + ' ' + rc.getLocation().y);
+                //System.out.println(isTunnelPoint(rc.getLocation()));
                 for (int i = 0; i < 2; ++i) {
                     left = left.rotateLeft();
                     if (forceMoveWall(left)) {
@@ -170,12 +170,12 @@ public strictfp class Slanderer {
                 }
             }
 
-            System.out.println("Near wall and not a tunnel point");
+            //System.out.println("Near wall and not a tunnel point");
 
             return;
         }
 
-        System.out.println("Not near wall");
+        //System.out.println("Not near wall");
 
         if (forceMoveWall(straight)) {
             return;
@@ -187,7 +187,7 @@ public strictfp class Slanderer {
             return;
         }
 
-        System.out.println("Couldn't move ahead");
+        //System.out.println("Couldn't move ahead");
 
         for (int i = 0; i < 2; ++i) {
             left = left.rotateLeft();

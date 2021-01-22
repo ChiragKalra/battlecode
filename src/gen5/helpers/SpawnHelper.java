@@ -11,7 +11,7 @@ import static gen5.helpers.MovementHelper.*;
 
 public class SpawnHelper {
 
-    private static final int LIMIT_WALL_RADIUS = 24;
+    private static final int LIMIT_WALL_RADIUS = 63;
 
     public static int slandererHPFloor (int hp) {
         double func = (0.02 + 0.03*Math.exp(-0.001*hp))*hp;

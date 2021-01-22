@@ -172,7 +172,7 @@ public class GridHelper {
         RobotInfo[] nearby = rc.senseNearbyRobots(sensorRadius);
         Pair<Integer, Integer> mEc = null;
         for (RobotInfo ri: nearby) {
-            if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
+            if (ri.type == RobotType.ENLIGHTENMENT_CENTER || ri.type == RobotType.MUCKRAKER && ri.conviction > 15) {
                 int x = ri.location.x >= loc.x ? 1 : 0, y = ri.location.y >= loc.y ? 1 : 0;
                 mEc = new Pair<>(x, y);
                 if (ri.team != mTeam) {
@@ -209,13 +209,12 @@ public class GridHelper {
             if (ri.type == RobotType.POLITICIAN) {
                 int flag = rc.getFlag(ri.getID());
                 if (isBroadcastingEC(flag)) {
+                    Pair<Integer, Integer> got = GridPoliticianFlag.getRelLocFromFlag(flag);
+                    Direction dir = current.directionTo(ri.location);
+                    got.key += dir.dx;
+                    got.value += dir.dy;
                     int hp = getHpFromFlag(flag);
-                    if (selected == null || hp < selected.value) {
-                        Pair<Integer, Integer> got = GridPoliticianFlag.getRelLocFromFlag(flag);
-                        Direction dir = current.directionTo(ri.location);
-                        got.key += dir.dx;
-                        got.value += dir.dy;
-
+                    if (selected == null || hp < 0 || distanceSquared(got) < distanceSquared(selected.key)) {
                         if (!captured.contains(got)) {
                             selected = new Pair<>(got, hp);
                             if (hp <= 0 && broadcastingCaptured == null) {
@@ -227,5 +226,9 @@ public class GridHelper {
             }
         }
         return selected;
+    }
+
+    private static int distanceSquared (Pair<Integer, Integer> p) {
+        return p.key*p.key + p.value*p.value;
     }
 }

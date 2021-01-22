@@ -105,7 +105,7 @@ public class AttackHelper {
             int damage = (int) (rc.getConviction()*empFac-10),
                     each = damage/nearby.length, kills = 0, damageDone = 0;
             for (RobotInfo ri: nearby) {
-                if (ri.team != mTeam && ri.type != RobotType.ENLIGHTENMENT_CENTER && ri.conviction <= rc.getConviction()*3) {
+                if (ri.team != mTeam && ri.type != RobotType.ENLIGHTENMENT_CENTER) {
                     if (ri.conviction < each) {
                         kills++;
                         damageDone += ri.conviction + 1;
