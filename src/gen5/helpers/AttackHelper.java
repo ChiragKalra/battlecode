@@ -80,7 +80,8 @@ public class AttackHelper {
         return 0;
     }
 
-    public static int shouldAttackDefensive () {
+    // returns (radius, is a muckraker adjacent)
+    public static Pair<Integer, Boolean> shouldAttackDefensive () {
         /*
         TODO check if 3 layers on wall, dont attack
         if (spawnerLocation != null) {
@@ -98,19 +99,28 @@ public class AttackHelper {
         if (empFac > 10000) {
             empFac = 10000;
         }
-        int empRad = 0, mostKills = 0, mostDamage = 0;
+        
+        Integer empRad = 0;
+        int mostKills = 0, mostDamage = 0;
+        Boolean muckrakerAdjacent = false;
         for (int rad : check) {
             RobotInfo[] nearby = rc.senseNearbyRobots(rad);
             if (nearby.length == 0) continue;
             int damage = (int) (rc.getConviction()*empFac-10),
                     each = damage/nearby.length, kills = 0, damageDone = 0;
             for (RobotInfo ri: nearby) {
-                if (ri.team != mTeam && ri.type != RobotType.ENLIGHTENMENT_CENTER && ri.conviction <= rc.getConviction()*3) {
-                    if (ri.conviction < each) {
-                        kills++;
-                        damageDone += ri.conviction + 1;
-                    } else {
-                        damageDone += each;
+                if (ri.team != mTeam && ri.type != RobotType.ENLIGHTENMENT_CENTER) {
+                    if (ri.conviction <= rc.getConviction()*3) {
+                        if (ri.conviction < each) {
+                            kills++;
+                            damageDone += ri.conviction + 1;
+                        } else {
+                            damageDone += each;
+                        }
+                    }
+
+                    if (ri.type == RobotType.MUCKRAKER && rad <= 2) {
+                        muckrakerAdjacent = true;
                     }
                 }
             }
@@ -125,7 +135,7 @@ public class AttackHelper {
             }
 
         }
-        return empRad;
+        return new Pair<>(empRad, muckrakerAdjacent);
     }
 
     /*
