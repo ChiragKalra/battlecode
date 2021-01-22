@@ -78,13 +78,13 @@ public strictfp class Slanderer {
             return;
         }
 
-        log("No muck");
+        // log("No muck");
 
         if (radius > RADIUS_CAP)
             radius = RADIUS_CAP;
         int innerRadius = radius * radius + 1;
         int outerRadius = (radius + 1) * (radius + 1) + 1;
-        log("radius: " + radius + " " + innerRadius + " " + outerRadius);
+        // log("radius: " + radius + " " + innerRadius + " " + outerRadius);
 
         Direction straight = rc.getLocation().directionTo(spawnerLocation).opposite();
         Direction left = straight.rotateLeft();
@@ -125,7 +125,7 @@ public strictfp class Slanderer {
             return;
         }
 
-        log("Not on wall");
+        // log("Not on wall");
 
         if (outsideWall(rc.getLocation(), outerRadius)) {
             if (forceMove(straight)) {
@@ -141,7 +141,7 @@ public strictfp class Slanderer {
             return;
         }
 
-        log("Not outside wall");
+        // log("Not outside wall");
 
         boolean nearWall = onWall(rc.getLocation().add(straight), innerRadius, outerRadius) ||
                 onWall(rc.getLocation().add(left), innerRadius, outerRadius) ||
@@ -173,12 +173,12 @@ public strictfp class Slanderer {
                 }
             }
 
-            log("Near wall and not a tunnel point");
+            // log("Near wall and not a tunnel point");
 
             return;
         }
 
-        log("Not near wall");
+        // log("Not near wall");
 
         if (forceMoveWall(straight)) {
             return;
@@ -190,7 +190,7 @@ public strictfp class Slanderer {
             return;
         }
 
-        log("Couldn't move ahead");
+        // log("Couldn't move ahead");
 
         for (int i = 0; i < 2; ++i) {
             left = left.rotateLeft();
