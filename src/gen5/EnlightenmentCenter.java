@@ -16,7 +16,7 @@ public strictfp class EnlightenmentCenter {
 
     public static int currentRadius = 3;
 
-    public static double RATIO_BID = 0.033;
+    public static double RATIO_BID = 0.06;
     public static double RATIO_UNITS = 0.02;
 
     public static int roundCaptured = 1;
@@ -46,6 +46,9 @@ public strictfp class EnlightenmentCenter {
                     break;
                 case Slanderer:
                     spawned = spawnSlanderer();
+                    break;
+                case Muckraker:
+                    spawned = spawnMuckraker(targetEC.key);
                     break;
             }
             if (!spawned && rc.senseNearbyRobots(sensorRadius, enemyTeam).length>0) {

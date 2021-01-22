@@ -49,8 +49,6 @@ public class GridHelper {
      *      3. no vacancies (select one random direction out of adjacent muckrakers)
      *
      */
-    private static Direction lastAdjFlag = null;
-    private static int lastChange = 0;
     public static Direction getGridDirectionForFlag() throws GameActionException {
         MapLocation current = rc.getLocation();
 
@@ -67,18 +65,7 @@ public class GridHelper {
         }
 
         // select random direction out of adjacent muckrakers
-        if (lastChange == 0 || lastAdjFlag == null) {
-            Direction flag = getDirectionFromAdjacentFlags(current);
-            if (flag != null) {
-                lastChange = ROUND_BROADCAST_CAPTURED;
-                lastAdjFlag = flag;
-                return flag;
-            }
-        } else {
-            lastChange--;
-        }
-
-        return null;
+        return getDirectionFromAdjacentFlags(current);
     }
 
     // check if current position is valid for grid formation
@@ -131,6 +118,8 @@ public class GridHelper {
      *      2. next random direction to move to
      *
      */
+    private static Direction lastAdjFlag = null;
+    private static int lastChange = 0;
     public static Direction getNextDirection() throws GameActionException {
         // direct away from ECs to not absorb damage by pols
         ArrayList<Direction> selected = new ArrayList<>();
@@ -146,7 +135,17 @@ public class GridHelper {
                 }
             }
         }
-        return selected.isEmpty() ? getRandomDirection() : (Direction) getRandom(selected.toArray());
+        if (lastChange == 0 || lastAdjFlag == null) {
+            if (!selected.isEmpty()) {
+                lastChange = ROUND_BROADCAST_CAPTURED;
+                lastAdjFlag = selected.get(0);
+                return selected.get(0);
+            }
+        } else {
+            lastChange--;
+            return lastAdjFlag;
+        }
+        return getRandomDirection();
     }
 
     // select random direction out of adjacent muckrakers

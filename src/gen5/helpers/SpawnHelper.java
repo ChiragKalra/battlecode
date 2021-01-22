@@ -11,7 +11,7 @@ import static gen5.helpers.MovementHelper.*;
 
 public class SpawnHelper {
 
-    private static final int LIMIT_WALL_RADIUS = 12;
+    private static final int LIMIT_WALL_RADIUS = 25;
 
     public static int slandererHPFloor (int hp) {
         double func = (0.02 + 0.03*Math.exp(-0.001*hp))*hp;
@@ -84,6 +84,25 @@ public class SpawnHelper {
 
         if (rc.canBuildRobot(RobotType.POLITICIAN, dir, xp)) {
             rc.buildRobot(RobotType.POLITICIAN, dir, xp);
+            return true;
+        }
+        return false;
+    }
+
+
+    public static boolean spawnMuckraker(MapLocation toAttack) throws GameActionException {
+        Direction got = getOptimalDirection(rc.getLocation().directionTo(toAttack)),
+                dir = getOptimalDirection(got != null ? got : directions[spawnDirectionGridPol]);
+        if (dir == null ) {
+            return false;
+        }
+
+        int xp = 1;
+        xp = Math.max(SpawnType.GridPolitician.minHp, xp);
+        xp = Math.min(SpawnType.GridPolitician.maxHp, xp);
+
+        if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, xp)) {
+            rc.buildRobot(RobotType.MUCKRAKER, dir, xp);
             return true;
         }
         return false;

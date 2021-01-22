@@ -67,11 +67,7 @@ public strictfp class RobotPlayer {
                 spawnType = SpawnType.AttackPolitician;
             }
         } else if (mType == RobotType.MUCKRAKER) {
-            if (hp <= SpawnType.Muckraker.maxHp) {
-                spawnType = SpawnType.Muckraker;
-            } else {
-                spawnType = SpawnType.BuffMuckraker;
-            }
+            spawnType = SpawnType.Muckraker;
         } else if (mType == RobotType.SLANDERER) {
             spawnType = SpawnType.Slanderer;
         }
@@ -90,7 +86,7 @@ public strictfp class RobotPlayer {
                     Slanderer.init();
                     break;
                 case Muckraker:
-                    // Muckraker.init();
+                    Muckraker.init();
             }
 
         } catch (Exception e) {
@@ -137,7 +133,7 @@ public strictfp class RobotPlayer {
                         }
                         break;
                     case Muckraker:
-                        //Muckraker.move();
+                        Muckraker.move();
                     case Slanderer:
                         Slanderer.move();
                         break;
