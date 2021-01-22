@@ -9,47 +9,47 @@ import static gen5.RobotPlayer.*;
 import static gen5.helpers.AttackHelper.checkForAttackCoordinates;
 import static gen5.helpers.MovementHelper.directions;
 import static gen5.helpers.SpawnHelper.*;
-import static gen5.util.Functions.sigmoid;
 import static gen5.util.SpawnType.getOptimalType;
 
 
 public strictfp class EnlightenmentCenter {
 
-    public static int currentRadius = 3;
+    public static int currentRadius = 5;
 
-    public static double RATIO_BID = 0.08;
+    public static double RATIO_BID = 0.033;
     public static double RATIO_UNITS = 0.02;
 
     public static int roundCaptured = 1;
     public static int directionsBlocked = 0;
+    public static boolean[] edgeAtDirection = new boolean[4];
     public static Direction shiftedTunnel = Direction.CENTER;
     public static Pair<MapLocation, Integer> targetEC;
 
 
     private static boolean spawnOptimal() throws GameActionException {
         boolean spawned = false;
-        int roundsMine = roundNumber - roundCaptured;
-        if (roundNumber % 17 == 1 && roundsMine > 100*sigmoid((roundCaptured-750)/200.0)) {
-            spawned = spawnSlanderer();
-        }
-
-        if (!spawned) {
-            SpawnType got = getOptimalType();
-            if (got != null) {
-                switch (got) {
-                    case Muckraker:
-                        spawned = spawnMuckraker();
-                        break;
-                    case DefensePolitician:
-                        spawned = spawnDefencePolitician();
-                        break;/*
-                    case Slanderer:
-                        spawned = spawnSlanderer();
-                        break;*/
-                }
-                if (!spawned && rc.senseNearbyRobots(sensorRadius, enemyTeam).length>0) {
+        SpawnType got = getOptimalType(targetEC);
+        if (got != null) {
+            switch (got) {
+                /*
+                case BuffMuckraker:
+                    spawned = spawnB(targetEC.key, targetEC.value);
+                    break;*/
+                case AttackPolitician:
+                    spawned = spawnAttackPolitician(targetEC.key, targetEC.value);
+                    break;
+                case GridPolitician:
+                    spawned = spawnGridPolitician();
+                    break;
+                case DefensePolitician:
                     spawned = spawnDefencePolitician();
-                }
+                    break;
+                case Slanderer:
+                    spawned = spawnSlanderer();
+                    break;
+            }
+            if (!spawned && rc.senseNearbyRobots(sensorRadius, enemyTeam).length>0) {
+                spawned = spawnDefencePolitician();
             }
         }
         return spawned;
@@ -66,6 +66,10 @@ public strictfp class EnlightenmentCenter {
                 directionsBlocked++;
             }
         }
+        for (int i = 0; i < 8; i+=2) {
+            Direction dir = directions[i];
+            edgeAtDirection[i/2] = !rc.onTheMap(cur.translate(dir.dx*6, dir.dy*6));
+        }
 
 
         MapLocation now = rc.getLocation();
@@ -81,10 +85,10 @@ public strictfp class EnlightenmentCenter {
                 }
             }
         }
-        if (now.x%5 == GridHelper.MUCKRAKER_GRID_X) {
+        if (now.x%5 == GridHelper.GRID_X) {
             dx = -edgeX;
         }
-        if (now.y%5 == GridHelper.MUCKRAKER_GRID_X) {
+        if (now.y%5 == GridHelper.GRID_Y) {
             dy = -edgeY;
         }
         switch (dx) {
@@ -146,7 +150,11 @@ public strictfp class EnlightenmentCenter {
         if (got != null) {
             if (got.value >= 0) {
                 targetEC = got;
+            } else {
+                targetEC = null;
             }
+        } else {
+            targetEC = null;
         }
     }
 }

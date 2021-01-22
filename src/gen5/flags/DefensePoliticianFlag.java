@@ -9,7 +9,7 @@ import battlecode.common.GameActionException;
 
  */
 
-public class PoliticianFlag {
+public class DefensePoliticianFlag {
     // check for flag changes and set flag
     public static void updateFlag() throws GameActionException {
 

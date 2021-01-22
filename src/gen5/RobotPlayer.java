@@ -3,12 +3,10 @@ package gen5;
 import battlecode.common.*;
 
 import gen5.flags.EnlightenmentCenterFlag;
-import gen5.flags.PoliticianFlag;
-import gen5.flags.SlandererFlag;
-import gen5.flags.MuckrakerFlag;
+import gen5.flags.DefensePoliticianFlag;
+import gen5.flags.GridPoliticianFlag;
 import gen5.util.Logger;
-
-import static gen5.Politician.isAttackType;
+import gen5.util.SpawnType;
 
 public strictfp class RobotPlayer {
     // toggle logging before competitive matches
@@ -23,6 +21,7 @@ public strictfp class RobotPlayer {
     public static Team mTeam, enemyTeam;
     public static int actionRadius, sensorRadius, detectionRadius;
     public static RobotType mType;
+    public static SpawnType spawnType;
     public static MapLocation spawnerLocation;
     public static int enlightenmentCenterId, roundNumber;
 
@@ -58,6 +57,24 @@ public strictfp class RobotPlayer {
             log("round ec obtained: " + rc.getRoundNum());
         }
 
+        int hp = rc.getConviction();
+        if (mType == RobotType.POLITICIAN) {
+            if ( hp <= SpawnType.GridPolitician.maxHp) {
+                spawnType = SpawnType.GridPolitician;
+            } else if ( hp <= SpawnType.DefensePolitician.maxHp) {
+                spawnType = SpawnType.DefensePolitician;
+            } else  {
+                spawnType = SpawnType.AttackPolitician;
+            }
+        } else if (mType == RobotType.MUCKRAKER) {
+            if (hp <= SpawnType.Muckraker.maxHp) {
+                spawnType = SpawnType.Muckraker;
+            } else {
+                spawnType = SpawnType.BuffMuckraker;
+            }
+        } else if (mType == RobotType.SLANDERER) {
+            spawnType = SpawnType.Slanderer;
+        }
 
         try {
             // set spawner location for relative movement
@@ -67,9 +84,6 @@ public strictfp class RobotPlayer {
             switch (mType) {
                 case ENLIGHTENMENT_CENTER:
                     EnlightenmentCenter.init();
-                    break;
-                case POLITICIAN:
-                    Politician.init();
                     break;
                 case SLANDERER:
                     Slanderer.init();
@@ -91,43 +105,53 @@ public strictfp class RobotPlayer {
                 if (mType != rc.getType()) {
                     mType = rc.getType();
                     // Decide weather newly formed pol is defense politician or attack politician
-                    isAttackType = true;
                     detectionRadius = mType.detectionRadiusSquared;
                     actionRadius = mType.actionRadiusSquared;
                     sensorRadius = mType.sensorRadiusSquared;
+
+                    hp = rc.getConviction();
+                    if ( hp <= SpawnType.DefensePolitician.maxHp) {
+                        spawnType = SpawnType.DefensePolitician;
+                    } else  {
+                        spawnType = SpawnType.AttackPolitician;
+                    }
                 }
 
-                switch (mType) {
-                    case ENLIGHTENMENT_CENTER:
-                        EnlightenmentCenter.move();
-                        break;
-                    case POLITICIAN:
-                        Politician.move();
-                        break;
-                    case SLANDERER:
-                        Slanderer.move();
-                        break;
-                    case MUCKRAKER:
+                if (spawnType == null) {
+                    EnlightenmentCenter.move();
+                } else switch (spawnType) {
+                    case AttackPolitician:
                         if (rc.isReady()) {
-                            Muckraker.move();
+                            AttackPolitician.move();
                         }
+                        break;
+                    case DefensePolitician:
+                        if (rc.isReady()) {
+                            DefensePolitician.move();
+                        }
+                        break;
+                    case GridPolitician:
+                        if (rc.isReady()) {
+                            GridPolitician.move();
+                        }
+                        break;
+                    case Muckraker:
+                        //Muckraker.move();
+                    case Slanderer:
+                        Slanderer.move();
                         break;
                 }
                 logger.log("move");
 
                 // update flag at the end of each round
-                switch (mType) {
-                    case ENLIGHTENMENT_CENTER:
-                        EnlightenmentCenterFlag.updateFlag();
+                if (spawnType == null) {
+                    EnlightenmentCenterFlag.updateFlag();
+                } else switch (spawnType) {
+                    case DefensePolitician:
+                        DefensePoliticianFlag.updateFlag();
                         break;
-                    case POLITICIAN:
-                        PoliticianFlag.updateFlag();
-                        break;
-                    case SLANDERER:
-                        SlandererFlag.updateFlag();
-                        break;
-                    case MUCKRAKER:
-                        MuckrakerFlag.updateFlag();
+                    case GridPolitician:
+                        GridPoliticianFlag.updateFlag();
                 }
 
                 logger.flush();

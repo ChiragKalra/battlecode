@@ -1,30 +1,30 @@
 package gen5.helpers;
 
 import battlecode.common.*;
-import gen5.flags.MuckrakerFlag;
+import gen5.flags.GridPoliticianFlag;
 import gen5.util.Pair;
 
 import java.util.ArrayList;
 
 import static gen5.RobotPlayer.*;
-import static gen5.flags.MuckrakerFlag.*;
+import static gen5.flags.GridPoliticianFlag.*;
 import static gen5.helpers.MovementHelper.*;
 import static gen5.util.Functions.getRandom;
 
 
-// muckraker info grid formation helper
+// POLITICIAN info grid formation helper
 public class GridHelper {
-    public static final int MUCKRAKER_GRID_WIDTH = 5;
-    public static final int MUCKRAKER_GRID_X = 1;
-    public static final int MUCKRAKER_GRID_Y = 3;
+    public static final int GRID_WIDTH = 5;
+    public static final int GRID_X = 1;
+    public static final int GRID_Y = 3;
     public static final int ROUND_BROADCAST_CAPTURED = 13;
 
     private static Direction getAdjacentVacant (MapLocation current) throws GameActionException {
         int mx = current.x, my = current.y;
-        MapLocation north = new MapLocation(mx, my + MUCKRAKER_GRID_WIDTH),
-            east = new MapLocation(mx + MUCKRAKER_GRID_WIDTH, my),
-            south = new MapLocation(mx, my - MUCKRAKER_GRID_WIDTH),
-            west = new MapLocation(mx - MUCKRAKER_GRID_WIDTH, my);
+        MapLocation north = new MapLocation(mx, my + GRID_WIDTH),
+            east = new MapLocation(mx + GRID_WIDTH, my),
+            south = new MapLocation(mx, my - GRID_WIDTH),
+            west = new MapLocation(mx - GRID_WIDTH, my);
 
         Direction selected = null;
 
@@ -49,48 +49,57 @@ public class GridHelper {
      *      3. no vacancies (select one random direction out of adjacent muckrakers)
      *
      */
-    public static Pair<Direction, Boolean> getGridDirectionForFlag() throws GameActionException {
+    private static Direction lastAdjFlag = null;
+    private static int lastChange = 0;
+    public static Direction getGridDirectionForFlag() throws GameActionException {
         MapLocation current = rc.getLocation();
 
         // find adjacent vacancies
         Direction vacancy = getAdjacentVacant(current);
         if (vacancy != null) {
-            return new Pair<>(vacancy, true);
+            return vacancy;
         }
 
         // avoid crowding if any
         Direction antiCrowd = getAntiCrowdingDirection(current);
         if (antiCrowd != null) {
-            return new Pair<>(antiCrowd, false);
+            return antiCrowd;
         }
 
-        Direction adj = getDirectionFromAdjacentFlags(current);
-        if (adj == null) {
-            return null;
-        }
         // select random direction out of adjacent muckrakers
-        return new Pair<>(adj, false);
+        if (lastChange == 0 || lastAdjFlag == null) {
+            Direction flag = getDirectionFromAdjacentFlags(current);
+            if (flag != null) {
+                lastChange = ROUND_BROADCAST_CAPTURED;
+                lastAdjFlag = flag;
+                return flag;
+            }
+        } else {
+            lastChange--;
+        }
+
+        return null;
     }
 
     // check if current position is valid for grid formation
     public static Boolean formsGrid () {
         MapLocation mapLocation = rc.getLocation();
 
-        return mapLocation.x % MUCKRAKER_GRID_WIDTH == MUCKRAKER_GRID_X &&
-                mapLocation.y % MUCKRAKER_GRID_WIDTH == MUCKRAKER_GRID_Y;
+        return mapLocation.x % GRID_WIDTH == GRID_X &&
+                mapLocation.y % GRID_WIDTH == GRID_Y;
     }
 
     // check for vacant grid spot in the sensor radius
     private static MapLocation checkVacantSpot(MapLocation mLoc) throws GameActionException {
         int mx = mLoc.x, my = mLoc.y;
 
-        int modX = Math.floorMod(MUCKRAKER_GRID_X-mx, MUCKRAKER_GRID_WIDTH),
-                modY = Math.floorMod(MUCKRAKER_GRID_Y-my, MUCKRAKER_GRID_WIDTH);
+        int modX = Math.floorMod(GRID_X -mx, GRID_WIDTH),
+                modY = Math.floorMod(GRID_Y -my, GRID_WIDTH);
 
         MapLocation ne = new MapLocation(mx + modX, my + modY),
-                se = new MapLocation(mx + modX, my + modY - MUCKRAKER_GRID_WIDTH),
-                sw = new MapLocation(mx + modX - MUCKRAKER_GRID_WIDTH, my + modY - MUCKRAKER_GRID_WIDTH),
-                nw = new MapLocation(mx + modX - MUCKRAKER_GRID_WIDTH, my + modY);
+                se = new MapLocation(mx + modX, my + modY - GRID_WIDTH),
+                sw = new MapLocation(mx + modX - GRID_WIDTH, my + modY - GRID_WIDTH),
+                nw = new MapLocation(mx + modX - GRID_WIDTH, my + modY);
 
         //check in all 4 directions
         MapLocation[] possible = {ne, se, sw, nw};
@@ -127,7 +136,7 @@ public class GridHelper {
         ArrayList<Direction> selected = new ArrayList<>();
         RobotInfo[] fellow = rc.senseNearbyRobots(sensorRadius, mTeam);
         for (RobotInfo ri : fellow) {
-            if (ri.type == RobotType.MUCKRAKER && rc.canGetFlag(ri.getID())) {
+            if (ri.type == RobotType.POLITICIAN && rc.canGetFlag(ri.getID())) {
                 int flag = rc.getFlag(ri.getID());
                 if (isPlaced(flag)) {
                     Direction dir = getDirection(flag);
@@ -146,7 +155,7 @@ public class GridHelper {
         RobotInfo[] nearby = rc.senseNearbyRobots(sensorRadius, mTeam);
         for (RobotInfo ri: nearby) {
             int flag = rc.getFlag(ri.getID());
-            if (ri.type == RobotType.MUCKRAKER && isPlaced(flag)) {
+            if (ri.type == RobotType.POLITICIAN && isPlaced(flag)) {
                 Direction dir = getDirection(rc.getFlag(rc.getID()));
                 if (dir != null) {
                     Direction sum = vectorAddition(dir, now.directionTo(ri.location));
@@ -198,12 +207,12 @@ public class GridHelper {
 
         //check in all 4 directions
         for (RobotInfo ri: rc.senseNearbyRobots(sensorRadius, mTeam)) {
-            if (ri.type == RobotType.MUCKRAKER) {
+            if (ri.type == RobotType.POLITICIAN) {
                 int flag = rc.getFlag(ri.getID());
                 if (isBroadcastingEC(flag)) {
                     int hp = getHpFromFlag(flag);
                     if (selected == null || hp < selected.value) {
-                        Pair<Integer, Integer> got = MuckrakerFlag.getRelLocFromFlag(flag);
+                        Pair<Integer, Integer> got = GridPoliticianFlag.getRelLocFromFlag(flag);
                         Direction dir = current.directionTo(ri.location);
                         got.key += dir.dx;
                         got.value += dir.dy;

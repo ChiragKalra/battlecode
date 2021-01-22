@@ -1,6 +1,9 @@
 package gen5;
 
-import battlecode.common.*;
+import battlecode.common.Direction;
+import battlecode.common.GameActionException;
+import battlecode.common.MapLocation;
+import gen5.helpers.AttackHelper;
 import gen5.util.Pair;
 import gen5.util.SpawnType;
 
@@ -11,42 +14,12 @@ import static gen5.helpers.AttackHelper.*;
 import static gen5.helpers.DefenseHelper.*;
 import static gen5.helpers.MovementHelper.*;
 
-public strictfp class Politician {
-    public static boolean isAttackType = false;
+public strictfp class DefensePolitician {
 
-    private static MapLocation locToEmp = null;
 
-    public static void moveAttack() throws GameActionException {
-        int rad = shouldAttackOffensive();
-        if (rad != 0) {
-            rc.empower(rad);
-            return;
-        }
-
-        if (shouldSelfEmpower()) {
-            locToEmp = spawnerLocation;
-        }
-
-        // movement
-        if (locToEmp == null) {
-            locToEmp = getOptimalLocationToEmpower();
-        }
-        if (locToEmp != null) {
-            goTo(locToEmp);
-        } else {
-            Pair<MapLocation, Integer> got = checkForAttackCoordinates();
-            if (got != null && got.value >= 0) {
-                goTo(got.key);
-            } else {
-                tryMove(getNextDirection(null), false);
-                //moveDefense();
-            }
-        }
-    }
-
-    public static void moveDefense () throws GameActionException {
+    public static void move() throws GameActionException {
         int rad = shouldAttackDefensive();
-        if (rad != 0 && !isAttackType) {
+        if (rad != 0 && spawnType == SpawnType.DefensePolitician) {
             rc.empower(rad);
             return;
         }
@@ -61,8 +34,8 @@ public strictfp class Politician {
         if (rc.canGetFlag(enlightenmentCenterId)) {
             radius = getRadius(rc.getFlag(enlightenmentCenterId));
         } else {
-            isAttackType = true;
-            moveAttack();
+            spawnType =  SpawnType.AttackPolitician;
+            AttackPolitician.move();
             return;
         }
 
@@ -158,22 +131,6 @@ public strictfp class Politician {
         tryMoveWall(left, outerRadius);
     }
 
-    public static void move() throws GameActionException {
-        if (rc.isReady()) {
-            init();
-            // move modes
-            if (isAttackType) {
-                moveAttack();
-            } else {
-                moveDefense();
-            }
-        }
-    }
-
     public static void init() throws GameActionException {
-        isAttackType = rc.getConviction() >= SpawnType.AttackPolitician.minHp || spawnerLocation == null;
-        if (rc.canGetFlag(enlightenmentCenterId)) {
-            tunnelShift = getShiftDirection(rc.getFlag(enlightenmentCenterId));
-        }
     }
 }

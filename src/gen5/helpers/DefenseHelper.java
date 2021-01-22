@@ -21,6 +21,9 @@ public class DefenseHelper {
 				return true;
 			}
 		}
+		// check if it's a grid location, allow the grid pols to occupy
+		if (GridHelper.formsGrid()) return true;
+
 		return ml.x == spawnerLocation.x + tunnelShift.dx || ml.y == spawnerLocation.y + tunnelShift.dy;
 	}
 

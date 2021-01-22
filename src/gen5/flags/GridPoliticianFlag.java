@@ -3,7 +3,7 @@ package gen5.flags;
 import battlecode.common.*;
 import gen5.util.Pair;
 
-import static gen5.Muckraker.placed;
+import static gen5.GridPolitician.placed;
 import static gen5.RobotPlayer.*;
 import static gen5.helpers.GridHelper.*;
 import static gen5.helpers.MovementHelper.directionList;
@@ -21,7 +21,7 @@ import static gen5.helpers.MovementHelper.directions;
  15-23   - ec hp
  */
 
-public class MuckrakerFlag {
+public class GridPoliticianFlag {
     public static final int HP_LOSS_RATIO = 10;
 
     public static boolean isPlaced (int flag) {
@@ -59,9 +59,9 @@ public class MuckrakerFlag {
         // set vacant grid location direction
         if (placed) {
             newFlag += 1;
-            Pair<Direction, Boolean> direction = getGridDirectionForFlag();
+            Direction direction = getGridDirectionForFlag();
             if (direction != null) {
-                int threeBit = directionList.indexOf(direction.key);
+                int threeBit = directionList.indexOf(direction);
                 newFlag += threeBit<<1;
             }
 

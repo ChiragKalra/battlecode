@@ -4,10 +4,10 @@ import battlecode.common.*;
 
 import static gen5.RobotPlayer.*;
 import static gen5.helpers.GridHelper.*;
-import static gen5.helpers.MovementHelper.tryMove;
+import static gen5.helpers.MovementHelper.*;
 
 
-public strictfp class Muckraker {
+public strictfp class GridPolitician {
     public static boolean placed = false;
     private static int explodeRadius = 0;
     private static Direction spawnDirection = null;
@@ -37,6 +37,8 @@ public strictfp class Muckraker {
 
         if (explodeRadius == 0 && spawnerLocation != null) {
             spawnDirection = spawnerLocation.directionTo(rc.getLocation());
+            int ind = directionList.indexOf(spawnDirection);
+            spawnDirection = directions[(ind/2)*2];
         }
 
         if (explodeRadius < 3*5 && spawnDirection != null) {

@@ -1,14 +1,14 @@
 package gen5.helpers;
 
 import battlecode.common.*;
-import gen5.flags.MuckrakerFlag;
+import gen5.flags.GridPoliticianFlag;
 import gen5.util.Pair;
 
 import java.util.HashMap;
 
 import static gen5.RobotPlayer.*;
-import static gen5.flags.MuckrakerFlag.getHpFromFlag;
-import static gen5.flags.MuckrakerFlag.isBroadcastingEC;
+import static gen5.flags.GridPoliticianFlag.getHpFromFlag;
+import static gen5.flags.GridPoliticianFlag.isBroadcastingEC;
 import static gen5.helpers.MovementHelper.*;
 
 
@@ -152,11 +152,11 @@ public class AttackHelper {
         Pair<MapLocation, Integer> selected = null;
         //check in all 4 directions
         for (RobotInfo ri: rc.senseNearbyRobots(sensorRadius, mTeam)) {
-            if (ri.type == RobotType.MUCKRAKER) {
+            if (ri.type == RobotType.POLITICIAN) {
                 int flag = rc.getFlag(ri.getID());
                 if (isBroadcastingEC(flag)) {
                     int hp = getHpFromFlag(flag);
-                    MapLocation loc = MuckrakerFlag.getAbsLocFromFlag(flag, ri.location);
+                    MapLocation loc = GridPoliticianFlag.getAbsLocFromFlag(flag, ri.location);
                     if (selected == null || hp < selected.value) {
                         selected = new Pair<>(loc, hp);
                     }

@@ -8,21 +8,20 @@ import static gen5.EnlightenmentCenter.*;
 import static gen5.RobotPlayer.*;
 import static gen5.helpers.GridHelper.getDirectionFromAdjacentFlags;
 import static gen5.helpers.MovementHelper.*;
-import static gen5.util.Functions.sigmoid;
 
 public class SpawnHelper {
 
-    private static final int LIMIT_WALL_RADIUS = 50;
+    private static final int LIMIT_WALL_RADIUS = 12;
 
     public static int slandererHPFloor (int hp) {
         double func = (0.02 + 0.03*Math.exp(-0.001*hp))*hp;
-        return (int) Math.ceil(Math.floor(func)/func*hp);
+        return (int) Math.ceil((Math.floor(func)*hp)/func);
     }
 
 
     // layerQuantity = { 0, 8, 12, 16, 20, 28, 32, 40, 44, 48, 56, 60, 68, 72, 76, 84, };
     // private static final int[] sectorQuantity = { 0, 8, 20, 36, 56, 84, 116, 156, 200, 248, 304, 364, 432, 504, 580, 664, };
-    //private static final int[] roundExpanded = new int[LIMIT_WALL_RADIUS+1];
+    private static final int[] roundExpanded = new int[LIMIT_WALL_RADIUS+1];
     private static int blockedRounds = 0;
     public static boolean shouldIncrementWallRadius() {
         int capacity  = 20;
@@ -33,20 +32,21 @@ public class SpawnHelper {
             case 3:
                 capacity = 7;
         }
-        if (rc.senseNearbyRobots(10).length >= capacity-2) {
+        if (rc.senseNearbyRobots(10, mTeam).length >= capacity-2) {
             blockedRounds++;
         } else {
             blockedRounds = 0;
         }
-        boolean ans = blockedRounds >= 10 && currentRadius<LIMIT_WALL_RADIUS && defPolCount >= 12*(currentRadius+2);
+        boolean ans = blockedRounds >= 10 && currentRadius<LIMIT_WALL_RADIUS &&
+                roundNumber-roundExpanded[currentRadius-1] > 6*currentRadius*capacity/20;
         if (ans) {
-            //roundExpanded[currentRadius+1] = roundNumber;
+            roundExpanded[currentRadius+1] = roundNumber;
             blockedRounds = 0;
         }
         return ans;
     }
 
-    private static int spawnDirectionMuck = 0;
+    /*private static int spawnDirectionMuck = 0;
     public static boolean spawnMuckraker() throws GameActionException {
         Direction got = getDirectionFromAdjacentFlags(rc.getLocation()),
                 dir = getOptimalDirection(got != null ? got : directions[(spawnDirectionMuck++)%8]);
@@ -63,6 +63,30 @@ public class SpawnHelper {
             return true;
         }
         return false;
+    }*/
+
+    private static int spawnDirectionGridPol = 0;
+    public static boolean spawnGridPolitician() throws GameActionException {
+        spawnDirectionGridPol = (spawnDirectionGridPol+2)%8;
+        if (edgeAtDirection[spawnDirectionDefPol/2]) {
+            spawnDirectionGridPol += 2;
+        }
+        spawnDirectionGridPol = (spawnDirectionGridPol+2)%8;
+        Direction got = getDirectionFromAdjacentFlags(rc.getLocation()),
+                dir = getOptimalDirection(got != null ? got : directions[spawnDirectionGridPol]);
+        if (dir == null ) {
+            return false;
+        }
+
+        int xp = (int)(rc.getInfluence()*RATIO_UNITS/4);
+        xp = Math.max(SpawnType.GridPolitician.minHp, xp);
+        xp = Math.min(SpawnType.GridPolitician.maxHp, xp);
+
+        if (rc.canBuildRobot(RobotType.POLITICIAN, dir, xp)) {
+            rc.buildRobot(RobotType.POLITICIAN, dir, xp);
+            return true;
+        }
+        return false;
     }
 
     public static boolean spawnAttackPolitician (MapLocation toAttack, int hp) throws GameActionException {
@@ -70,10 +94,11 @@ public class SpawnHelper {
         if (dir == null) {
             return false;
         }
-        int xp = Math.max(hp + 11, (int)(rc.getInfluence()*RATIO_UNITS));
-        if (xp % 2 == 0) {
-            xp++;
-        }
+        int xp = hp + 11,
+            minXp = SpawnType.AttackPolitician.minHp,
+            maxXp = SpawnType.AttackPolitician.maxHp;
+        xp = Math.max(minXp, xp);
+        xp = Math.min(maxXp, xp);
         if (rc.canBuildRobot(RobotType.POLITICIAN, dir, xp)) {
             rc.buildRobot(RobotType.POLITICIAN, dir, xp);
             return true;
@@ -81,38 +106,18 @@ public class SpawnHelper {
         return false;
     }
 
-    /*private static int spawnDirectionSlan = 1;
-    public static boolean spawnSlanderer() throws GameActionException {
-        Direction dir = getOptimalDirection(directions[(spawnDirectionSlan+=2)%8]);
-        if (dir == null || rc.senseNearbyRobots(sensorRadius, enemyTeam).length>0) {
-            return false;
-        }
-        double earlyGameFactor = sigmoid((roundNumber-roundCaptured-800)/150.0);
-        int xp = slandererHPFloor((int)(rc.getInfluence()*0.3)),
-            minXp = slandererHPFloor(SpawnType.Slanderer.minHp),
-            maxXp = (int) (slandererHPFloor(SpawnType.Slanderer.maxHp)*earlyGameFactor);
-        xp = Math.max(minXp, xp);
-        xp = Math.min(maxXp == 0 ? minXp : maxXp, xp);
-
-
-        if (rc.canBuildRobot(RobotType.SLANDERER, dir, xp)) {
-            rc.buildRobot(RobotType.SLANDERER, dir, xp);
-            return true;
-        } else if (rc.canBuildRobot(RobotType.SLANDERER, dir, minXp)) {
-            rc.buildRobot(RobotType.SLANDERER, dir, minXp);
-            return true;
-        }
-        return false;
-    }*/
-
     private static int spawnDirectionSlan = 1;
+    private static final int slanMinXp = slandererHPFloor(SpawnType.Slanderer.minHp),
+            slanMaxXp = slandererHPFloor(SpawnType.Slanderer.maxHp);
     public static boolean spawnSlanderer() throws GameActionException {
         Direction dir = getOptimalDirection(directions[(spawnDirectionSlan+=2)%8]);
         if (dir == null || rc.senseNearbyRobots(sensorRadius, enemyTeam).length>0) {
             return false;
         }
-        int xp = slandererHPFloor((int)(rc.getInfluence()*(1-0.5*sigmoid((roundNumber-500)/100.0))));
-        if (xp > 0) {
+        int xp = slandererHPFloor(rc.getInfluence());
+        xp = Math.max(slanMinXp, xp);
+        xp = Math.min(slanMaxXp, xp);
+        if (rc.canBuildRobot(RobotType.SLANDERER, dir, xp)) {
             rc.buildRobot(RobotType.SLANDERER, dir, xp);
             return true;
         }
@@ -120,21 +125,23 @@ public class SpawnHelper {
     }
 
 
-    private static int spawnDirectionDefPol = 0, defPolCount = 0;
+    private static int spawnDirectionDefPol = 0;
     public static boolean spawnDefencePolitician() throws GameActionException {
-        Direction dir = getOptimalDirection(directions[(spawnDirectionDefPol+=2)%8]);
+        spawnDirectionDefPol = (spawnDirectionDefPol+2)%8;
+        if (edgeAtDirection[spawnDirectionDefPol/2]) {
+            spawnDirectionDefPol += 2;
+        }
+        spawnDirectionDefPol = (spawnDirectionDefPol+2)%8;
+
+        Direction dir = getOptimalDirection(directions[spawnDirectionDefPol]);
         if (dir == null ) {
             return false;
         }
         int xp = (int)(rc.getInfluence()*0.005);
         xp = Math.max(SpawnType.DefensePolitician.minHp, xp);
         xp = Math.min(SpawnType.DefensePolitician.maxHp, xp);
-        if (xp % 2 == 1) {
-            xp++;
-        }
         if (rc.canBuildRobot(RobotType.POLITICIAN, dir, xp)) {
             rc.buildRobot(RobotType.POLITICIAN, dir, xp);
-            defPolCount++;
             return true;
         }
         return false;
