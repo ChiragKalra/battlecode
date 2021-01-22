@@ -3,6 +3,7 @@ package gen5;
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
+import battlecode.common.RobotInfo;
 import gen5.helpers.AttackHelper;
 import gen5.util.Pair;
 import gen5.util.SpawnType;
@@ -16,14 +17,7 @@ import static gen5.helpers.MovementHelper.*;
 
 public strictfp class DefensePolitician {
 
-
     public static void move() throws GameActionException {
-        int rad = shouldAttackDefensive();
-        if (rad != 0 && spawnType == SpawnType.DefensePolitician) {
-            rc.empower(rad);
-            return;
-        }
-
         /*for (RobotInfo ri: rc.senseNearbyRobots(actionRadius, mTeam)) {
             if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
                 enlightenmentCenterId = ri.getID();
@@ -34,7 +28,7 @@ public strictfp class DefensePolitician {
         if (rc.canGetFlag(enlightenmentCenterId)) {
             radius = getRadius(rc.getFlag(enlightenmentCenterId));
         } else {
-            spawnType =  SpawnType.AttackPolitician;
+            spawnType = SpawnType.AttackPolitician;
             AttackPolitician.move();
             return;
         }
@@ -46,7 +40,26 @@ public strictfp class DefensePolitician {
         Direction left = straight.rotateLeft();
         Direction right = straight.rotateRight();
 
-        if (onWall(rc.getLocation(), innerRadius, outerRadius)) {
+        boolean onInnerWall = isWallOfRadius(spawnerLocation, rc.getLocation(), innerRadius);
+        boolean onOuterWall = isWallOfRadius(spawnerLocation, rc.getLocation(), outerRadius);
+        boolean isOnWall = onInnerWall || onOuterWall;
+        boolean isOutsideWall = outsideWall(rc.getLocation(), outerRadius);
+
+        int rad = shouldAttackDefensive();
+        if (rad != 0 && spawnType == SpawnType.DefensePolitician) {
+            // only >= third layer will explode normally
+            if (isOutsideWall) {
+                rc.empower(rad);
+                return;
+            }
+
+            // second layer will explode if there's no third layer
+            // for ()
+            // first layer will explode if there's no second layer
+            // check if third layer not present
+        }
+
+        if (isOnWall) {
             if (!isTunnelPoint(rc.getLocation())) {
                 return;
             }
@@ -70,7 +83,7 @@ public strictfp class DefensePolitician {
             return;
         }
 
-        if (outsideWall(rc.getLocation(), outerRadius)) {
+        if (isOutsideWall) {
             Direction opposite = straight.opposite();
             Direction oppLeft = opposite.rotateLeft();
             Direction oppRight = opposite.rotateRight();
