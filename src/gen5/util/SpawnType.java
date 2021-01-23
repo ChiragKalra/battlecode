@@ -1,7 +1,6 @@
 package gen5.util;
 
-import static gen5.RobotPlayer.rc;
-import static gen5.RobotPlayer.roundNumber;
+import static gen5.RobotPlayer.*;
 
 
 public enum SpawnType {
@@ -34,6 +33,9 @@ public enum SpawnType {
                 case 2:
                 case 7:
                 case 10:
+                    if (haveWonInVotes) {
+                        return SpawnType.DefensePolitician;
+                    }
                     return SpawnType.Slanderer;
                 case 3:
                 case 6:

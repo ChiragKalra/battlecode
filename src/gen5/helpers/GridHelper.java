@@ -16,8 +16,8 @@ import static gen5.util.Functions.getRandom;
 // POLITICIAN info grid formation helper
 public class GridHelper {
     public static final int GRID_WIDTH = 5;
-    public static final int GRID_X = 2;
-    public static final int GRID_Y = 2;
+    public static final int GRID_X = 1;
+    public static final int GRID_Y = 3;
     public static final int ROUND_BROADCAST_CAPTURED = 13;
 
     private static Direction getAdjacentVacant (MapLocation current) throws GameActionException {
