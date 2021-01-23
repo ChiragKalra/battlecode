@@ -69,9 +69,6 @@ public class SpawnHelper {
     private static int spawnDirectionGridPol = 0;
     public static boolean spawnGridPolitician() throws GameActionException {
         spawnDirectionGridPol = (spawnDirectionGridPol+2)%8;
-        while (edgeAtDirection[spawnDirectionGridPol/2]) {
-            spawnDirectionGridPol = (spawnDirectionGridPol+2)%8;
-        }
         Direction got = getDirectionFromAdjacentFlags(rc.getLocation()),
                 dir = getOptimalDirection(got != null ? got : directions[spawnDirectionGridPol]);
         if (dir == null ) {
