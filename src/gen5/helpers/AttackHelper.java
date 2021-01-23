@@ -14,8 +14,10 @@ import static gen5.helpers.MovementHelper.*;
 
 public class AttackHelper {
 
-    private static final double EMP_ATTACK_THRESHOLD_RATIO = 0.75;
-    private static final double EMP_AFTER_ROUNDS = 4;
+    private static final double EMP_ATTACK_THRESHOLD_RATIO = 0.8;
+    private static final double EMP_AFTER_ROUNDS = 10;
+
+    private static final int[] check = {1, 2, 4, 5, 8, 9};
 
     private static final HashMap<MapLocation, Integer> roundsNotAttackedEC = new HashMap<>();
 
@@ -41,43 +43,53 @@ public class AttackHelper {
 
 
     public static int shouldAttackOffensive() {
-        RobotInfo[] nearby = rc.senseNearbyRobots(1);
-        if (nearby.length == 0) {
-            return 0;
-        }
-        double empFac = rc.getEmpowerFactor(mTeam, 0), selfEmpFac = 1;
-        if (empFac > 10000) {
-            empFac = 10000;
-        }
-        int damage = (int) (rc.getConviction()*empFac-10),
-                each = damage/nearby.length, done = 0;
+        int bestRad = 0, ecRad = 100;
+        double bestDamage = 0, empFac = rc.getEmpowerFactor(mTeam, 0), selfEmpFac = 1;
         MapLocation detectedEC = null;
-        for (RobotInfo ri: nearby) {
-            if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
-                done += each;
-                detectedEC = ri.location;
-                if (empFac > 100) {
-                    return actionRadius;
-                }
-                if (ri.team == mTeam) {
-                    selfEmpFac = 1.1112;
-                }
-            } else if (ri.team != mTeam) {
-                done += Math.min(ri.conviction, each);
-            } else  {
-                done += Math.min(ri.influence-ri.conviction+1, each);
+        for (int rad : check) {
+            RobotInfo[] nearby = rc.senseNearbyRobots(rad);
+            if (nearby.length == 0) {
+                return 0;
             }
+            if (empFac > 10000) {
+                empFac = 10000;
+            }
+            int damage = (int) (rc.getConviction() * empFac - 10),
+                    each = damage / nearby.length, done = 0;
+            for (RobotInfo ri : nearby) {
+                if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
+                    done += each;
+                    if (empFac > 100) {
+                        return actionRadius;
+                    }
+                    if (ri.team == mTeam) {
+                        selfEmpFac = 1.25;
+                    } else {
+                        detectedEC = ri.location;
+                        ecRad = Math.min(rad, ecRad);
+                    }
+                } else if (ri.team != mTeam) {
+                    done += Math.min(ri.conviction, each);
+                } else {
+                    done += Math.min(ri.influence - ri.conviction + 1, each);
+                }
+            }
+            double ratio = done / (double) (damage+10);
+            boolean attacking = ratio > EMP_ATTACK_THRESHOLD_RATIO * selfEmpFac;
+            if (attacking && ratio > bestDamage) {
+                bestDamage = ratio;
+                bestRad = rad;
+            }
+            selfEmpFac = 1;
         }
-        boolean attacking = done/(double) damage > EMP_ATTACK_THRESHOLD_RATIO*selfEmpFac;
-        if (attacking) return 1;
         if (detectedEC != null) {
             int got = roundsNotAttackedEC.getOrDefault(detectedEC, 0) + 1;
             if (got > EMP_AFTER_ROUNDS) {
-                return 1;
+                return ecRad;
             }
             roundsNotAttackedEC.put(detectedEC, got);
         }
-        return 0;
+        return bestRad;
     }
 
     // returns (radius, is a muckraker adjacent)
@@ -92,31 +104,27 @@ public class AttackHelper {
             }
         }*/
 
-
-        int[] check = {1, 2, 4, 5, 8, 9};
-
         double empFac = rc.getEmpowerFactor(mTeam, 0);
         if (empFac > 10000) {
             empFac = 10000;
         }
         
-        Integer empRad = 0;
+        int empRad = 0;
         int mostKills = 0, mostDamage = 0;
-        Boolean muckrakerAdjacent = false;
+        boolean muckrakerAdjacent = false;
         for (int rad : check) {
             RobotInfo[] nearby = rc.senseNearbyRobots(rad);
             if (nearby.length == 0) continue;
             int damage = (int) (rc.getConviction()*empFac-10),
                     each = damage/nearby.length, kills = 0, damageDone = 0;
             for (RobotInfo ri: nearby) {
-                if (ri.team != mTeam && ri.type != RobotType.ENLIGHTENMENT_CENTER) {
-                    if (ri.conviction <= rc.getConviction()*3) {
-                        if (ri.conviction < each) {
-                            kills++;
-                            damageDone += ri.conviction + 1;
-                        } else {
-                            damageDone += each;
-                        }
+                if (ri.team != mTeam && (ri.type == RobotType.MUCKRAKER ||
+                        (ri.type == RobotType.POLITICIAN && roundNumber-roundSpawned > 150))) {
+                    if (ri.conviction < each) {
+                        kills++;
+                        damageDone += ri.conviction + 1;
+                    } else {
+                        damageDone += each;
                     }
 
                     if (ri.type == RobotType.MUCKRAKER && rad <= 2) {
@@ -138,24 +146,29 @@ public class AttackHelper {
         return new Pair<>(empRad, muckrakerAdjacent);
     }
 
-    /*
-     * @return
-     *      1. next direction to move to if enlightenment center detected nearby
-     *      2. next direction to move to if enlightenment center detected in the grid
-     *      3. next random direction to move to
-     *
-     */
+    private static Direction opEc = null;
+    private static int moves = 0;
+    public static Direction getNextDirection(MapLocation attackLocation) throws GameActionException {
+        if (moves > 0 && opEc != null) {
+            moves--;
+            return opEc;
+        }
 
-    public static Direction getNextDirection(MapLocation attackLocation) {
         MapLocation mLoc = rc.getLocation();
         if (attackLocation == null) {
             for (RobotInfo ri: rc.senseNearbyRobots()) {
-                if (ri.team != mTeam && ri.type == RobotType.ENLIGHTENMENT_CENTER) {
-                    return mLoc.directionTo(ri.location);
+                if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
+                    if (ri.team != mTeam) {
+                        return mLoc.directionTo(ri.location);
+                    } else {
+                        opEc = ri.location.directionTo(mLoc);
+                        moves = 30;
+                    }
                 }
             }
         }
-        return getRandomDirection();
+        Direction grid = GridHelper.getDirectionFromAdjacentFlags(mLoc);
+        return grid != null ? grid : getRandomDirection();
     }
 
     public static Pair<MapLocation, Integer> checkForAttackCoordinates() throws GameActionException {

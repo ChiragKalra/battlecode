@@ -3,6 +3,7 @@ package gen5.helpers;
 import battlecode.common.*;
 
 import gen5.util.SpawnType;
+import gen5.util.Vector;
 
 import static gen5.EnlightenmentCenter.*;
 import static gen5.RobotPlayer.*;
@@ -11,7 +12,7 @@ import static gen5.helpers.MovementHelper.*;
 
 public class SpawnHelper {
 
-    private static final int LIMIT_WALL_RADIUS = 63;
+    private static final int LIMIT_WALL_RADIUS = 32;
 
     public static int slandererHPFloor (int hp) {
         double func = (0.02 + 0.03*Math.exp(-0.001*hp))*hp;
@@ -68,10 +69,9 @@ public class SpawnHelper {
     private static int spawnDirectionGridPol = 0;
     public static boolean spawnGridPolitician() throws GameActionException {
         spawnDirectionGridPol = (spawnDirectionGridPol+2)%8;
-        if (edgeAtDirection[spawnDirectionDefPol/2]) {
-            spawnDirectionGridPol += 2;
+        while (edgeAtDirection[spawnDirectionDefPol/2]) {
+            spawnDirectionGridPol = (spawnDirectionGridPol+2)%8;
         }
-        spawnDirectionGridPol = (spawnDirectionGridPol+2)%8;
         Direction got = getDirectionFromAdjacentFlags(rc.getLocation()),
                 dir = getOptimalDirection(got != null ? got : directions[spawnDirectionGridPol]);
         if (dir == null ) {
@@ -129,7 +129,16 @@ public class SpawnHelper {
     private static final int slanMinXp = slandererHPFloor(SpawnType.Slanderer.minHp),
             slanMaxXp = slandererHPFloor(SpawnType.Slanderer.maxHp);
     public static boolean spawnSlanderer() throws GameActionException {
-        Direction dir = getOptimalDirection(directions[(spawnDirectionSlan+=2)%8]);
+        Direction dir = null;
+        if (slandererDirection == null) {
+            dir = getOptimalDirection(directions[(spawnDirectionSlan+=2)%8]);
+        } else {
+            spawnDirectionSlan = (spawnDirectionSlan+2)%8;
+            while (!slandererDirection[spawnDirectionSlan]) {
+                spawnDirectionSlan = (spawnDirectionSlan+2)%8;
+            }
+            dir = directions[spawnDirectionSlan];
+        }
         if (dir == null || rc.senseNearbyRobots(sensorRadius, enemyTeam).length>0) {
             return false;
         }
@@ -145,12 +154,12 @@ public class SpawnHelper {
 
 
     private static int spawnDirectionDefPol = 0;
+    public static Vector<Integer> defencePoliticians = new Vector<>(null, 500);
     public static boolean spawnDefencePolitician() throws GameActionException {
         spawnDirectionDefPol = (spawnDirectionDefPol+2)%8;
-        if (edgeAtDirection[spawnDirectionDefPol/2]) {
-            spawnDirectionDefPol += 2;
+        while (edgeAtDirection[spawnDirectionDefPol/2]) {
+            spawnDirectionDefPol = (spawnDirectionDefPol+2)%8;
         }
-        spawnDirectionDefPol = (spawnDirectionDefPol+2)%8;
 
         Direction dir = getOptimalDirection(directions[spawnDirectionDefPol]);
         if (dir == null ) {
@@ -161,6 +170,7 @@ public class SpawnHelper {
         xp = Math.min(SpawnType.DefensePolitician.maxHp, xp);
         if (rc.canBuildRobot(RobotType.POLITICIAN, dir, xp)) {
             rc.buildRobot(RobotType.POLITICIAN, dir, xp);
+            defencePoliticians.add(rc.senseRobotAtLocation(rc.getLocation().add(dir)).getID());
             return true;
         }
         return false;

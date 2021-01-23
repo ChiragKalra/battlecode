@@ -23,7 +23,8 @@ public strictfp class RobotPlayer {
     public static RobotType mType;
     public static SpawnType spawnType;
     public static MapLocation spawnerLocation;
-    public static int enlightenmentCenterId, roundNumber;
+    public static int enlightenmentCenterId, roundNumber, roundSpawned;
+    public static boolean haveWonInVotes = false;
 
 
 
@@ -52,6 +53,7 @@ public strictfp class RobotPlayer {
         actionRadius = mType.actionRadiusSquared;
         sensorRadius = mType.sensorRadiusSquared;
         detectionRadius = mType.detectionRadiusSquared;
+        roundSpawned = rc.getRoundNum();
 
         if (mType == RobotType.ENLIGHTENMENT_CENTER) {
             log("round ec obtained: " + rc.getRoundNum());
@@ -96,6 +98,7 @@ public strictfp class RobotPlayer {
         while (rc.getRoundNum() <= GameConstants.GAME_MAX_NUMBER_OF_ROUNDS) {
             try {
                 roundNumber = rc.getRoundNum();
+                haveWonInVotes = rc.getTeamVotes() > GameConstants.GAME_MAX_NUMBER_OF_ROUNDS/2;
                 Logger logger = new Logger("full", true);
 
                 // slanderer will convert to politician in 300 rounds, watch for changes

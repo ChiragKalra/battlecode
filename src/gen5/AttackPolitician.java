@@ -1,36 +1,41 @@
 package gen5;
 
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
+import battlecode.common.*;
 import gen5.util.Pair;
 import gen5.util.SpawnType;
 
 import static gen5.RobotPlayer.*;
-import static gen5.flags.EnlightenmentCenterFlag.getRadius;
-import static gen5.flags.EnlightenmentCenterFlag.getShiftDirection;
 import static gen5.helpers.AttackHelper.*;
-import static gen5.helpers.DefenseHelper.*;
 import static gen5.helpers.MovementHelper.*;
 
 public strictfp class AttackPolitician {
-    private static MapLocation locToEmp = null;
 
     public static void move() throws GameActionException {
+        if (rc.getConviction() < SpawnType.AttackPolitician.minHp) {
+            for (RobotInfo ri : rc.senseNearbyRobots(sensorRadius, mTeam)) {
+                if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
+                    enlightenmentCenterId = ri.getID();
+                    spawnerLocation = ri.location;
+                    spawnType = SpawnType.DefensePolitician;
+                    DefensePolitician.init();
+                    DefensePolitician.move();
+                    return;
+                }
+            }
+        }
+
+
         int rad = shouldAttackOffensive();
         if (rad != 0) {
             rc.empower(rad);
             return;
         }
 
+        MapLocation locToEmp = getOptimalLocationToEmpower();
         if (shouldSelfEmpower()) {
             locToEmp = spawnerLocation;
         }
 
-        // movement
-        if (locToEmp == null) {
-            locToEmp = getOptimalLocationToEmpower();
-        }
         if (locToEmp != null) {
             goTo(locToEmp);
         } else {
@@ -44,5 +49,5 @@ public strictfp class AttackPolitician {
     }
 
 
-    public static void init() throws GameActionException { }
+    public static void init() { }
 }

@@ -10,7 +10,7 @@ import static gen5.helpers.DefenseHelper.*;
 
 
 public strictfp class Slanderer {
-    private static int RADIUS_CAP = 6;
+    private static final int RADIUS_CAP = 7;
 
     private static Direction getAntiMuckDirection() {
         // TODO: move away from muckrakers (optimise)
@@ -148,8 +148,8 @@ public strictfp class Slanderer {
                 onWall(rc.getLocation().add(right), innerRadius, outerRadius);
         if (nearWall) {
             if (isTunnelPoint(rc.getLocation())) {
-                System.out.println(rc.getLocation().x + ' ' + rc.getLocation().y);
-                System.out.println(isTunnelPoint(rc.getLocation()));
+                //log(rc.getLocation().x + ' ' + rc.getLocation().y);
+                //log(isTunnelPoint(rc.getLocation()));
                 for (int i = 0; i < 2; ++i) {
                     left = left.rotateLeft();
                     if (forceMoveWall(left)) {

@@ -172,7 +172,7 @@ public class GridHelper {
         RobotInfo[] nearby = rc.senseNearbyRobots(sensorRadius);
         Pair<Integer, Integer> mEc = null;
         for (RobotInfo ri: nearby) {
-            if (ri.type == RobotType.ENLIGHTENMENT_CENTER || ri.type == RobotType.MUCKRAKER && ri.conviction > 15) {
+            if (ri.type == RobotType.ENLIGHTENMENT_CENTER || ri.type == RobotType.MUCKRAKER && ri.conviction > 150) {
                 int x = ri.location.x >= loc.x ? 1 : 0, y = ri.location.y >= loc.y ? 1 : 0;
                 mEc = new Pair<>(x, y);
                 if (ri.team != mTeam) {

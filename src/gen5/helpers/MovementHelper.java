@@ -2,8 +2,6 @@ package gen5.helpers;
 
 import battlecode.common.*;
 import gen5.util.Functions;
-import gen5.util.PassabilityGrid;
-
 import java.util.*;
 
 import static gen5.RobotPlayer.*;
@@ -13,7 +11,6 @@ public class MovementHelper {
 
     // max acceptable crowding ratio in a direction
     public static final double RATIO_CROWDING = 0.33;
-    public static final int RADIUS_CROWDING = actionRadius;
 
     public static final Direction[] directions = {
             Direction.NORTH,
@@ -124,26 +121,18 @@ public class MovementHelper {
     }
 
 
-    public static Direction getAntiCrowdingDirection(MapLocation current) throws GameActionException {
-        byte[] occupied = new byte[8], total = new byte[8];
-        int rad = (int) Math.sqrt(RADIUS_CROWDING);
-        PassabilityGrid grid = new PassabilityGrid(current, RADIUS_CROWDING);
-        for (int x = -rad; x <= rad; x++) {
-            int limY = (int) Math.sqrt(RADIUS_CROWDING - x*x);
-            for (int y = -limY; y <= limY; y++) {
-                MapLocation ml = new MapLocation(x+current.x, y+current.y);
-                int dirInd = directionList.indexOf(current.directionTo(ml));
-                //  don't evaluate x = y = 0 condition
-                if (dirInd != -1) {
-                    total[dirInd]++;
-                    occupied[dirInd] += grid.isBlockedOrOutside(ml) ? 1 : 0;
-                }
-            }
+    public static Direction getAntiCrowdingDirection(MapLocation current) {
+        byte[] occupied = new byte[8];
+        int total = 0;
+        for (MapLocation ml : rc.detectNearbyRobots(actionRadius)) {
+            occupied[directionList.indexOf(current.directionTo(ml))]++;
+            total++;
         }
 
-        double[] ratios = new double[8], filter = {0.05, .2, .5, .2, .05};
+
+        double[] ratios = new double[8], filter = {.2, .6, .2};
         for (int i = 0; i < 8; i++) {
-            ratios[i] = occupied[i] / (float) total[i];
+            ratios[i] = occupied[i] / (float) total;
         }
         ratios = convolveCircularly(ratios, filter);
 
@@ -161,29 +150,10 @@ public class MovementHelper {
         return directions[(maxInd+4)%8];
     }
 
+/*
 
     private static MapLocation[] relativeLocations;
     private static int cachedRadius = 0, ptr = 0;
-
-
-
-        /*if (roundNumber == 1) {
-            StringBuilder sb = new StringBuilder("{ ");
-            StringBuilder sbp = new StringBuilder("{ ");
-            int sum = 0;
-            for (int i = 0; i <= 15; i++) {
-                int len = MovementHelper.getCircumferencePoints(rc.getLocation(), i * i + 1).length;
-                sb.append(len).append(", ");
-                sum += len;
-                sbp.append(sum).append(", ");
-            }
-            sb.append("}");
-            sbp.append("}");
-            log (sb.toString());
-            log (sbp.toString());
-        }*/
-
-
 
     public static MapLocation[] getCircumferencePoints (MapLocation center, int radiusSquared) {
         int rad = (int) Math.sqrt(radiusSquared);
@@ -217,5 +187,6 @@ public class MovementHelper {
         }
         return ret;
     }
+*/
 
 }

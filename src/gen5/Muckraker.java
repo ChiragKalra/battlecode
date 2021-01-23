@@ -10,23 +10,26 @@ import static gen5.helpers.AttackHelper.*;
 import static gen5.helpers.MovementHelper.*;
 
 public strictfp class Muckraker {
-    private static MapLocation locToEmp = null;
 
     public static void move() throws GameActionException {
+        MapLocation locToEmp;
         for (RobotInfo robot : rc.senseNearbyRobots(sensorRadius, enemyTeam)) {
-            if (robot.location.isWithinDistanceSquared(rc.getLocation(), actionRadius) && robot.type.canBeExposed()) {
-                // expose the slanderer
-                if (rc.canExpose(robot.location)) {
-                    rc.expose(robot.location);
-                    return;
+            if (robot.type.canBeExposed()) {
+                if (robot.location.isWithinDistanceSquared(rc.getLocation(), actionRadius)) {
+                    // expose the slanderer
+                    if (rc.canExpose(robot.location)) {
+                        rc.expose(robot.location);
+                        return;
+                    }
+                } else {
+                    locToEmp = robot.location;
                 }
             }
         }
 
         // movement
-        if (locToEmp == null) {
-            locToEmp = getOptimalLocationToEmpower();
-        }
+        locToEmp = getOptimalLocationToEmpower();
+
         if (locToEmp != null) {
             goTo(locToEmp);
         } else {

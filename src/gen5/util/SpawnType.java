@@ -8,7 +8,7 @@ import static gen5.RobotPlayer.roundNumber;
 
 public enum SpawnType {
     AttackPolitician( 61, 1000),
-    DefensePolitician(15, 60),
+    DefensePolitician(18, 60),
     GridPolitician( 1, 1),
     Muckraker(1, 5),
     BuffMuckraker(1000,1000),
@@ -25,13 +25,13 @@ public enum SpawnType {
         if (roundNumber < 4) {
             if (roundNumber == 1) return SpawnType.Slanderer;
             return SpawnType.DefensePolitician;
-        } else /*if (roundNumber < 120) {
+        } else if (roundNumber < 120) {
             switch (roundNumber % 6) {
                 case 1: return SpawnType.DefensePolitician;
                 case 3: return SpawnType.Slanderer;
                 default : return SpawnType.GridPolitician;
             }
-        } else*/ {
+        } else {
             switch (roundNumber % 11) {
                 case 2:
                 case 7:
@@ -39,17 +39,17 @@ public enum SpawnType {
                     return SpawnType.Slanderer;
                 case 3:
                 case 6:
-                    if (targetEc != null && Math.random() > 0.5) {
-                        if (rc.getConviction() > 3000 && Math.random() < 0.002) {
+                    return SpawnType.GridPolitician;
+                default:
+                    if (targetEc != null && roundNumber < 750) {
+                        return SpawnType.AttackPolitician;
+                    }
+                    if (targetEc != null && Math.random() > 0.6667) {
+                        if (rc.getConviction() > 2000 && Math.random() < 0.005) {
                             return SpawnType.BuffMuckraker;
                         } else {
                             return SpawnType.Muckraker;
                         }
-                    }
-                    return SpawnType.GridPolitician;
-                default:
-                    if (targetEc != null && roundNumber < 400) {
-                        return SpawnType.AttackPolitician;
                     }
                     return SpawnType.DefensePolitician;
             }

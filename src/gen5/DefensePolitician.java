@@ -1,7 +1,6 @@
 package gen5;
 
 import battlecode.common.*;
-import gen5.helpers.AttackHelper;
 import gen5.util.Pair;
 import gen5.util.SpawnType;
 
@@ -10,17 +9,17 @@ import static gen5.flags.EnlightenmentCenterFlag.getRadius;
 import static gen5.flags.EnlightenmentCenterFlag.getShiftDirection;
 import static gen5.helpers.AttackHelper.*;
 import static gen5.helpers.DefenseHelper.*;
-import static gen5.helpers.MovementHelper.*;
 
 public strictfp class DefensePolitician {
 
     public static void move() throws GameActionException {
-        /*for (RobotInfo ri: rc.senseNearbyRobots(actionRadius, mTeam)) {
+        for (RobotInfo ri: rc.senseNearbyRobots(sensorRadius, mTeam)) {
             if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
                 enlightenmentCenterId = ri.getID();
+                spawnerLocation = ri.location;
             }
         }
-*/
+
         int radius;
         if (rc.canGetFlag(enlightenmentCenterId)) {
             radius = getRadius(rc.getFlag(enlightenmentCenterId));
