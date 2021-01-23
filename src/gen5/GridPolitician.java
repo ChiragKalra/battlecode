@@ -13,25 +13,10 @@ public strictfp class GridPolitician {
     private static Direction spawnDirection = null;
 
     public static void move() throws GameActionException {
-        // check for slanderers
-        for (RobotInfo robot : rc.senseNearbyRobots(sensorRadius, enemyTeam)) {
-            if (robot.location.isWithinDistanceSquared(rc.getLocation(), actionRadius) && robot.type.canBeExposed()) {
-                // expose the slanderer
-                if (rc.canExpose(robot.location)) {
-                    rc.expose(robot.location);
-                    return;
-                }
-            }
-        }
-
-
-        /*
-        not making enough muckrakers to block spawn
-        MapLocation got = AttackHelper.getNearbyEnemyEc();
-        if (got != null) {
-            tryMove(rc.getLocation().directionTo(got));
+        if (rc.detectNearbyRobots().length >= 75) {
+            rc.empower(1);
             return;
-        }*/
+        }
 
         // occupy a grid spot if not unplaced
 

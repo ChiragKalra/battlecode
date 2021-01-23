@@ -35,10 +35,9 @@ public strictfp class EnlightenmentCenter {
         SpawnType got = getOptimalType(targetEC);
         if (got != null) {
             switch (got) {
-                /*
                 case BuffMuckraker:
-                    spawned = spawnB(targetEC.key, targetEC.value);
-                    break;*/
+                    spawned = spawnMuckraker(targetEC.location, true);
+                    break;
                 case AttackPolitician:
                     spawned = spawnAttackPolitician(targetEC.location, targetEC.hp);
                     break;
@@ -52,7 +51,7 @@ public strictfp class EnlightenmentCenter {
                     spawned = spawnSlanderer();
                     break;
                 case Muckraker:
-                    spawned = spawnMuckraker(targetEC.location);
+                    spawned = spawnMuckraker(targetEC.location, false);
                     break;
             }
             if (!spawned) {

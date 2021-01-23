@@ -69,7 +69,7 @@ public class SpawnHelper {
     private static int spawnDirectionGridPol = 0;
     public static boolean spawnGridPolitician() throws GameActionException {
         spawnDirectionGridPol = (spawnDirectionGridPol+2)%8;
-        while (edgeAtDirection[spawnDirectionDefPol/2]) {
+        while (edgeAtDirection[spawnDirectionGridPol/2]) {
             spawnDirectionGridPol = (spawnDirectionGridPol+2)%8;
         }
         Direction got = getDirectionFromAdjacentFlags(rc.getLocation()),
@@ -90,7 +90,7 @@ public class SpawnHelper {
     }
 
 
-    public static boolean spawnMuckraker(MapLocation toAttack) throws GameActionException {
+    public static boolean spawnMuckraker(MapLocation toAttack, boolean buff) throws GameActionException {
         Direction got = rc.getLocation().directionTo(toAttack),
                 rand = directions[(int) (Math.random() * 4) * 2],
                 dir = getOptimalDirection(got != null ? got : rand);
@@ -99,8 +99,13 @@ public class SpawnHelper {
         }
 
         int xp = 1;
-        xp = Math.max(SpawnType.GridPolitician.minHp, xp);
-        xp = Math.min(SpawnType.GridPolitician.maxHp, xp);
+        if (buff) {
+            xp = Math.max(SpawnType.BuffMuckraker.minHp, xp);
+            xp = Math.min(SpawnType.BuffMuckraker.maxHp, xp);
+        } else {
+            xp = Math.max(SpawnType.Muckraker.minHp, xp);
+            xp = Math.min(SpawnType.Muckraker.maxHp, xp);
+        }
 
         if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, xp)) {
             rc.buildRobot(RobotType.MUCKRAKER, dir, xp);
