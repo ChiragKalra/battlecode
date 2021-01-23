@@ -58,6 +58,7 @@ public class GridPoliticianFlag {
     }
 
     private static int getFlag(EcInfo got) {
+        //log("location="+got.location+",hp="+got.hp+",enemy="+got.enemy);
         int newFlag = 1<<4;
             int relX = (got.location.x+13) << 5,
                     relY = (got.location.y+13) << 10,

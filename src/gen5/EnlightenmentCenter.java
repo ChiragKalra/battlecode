@@ -19,7 +19,7 @@ public strictfp class EnlightenmentCenter {
 
     public static int currentRadius = 4;
 
-    public static double RATIO_BID = 0.06;
+    public static double RATIO_BID = 0.08;
     public static double RATIO_UNITS = 0.02;
 
     public static int roundCaptured = 1;
@@ -176,7 +176,7 @@ public strictfp class EnlightenmentCenter {
             if (got.hp >= 0) {
                 targetEC = got;
                 int dir = directionList.indexOf(rc.getLocation().directionTo(got.location));
-                if (dir != -1) {
+                if (dir != -1 && directionsBlocked == 0) {
                     slandererDirection = new boolean[8];
                     Arrays.fill(slandererDirection, true);
                     slandererDirection[Math.floorMod(dir - 1, 8)] =

@@ -12,6 +12,10 @@ public class DefenseHelper {
 	private static RobotInfo[] nearby;
 
 	public static boolean isTunnelPoint(MapLocation ml) {
+		if (haveWonInVotes) {
+			return false;
+		}
+
 		if (roundCached < roundNumber || nearby == null) {
 			nearby = rc.senseNearbyRobots(ml, 5, null);
 			roundCached = roundNumber;

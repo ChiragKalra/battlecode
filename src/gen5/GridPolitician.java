@@ -24,9 +24,15 @@ public strictfp class GridPolitician {
             spawnDirection = spawnerLocation.directionTo(rc.getLocation());
             int ind = directionList.indexOf(spawnDirection);
             spawnDirection = directions[(ind/2)*2];
+            if (roundNumber < 30) {
+                explodeRadius = 10;
+            }
         }
 
         if (explodeRadius < 3*5 && spawnDirection != null) {
+            if (!rc.onTheMap(rc.getLocation().add(spawnDirection))) {
+                spawnDirection = spawnDirection.rotateLeft();
+            }
             tryMove(spawnDirection, false);
             explodeRadius++;
         } else if (!placed) {

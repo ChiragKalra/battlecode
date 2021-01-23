@@ -39,7 +39,7 @@ public class SpawnHelper {
             blockedRounds = 0;
         }
         boolean ans = blockedRounds >= 10 && currentRadius<LIMIT_WALL_RADIUS &&
-                roundNumber-roundExpanded[currentRadius-1] > 6*currentRadius*capacity/20;
+                roundNumber-roundExpanded[currentRadius-1] > 6*currentRadius*capacity/20.0;
         if (ans) {
             roundExpanded[currentRadius+1] = roundNumber;
             blockedRounds = 0;
@@ -69,6 +69,9 @@ public class SpawnHelper {
     private static int spawnDirectionGridPol = 0;
     public static boolean spawnGridPolitician() throws GameActionException {
         spawnDirectionGridPol = (spawnDirectionGridPol+2)%8;
+        while (edgeAtDirection[spawnDirectionGridPol/2]) {
+            spawnDirectionGridPol = (spawnDirectionGridPol+2)%8;
+        }
         Direction got = getDirectionFromAdjacentFlags(rc.getLocation()),
                 dir = getOptimalDirection(got != null ? got : directions[spawnDirectionGridPol]);
         if (dir == null ) {
