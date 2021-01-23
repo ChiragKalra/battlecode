@@ -2,6 +2,7 @@ package gen5;
 
 import battlecode.common.*;
 import gen5.util.EcInfo;
+import gen5.util.Pair;
 import gen5.util.SpawnType;
 
 import static gen5.RobotPlayer.*;
@@ -29,6 +30,14 @@ public strictfp class AttackPolitician {
         if (rad != 0) {
             rc.empower(rad);
             return;
+        }
+
+        if (roundNumber - roundSpawned > 750) {
+            Pair<Integer, Boolean> got = shouldAttackDefensive();
+            if (got.key != 0) {
+                rc.empower(got.key);
+                return;
+            }
         }
 
         MapLocation locToEmp = getOptimalLocationToEmpower();

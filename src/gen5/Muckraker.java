@@ -1,8 +1,6 @@
 package gen5;
 
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.RobotInfo;
+import battlecode.common.*;
 import gen5.util.EcInfo;
 
 import static gen5.RobotPlayer.*;
@@ -11,10 +9,20 @@ import static gen5.helpers.MovementHelper.*;
 
 public strictfp class Muckraker {
 
+    private static MapLocation getOptimalLocationToExpose () {
+        RobotInfo[] nearby = rc.senseNearbyRobots(sensorRadius, enemyTeam);
+        for (RobotInfo ri: nearby) {
+            if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
+                return ri.location;
+            }
+        }
+        return null;
+    }
+
     public static void move() throws GameActionException {
-        MapLocation locToEmp;
+        MapLocation locToExpose;
         // movement
-        locToEmp = getOptimalLocationToEmpower();
+        locToExpose = getOptimalLocationToExpose();
 
         for (RobotInfo robot : rc.senseNearbyRobots(sensorRadius, enemyTeam)) {
             if (robot.type.canBeExposed()) {
@@ -25,17 +33,17 @@ public strictfp class Muckraker {
                         return;
                     }
                 } else {
-                    locToEmp = robot.location;
+                    locToExpose = robot.location;
                 }
             }
         }
 
 
-        if (locToEmp != null) {
-            goTo(locToEmp);
+        if (locToExpose != null) {
+            goTo(locToExpose);
         } else {
             EcInfo got = checkForAttackCoordinates();
-            if (got != null && got.hp >= 0) {
+            if (got != null && got.hp >= 0 && got.enemy) {
                 goTo(got.location);
             } else {
                 tryMove(getNextDirection(null), false);

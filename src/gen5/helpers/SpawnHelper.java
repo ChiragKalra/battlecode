@@ -91,8 +91,9 @@ public class SpawnHelper {
 
 
     public static boolean spawnMuckraker(MapLocation toAttack) throws GameActionException {
-        Direction got = getOptimalDirection(rc.getLocation().directionTo(toAttack)),
-                dir = getOptimalDirection(got != null ? got : directions[spawnDirectionGridPol]);
+        Direction got = rc.getLocation().directionTo(toAttack),
+                rand = directions[(int) (Math.random() * 4) * 2],
+                dir = getOptimalDirection(got != null ? got : rand);
         if (dir == null ) {
             return false;
         }
@@ -125,20 +126,22 @@ public class SpawnHelper {
         return false;
     }
 
-    private static int spawnDirectionSlan = 1;
     private static final int slanMinXp = slandererHPFloor(SpawnType.Slanderer.minHp),
             slanMaxXp = slandererHPFloor(SpawnType.Slanderer.maxHp);
     public static boolean spawnSlanderer() throws GameActionException {
-        Direction dir;
-        if (slandererDirection == null) {
-            dir = getOptimalDirection(directions[(spawnDirectionSlan+=2)%8]);
-        } else {
-            spawnDirectionSlan = (spawnDirectionSlan+2)%8;
-            while (!slandererDirection[spawnDirectionSlan]) {
-                spawnDirectionSlan = (spawnDirectionSlan+2)%8;
+        Direction dir = null;
+        if (slandererDirection != null) {
+            for (int d = 1; d < 8; d += 2) {
+                if (slandererDirection[d]) {
+                    dir = directions[d];
+                    break;
+                }
             }
-            dir = directions[spawnDirectionSlan];
         }
+        if (dir == null) {
+            dir = directions[(int) (Math.random() * 4) * 2 + 1];
+        }
+        dir = getOptimalDirection(dir);
         if (dir == null || rc.senseNearbyRobots(sensorRadius, enemyTeam).length>0) {
             return false;
         }

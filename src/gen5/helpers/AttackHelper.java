@@ -119,7 +119,7 @@ public class AttackHelper {
                     each = damage/nearby.length, kills = 0, damageDone = 0;
             for (RobotInfo ri: nearby) {
                 if (ri.team != mTeam && (ri.type == RobotType.MUCKRAKER ||
-                        (ri.type == RobotType.POLITICIAN && roundNumber-roundSpawned > 150))) {
+                        (ri.type == RobotType.POLITICIAN && roundNumber-roundSpawned > 250))) {
                     if (ri.conviction < each) {
                         kills++;
                         damageDone += ri.conviction + 1;

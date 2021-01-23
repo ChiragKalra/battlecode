@@ -41,15 +41,15 @@ public enum SpawnType {
                 case 6:
                     return SpawnType.GridPolitician;
                 default:
-                    if (targetEc != null && roundNumber < 750) {
-                        return SpawnType.AttackPolitician;
-                    }
-                    if (targetEc != null && targetEc.enemy && Math.random() > 0.5) {
+                    if (targetEc != null && targetEc.enemy && Math.random() > 0.400) {
                         if (rc.getConviction() > 2000 && Math.random() < 0.005) {
                             return SpawnType.BuffMuckraker;
                         } else {
                             return SpawnType.Muckraker;
                         }
+                    }
+                    if (targetEc != null && roundNumber < 600) {
+                        return SpawnType.AttackPolitician;
                     }
                     return SpawnType.DefensePolitician;
             }
