@@ -41,9 +41,12 @@ public enum SpawnType {
                     return SpawnType.Slanderer;
                 case 3:
                 case 6:
+                    if (Math.random() > 0.75 && roundNumber < 500) {
+                        return SpawnType.Muckraker;
+                    }
                     return SpawnType.GridPolitician;
                 default:
-                    if (targetEc != null && targetEc.enemy && Math.random() > 0.500) {
+                    if (targetEc != null && targetEc.enemy) {
                         if (rc.getConviction() > 3000 && !hasSpawnedBuffed) {
                             hasSpawnedBuffed = true;
                             return SpawnType.BuffMuckraker;

@@ -51,7 +51,7 @@ public strictfp class EnlightenmentCenter {
                     spawned = spawnSlanderer();
                     break;
                 case Muckraker:
-                    spawned = spawnMuckraker(targetEC.location, false);
+                    spawned = spawnMuckraker(targetEC == null ? null : targetEC.location, false);
                     break;
             }
             if (!spawned) {

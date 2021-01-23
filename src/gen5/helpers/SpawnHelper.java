@@ -91,7 +91,7 @@ public class SpawnHelper {
 
 
     public static boolean spawnMuckraker(MapLocation toAttack, boolean buff) throws GameActionException {
-        Direction got = rc.getLocation().directionTo(toAttack),
+        Direction got = toAttack == null ? null : rc.getLocation().directionTo(toAttack),
                 rand = directions[(int) (Math.random() * 4) * 2],
                 dir = getOptimalDirection(got != null ? got : rand);
         if (dir == null ) {
