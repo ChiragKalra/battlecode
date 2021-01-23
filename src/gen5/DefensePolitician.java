@@ -1,9 +1,6 @@
 package gen5;
 
-import battlecode.common.Direction;
-import battlecode.common.GameActionException;
-import battlecode.common.MapLocation;
-import battlecode.common.RobotInfo;
+import battlecode.common.*;
 import gen5.helpers.AttackHelper;
 import gen5.util.Pair;
 import gen5.util.SpawnType;
@@ -45,18 +42,30 @@ public strictfp class DefensePolitician {
         boolean isOnWall = onInnerWall || onOuterWall;
         boolean isOutsideWall = outsideWall(rc.getLocation(), outerRadius);
 
-        int rad = shouldAttackDefensive();
+        Pair<Integer, Boolean> p = shouldAttackDefensive();
+        Integer rad = p.key;
+        Boolean muckrakerAdjacent = p.value;
         if (rad != 0 && spawnType == SpawnType.DefensePolitician) {
-            // only >= third layer will explode normally
-            if (isOutsideWall) {
+            // only >= third layer will explode normally (except when a muckraker is adjacent)
+            if (isOutsideWall || muckrakerAdjacent) {
                 rc.empower(rad);
                 return;
             }
 
             // second layer will explode if there's no third layer
-            // for ()
             // first layer will explode if there's no second layer
-            // check if third layer not present
+            if (isOnWall) {
+                int defensePoliticianCount = (isDefensePolitician(straight) ? 1 : 0) + (isDefensePolitician(left) ? 1 : 0) +
+                                                (isDefensePolitician(right) ? 1 : 0);
+                if (defensePoliticianCount < 2) {
+                    rc.empower(rad);
+                }
+                return;
+            }
+
+            // politicians inside the wall will explode
+            rc.empower(rad);
+            return;
         }
 
         if (isOnWall) {
@@ -142,6 +151,20 @@ public strictfp class DefensePolitician {
 
         left = left.rotateLeft();
         tryMoveWall(left, outerRadius);
+    }
+
+    private static boolean isDefensePolitician(Direction dir) throws GameActionException {
+        MapLocation loc = rc.getLocation().add(dir);
+        if (!rc.onTheMap(loc)) {
+            return false;
+        }
+        RobotInfo robot = rc.senseRobotAtLocation(loc);
+        if (robot == null) {
+            return false;
+        }
+        return robot.team == mTeam && robot.type == RobotType.POLITICIAN && 
+                robot.getConviction() >= SpawnType.DefensePolitician.minHp &&
+                robot.getConviction() <= SpawnType.DefensePolitician.maxHp;
     }
 
     public static void init() throws GameActionException {
