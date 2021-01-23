@@ -2,20 +2,20 @@ package gen5.helpers;
 
 import battlecode.common.*;
 import gen5.flags.GridPoliticianFlag;
+import gen5.util.EcInfo;
 import gen5.util.Pair;
 
 import java.util.HashMap;
 
 import static gen5.RobotPlayer.*;
-import static gen5.flags.GridPoliticianFlag.getHpFromFlag;
-import static gen5.flags.GridPoliticianFlag.isBroadcastingEC;
+import static gen5.flags.GridPoliticianFlag.*;
 import static gen5.helpers.MovementHelper.*;
 
 
 public class AttackHelper {
 
     private static final double EMP_ATTACK_THRESHOLD_RATIO = 0.8;
-    private static final double EMP_AFTER_ROUNDS = 10;
+    private static final double EMP_AFTER_ROUNDS = 6;
 
     private static final int[] check = {1, 2, 4, 5, 8, 9};
 
@@ -171,8 +171,8 @@ public class AttackHelper {
         return grid != null ? grid : getRandomDirection();
     }
 
-    public static Pair<MapLocation, Integer> checkForAttackCoordinates() throws GameActionException {
-        Pair<MapLocation, Integer> selected = null;
+    public static EcInfo checkForAttackCoordinates() throws GameActionException {
+        EcInfo selected = null;
         //check in all 4 directions
         for (RobotInfo ri: rc.senseNearbyRobots(sensorRadius, mTeam)) {
             if (ri.type == RobotType.POLITICIAN) {
@@ -180,8 +180,8 @@ public class AttackHelper {
                 if (isBroadcastingEC(flag)) {
                     int hp = getHpFromFlag(flag);
                     MapLocation loc = GridPoliticianFlag.getAbsLocFromFlag(flag, ri.location);
-                    if (selected == null || hp < selected.value) {
-                        selected = new Pair<>(loc, hp);
+                    if (selected == null || hp < selected.hp) {
+                        selected = new EcInfo(loc, hp, isEnemyEc(flag));
                     }
                 }
             }

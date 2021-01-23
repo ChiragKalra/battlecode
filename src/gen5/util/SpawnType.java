@@ -1,7 +1,5 @@
 package gen5.util;
 
-import battlecode.common.MapLocation;
-
 import static gen5.RobotPlayer.rc;
 import static gen5.RobotPlayer.roundNumber;
 
@@ -21,7 +19,7 @@ public enum SpawnType {
         this.maxHp = maxHp;
     }
 
-    public static SpawnType getOptimalType(Pair<MapLocation, Integer> targetEc) {
+    public static SpawnType getOptimalType(EcInfo targetEc) {
         if (roundNumber < 4) {
             if (roundNumber == 1) return SpawnType.Slanderer;
             return SpawnType.DefensePolitician;
@@ -44,7 +42,7 @@ public enum SpawnType {
                     if (targetEc != null && roundNumber < 750) {
                         return SpawnType.AttackPolitician;
                     }
-                    if (targetEc != null && Math.random() > 0.6667) {
+                    if (targetEc != null && targetEc.enemy && Math.random() > 0.5) {
                         if (rc.getConviction() > 2000 && Math.random() < 0.005) {
                             return SpawnType.BuffMuckraker;
                         } else {

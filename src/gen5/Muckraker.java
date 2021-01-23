@@ -3,7 +3,7 @@ package gen5;
 import battlecode.common.GameActionException;
 import battlecode.common.MapLocation;
 import battlecode.common.RobotInfo;
-import gen5.util.Pair;
+import gen5.util.EcInfo;
 
 import static gen5.RobotPlayer.*;
 import static gen5.helpers.AttackHelper.*;
@@ -13,6 +13,9 @@ public strictfp class Muckraker {
 
     public static void move() throws GameActionException {
         MapLocation locToEmp;
+        // movement
+        locToEmp = getOptimalLocationToEmpower();
+
         for (RobotInfo robot : rc.senseNearbyRobots(sensorRadius, enemyTeam)) {
             if (robot.type.canBeExposed()) {
                 if (robot.location.isWithinDistanceSquared(rc.getLocation(), actionRadius)) {
@@ -27,15 +30,13 @@ public strictfp class Muckraker {
             }
         }
 
-        // movement
-        locToEmp = getOptimalLocationToEmpower();
 
         if (locToEmp != null) {
             goTo(locToEmp);
         } else {
-            Pair<MapLocation, Integer> got = checkForAttackCoordinates();
-            if (got != null && got.value >= 0) {
-                goTo(got.key);
+            EcInfo got = checkForAttackCoordinates();
+            if (got != null && got.hp >= 0) {
+                goTo(got.location);
             } else {
                 tryMove(getNextDirection(null), false);
             }

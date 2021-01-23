@@ -129,7 +129,7 @@ public class SpawnHelper {
     private static final int slanMinXp = slandererHPFloor(SpawnType.Slanderer.minHp),
             slanMaxXp = slandererHPFloor(SpawnType.Slanderer.maxHp);
     public static boolean spawnSlanderer() throws GameActionException {
-        Direction dir = null;
+        Direction dir;
         if (slandererDirection == null) {
             dir = getOptimalDirection(directions[(spawnDirectionSlan+=2)%8]);
         } else {

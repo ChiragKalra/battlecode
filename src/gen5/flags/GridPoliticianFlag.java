@@ -1,7 +1,7 @@
 package gen5.flags;
 
 import battlecode.common.*;
-import gen5.util.Pair;
+import gen5.util.EcInfo;
 
 import static gen5.GridPolitician.placed;
 import static gen5.RobotPlayer.*;
@@ -11,18 +11,19 @@ import static gen5.helpers.MovementHelper.directions;
 
 
 /*
- # Muckraker Flag
+ # Grid Flag
 
  0       - placed;
  1-3     - adjacent vacancy direction
  4       - broadcasting EC
  5-9     - ec near grid x
  10-14   - ec near grid y
- 15-23   - ec hp
+ 15-22   - ec hp
+ 23      - enemy EC
  */
 
 public class GridPoliticianFlag {
-    public static final int HP_LOSS_RATIO = 10;
+    public static final int HP_LOSS_RATIO = 20;
 
     public static boolean isPlaced (int flag) {
         return (flag & 1) == 1;
@@ -42,14 +43,27 @@ public class GridPoliticianFlag {
         return new MapLocation((relX-1)*5 + muck.x+3, (relY-1)*5 + muck.y + 3);
     }
 
-    public static Pair<Integer, Integer> getRelLocFromFlag (int flag) {
+    public static MapLocation getRelLocFromFlag (int flag) {
         int relX = (flag >> 5) % 32 - 13,
                 relY = (flag >> 10) % 32 - 13;
-        return new Pair<>(relX, relY);
+        return new MapLocation(relX, relY);
     }
 
     public static int getHpFromFlag (int flag) {
-        return (flag >> 15)*HP_LOSS_RATIO - HP_LOSS_RATIO;
+        return ((flag<<1) >> 16)*HP_LOSS_RATIO - HP_LOSS_RATIO;
+    }
+
+    public static boolean isEnemyEc (int flag) {
+        return (flag & (1<<23)) > 0;
+    }
+
+    private static int getFlag(EcInfo got) {
+        int newFlag = 1<<4;
+            int relX = (got.location.x+13) << 5,
+                    relY = (got.location.y+13) << 10,
+                    hp = Math.min(255, (int)Math.ceil((got.hp+HP_LOSS_RATIO)/(double)HP_LOSS_RATIO));
+            newFlag += relX + relY + (hp << 15) + (got.enemy ? (1<<23) : 0);
+        return newFlag;
     }
 
     // check for flag changes and set flag
@@ -65,34 +79,19 @@ public class GridPoliticianFlag {
                 newFlag += threeBit<<1;
             }
 
-            Pair<Pair<Integer, Integer>, Integer> got = getNearbyEC();
+            EcInfo got = getNearbyEC();
             if (got != null) {
-                newFlag += 1<<4;
-                int relX = (got.key.key+13) << 5,
-                        relY = (got.key.value+13) << 10,
-                        hp = Math.min(511, (int)Math.ceil((got.value+HP_LOSS_RATIO)/(double)HP_LOSS_RATIO));
-                newFlag += relX + relY + (hp << 15);
-                //log("yeah"+got.key.key+','+got.key.value+'='+got.value);
+                newFlag += getFlag(got);
             } else {
                 got = getECFromAdjFlags();
-                if (got != null ) {
-                    //log("yeah"+got.key.key+','+got.key.value+'='+got.value);
-                    newFlag += 1 << 4;
-                    int relX = (got.key.key + 13) << 5,
-                            relY = (got.key.value + 13) << 10,
-                            hp = Math.min(511, (int) Math.ceil((got.value + HP_LOSS_RATIO) / (double) HP_LOSS_RATIO));
-                    newFlag += relX + relY + (hp << 15);
+                if (got != null) {
+                    newFlag += getFlag(got);
                 }
             }
         } else {
-            Pair<Pair<Integer, Integer>, Integer> got = getNearbyEC();
+            EcInfo got = getNearbyEC();
             if (got != null) {
-                newFlag += 1<<4;
-                int relX = (got.key.key+13) << 5,
-                        relY = (got.key.value+13) << 10,
-                        hp = Math.min(511, (int)Math.ceil((got.value+HP_LOSS_RATIO)/(double)HP_LOSS_RATIO));
-                newFlag += relX + relY + (hp << 15);
-                //log("yeah"+got.key.key+','+got.key.value+'='+got.value);
+                newFlag += getFlag(got);
             }
         }
 

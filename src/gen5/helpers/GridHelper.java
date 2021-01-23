@@ -2,7 +2,8 @@ package gen5.helpers;
 
 import battlecode.common.*;
 import gen5.flags.GridPoliticianFlag;
-import gen5.util.Pair;
+import gen5.util.EcInfo;
+import gen5.util.Vector;
 
 import java.util.ArrayList;
 
@@ -15,8 +16,8 @@ import static gen5.util.Functions.getRandom;
 // POLITICIAN info grid formation helper
 public class GridHelper {
     public static final int GRID_WIDTH = 5;
-    public static final int GRID_X = 1;
-    public static final int GRID_Y = 3;
+    public static final int GRID_X = 2;
+    public static final int GRID_Y = 2;
     public static final int ROUND_BROADCAST_CAPTURED = 13;
 
     private static Direction getAdjacentVacant (MapLocation current) throws GameActionException {
@@ -166,31 +167,31 @@ public class GridHelper {
     }
 
     private static int lastRoundSeen = -1;
-    public static Pair<Pair<Integer, Integer>, Integer> getNearbyEC() {
+    public static EcInfo getNearbyEC() {
         // check nearby
         MapLocation loc = rc.getLocation();
         RobotInfo[] nearby = rc.senseNearbyRobots(sensorRadius);
-        Pair<Integer, Integer> mEc = null;
+        MapLocation mEc = null;
         for (RobotInfo ri: nearby) {
             if (ri.type == RobotType.ENLIGHTENMENT_CENTER || ri.type == RobotType.MUCKRAKER && ri.conviction > 150) {
                 int x = ri.location.x >= loc.x ? 1 : 0, y = ri.location.y >= loc.y ? 1 : 0;
-                mEc = new Pair<>(x, y);
+                mEc = new MapLocation(x, y);
                 if (ri.team != mTeam) {
                     lastRoundSeen = roundNumber;
-                    return new Pair<>(mEc, ri.conviction);
+                    return new EcInfo(mEc, ri.conviction, ri.team == enemyTeam);
                 }
             }
         }
         if (mEc != null && lastRoundSeen != -1 && Math.abs(lastRoundSeen-roundNumber) <= ROUND_BROADCAST_CAPTURED) {
-            return new Pair<>(mEc, -HP_LOSS_RATIO);
+            return new EcInfo(mEc, -HP_LOSS_RATIO, false);
         }
         return null;
     }
 
-    private static final ArrayList<Pair<Integer, Integer>> captured = new ArrayList<>();
-    private static Pair<Integer, Integer> broadcastingCaptured = null;
+    private static final Vector<MapLocation> captured = new Vector<>(null, 100);
+    private static MapLocation broadcastingCaptured = null;
     private static int roundsBroadcasted = 0;
-    public static Pair<Pair<Integer, Integer>, Integer> getECFromAdjFlags() throws GameActionException {
+    public static EcInfo getECFromAdjFlags() throws GameActionException {
         if (broadcastingCaptured != null) {
             roundsBroadcasted++;
             if (roundsBroadcasted > ROUND_BROADCAST_CAPTURED) {
@@ -202,21 +203,20 @@ public class GridHelper {
 
         MapLocation current = rc.getLocation();
 
-        Pair<Pair<Integer, Integer>, Integer> selected = null;
+        EcInfo selected = null;
 
         //check in all 4 directions
         for (RobotInfo ri: rc.senseNearbyRobots(sensorRadius, mTeam)) {
             if (ri.type == RobotType.POLITICIAN) {
                 int flag = rc.getFlag(ri.getID());
                 if (isBroadcastingEC(flag)) {
-                    Pair<Integer, Integer> got = GridPoliticianFlag.getRelLocFromFlag(flag);
+                    MapLocation got = GridPoliticianFlag.getRelLocFromFlag(flag);
                     Direction dir = current.directionTo(ri.location);
-                    got.key += dir.dx;
-                    got.value += dir.dy;
+                    got = got.add(dir);
                     int hp = getHpFromFlag(flag);
-                    if (selected == null || hp < 0 || distanceSquared(got) < distanceSquared(selected.key)) {
-                        if (!captured.contains(got)) {
-                            selected = new Pair<>(got, hp);
+                    if (selected == null || hp < 0 || distanceSquared(got) < distanceSquared(selected.location)) {
+                        if (!captured.has(got)) {
+                            selected = new EcInfo(got, hp, isEnemyEc(flag));
                             if (hp <= 0 && broadcastingCaptured == null) {
                                 broadcastingCaptured = got;
                             }
@@ -228,7 +228,7 @@ public class GridHelper {
         return selected;
     }
 
-    private static int distanceSquared (Pair<Integer, Integer> p) {
-        return p.key*p.key + p.value*p.value;
+    private static int distanceSquared (MapLocation p) {
+        return p.x*p.x + p.y*p.y;
     }
 }

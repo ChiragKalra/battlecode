@@ -2,7 +2,7 @@ package gen5;
 
 import battlecode.common.*;
 import gen5.helpers.GridHelper;
-import gen5.util.Pair;
+import gen5.util.EcInfo;
 import gen5.util.SpawnType;
 
 import java.util.Arrays;
@@ -27,7 +27,7 @@ public strictfp class EnlightenmentCenter {
     public static boolean[] edgeAtDirection = new boolean[4], slandererDirection = new boolean[8];
     public static int[] edgeDistance = new int[4];
     public static Direction shiftedTunnel = Direction.CENTER;
-    public static Pair<MapLocation, Integer> targetEC;
+    public static EcInfo targetEC;
 
 
     private static boolean spawnOptimal() throws GameActionException {
@@ -40,7 +40,7 @@ public strictfp class EnlightenmentCenter {
                     spawned = spawnB(targetEC.key, targetEC.value);
                     break;*/
                 case AttackPolitician:
-                    spawned = spawnAttackPolitician(targetEC.key, targetEC.value);
+                    spawned = spawnAttackPolitician(targetEC.location, targetEC.hp);
                     break;
                 case GridPolitician:
                     spawned = spawnGridPolitician();
@@ -52,7 +52,7 @@ public strictfp class EnlightenmentCenter {
                     spawned = spawnSlanderer();
                     break;
                 case Muckraker:
-                    spawned = spawnMuckraker(targetEC.key);
+                    spawned = spawnMuckraker(targetEC.location);
                     break;
             }
             if (!spawned) {
@@ -172,11 +172,11 @@ public strictfp class EnlightenmentCenter {
             rc.bid(1);
         }
 
-        Pair<MapLocation, Integer> got = checkForAttackCoordinates();
+        EcInfo got = checkForAttackCoordinates();
         if (got != null) {
-            if (got.value >= 0) {
+            if (got.hp >= 0) {
                 targetEC = got;
-                int dir = directionList.indexOf(rc.getLocation().directionTo(got.key));
+                int dir = directionList.indexOf(rc.getLocation().directionTo(got.location));
                 if (dir != -1) {
                     slandererDirection = new boolean[8];
                     Arrays.fill(slandererDirection, true);

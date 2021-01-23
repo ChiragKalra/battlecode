@@ -1,7 +1,7 @@
 package gen5;
 
 import battlecode.common.*;
-import gen5.util.Pair;
+import gen5.util.EcInfo;
 import gen5.util.SpawnType;
 
 import static gen5.RobotPlayer.*;
@@ -39,9 +39,9 @@ public strictfp class AttackPolitician {
         if (locToEmp != null) {
             goTo(locToEmp);
         } else {
-            Pair<MapLocation, Integer> got = checkForAttackCoordinates();
-            if (got != null && got.value >= 0) {
-                goTo(got.key);
+            EcInfo got = checkForAttackCoordinates();
+            if (got != null && got.hp >= 0) {
+                goTo(got.location);
             } else {
                 tryMove(getNextDirection(null), false);
             }
