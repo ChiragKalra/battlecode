@@ -2,6 +2,7 @@ package gen5.helpers;
 
 import battlecode.common.*;
 
+import gen5.util.LinkedList;
 import gen5.util.SpawnType;
 import gen5.util.Vector;
 
@@ -162,7 +163,7 @@ public class SpawnHelper {
 
 
     private static int spawnDirectionDefPol = 0;
-    public static Vector<Integer> defencePoliticians = new Vector<>(null, 500);
+    public static LinkedList<Integer> defencePoliticians = new LinkedList<>();
     public static boolean spawnDefencePolitician() throws GameActionException {
         spawnDirectionDefPol = (spawnDirectionDefPol+2)%8;
         while (edgeAtDirection[spawnDirectionDefPol/2]) {

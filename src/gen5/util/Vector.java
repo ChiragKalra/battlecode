@@ -1,9 +1,11 @@
 package gen5.util;
 
+import java.util.Iterator;
+
 import static gen5.RobotPlayer.log;
 
 @SuppressWarnings("unchecked")
-public class Vector<T> {
+public class Vector<T> implements Iterable<T> {
     private final T[] container;
     public final int maxSize;
     public int length = 0;
@@ -50,5 +52,28 @@ public class Vector<T> {
             }
         }
         return false;
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new ArrayIterator();
+    }
+
+    public class ArrayIterator implements Iterator<T> {
+        int curr;
+        ArrayIterator () {
+            curr = 0;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return curr+1 < length;
+        }
+
+        @Override
+        public T next() {
+            curr++;
+            return container[curr];
+        }
     }
 }

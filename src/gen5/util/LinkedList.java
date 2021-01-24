@@ -19,7 +19,7 @@ public class LinkedList<T> implements Iterable<T> {
         }
     }
 
-    public void insert (T data) {
+    public void add (T data) {
         size++;
         Node newNode = new Node(data);
 
