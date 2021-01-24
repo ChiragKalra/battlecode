@@ -63,7 +63,6 @@ public class FarmHelper {
                     roundsRunning = 0;
                     return null;
                 }
-                ++roundsRunning;
                 return antiMuckDirection;
             }
             return null;
@@ -79,7 +78,7 @@ public class FarmHelper {
             }
         }
 
-        roundsRunning = 1;
+        roundsRunning = 0;
         return antiMuckDirection;
     }
 
@@ -97,6 +96,14 @@ public class FarmHelper {
             rc.move(dir.rotateLeft());
         } else if (right > 0 && right >= straight && right >= left) {
             rc.move(dir.rotateRight());
+        } else {
+        	return;
+        }
+
+        ++roundsRunning;
+        if (roundsRunning >= 6) {
+        	roundsRunning = 0;
+        	antiMuckDirection = null;
         }
     }
 }
