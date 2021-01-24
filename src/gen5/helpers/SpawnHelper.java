@@ -25,7 +25,7 @@ public class SpawnHelper {
         Vector<Direction> dirs = new Vector<>(null, 4);
         for (int i = 0; i < 4; i++) {
             int count = 0; // TODO add def pol count here
-            if (count < 0.5*currentRadius) {
+            if (count < 1.25*currentRadius) {
                 dirs.add(directions[i*2+1]);
             }
         }
@@ -50,8 +50,8 @@ public class SpawnHelper {
         } else {
             blockedRounds = 0;
         }
-        boolean ans = blockedRounds >= 10 && currentRadius<LIMIT_WALL_RADIUS &&
-                defencePoliticians.getSize() > 3*currentRadius;
+        boolean ans = blockedRounds >= 10 && currentRadius<LIMIT_WALL_RADIUS && (
+                currentRadius < 7 || defencePoliticians.getSize() > 8*currentRadius*(directionsBlocked/4.0));
         if (ans) {
             blockedRounds = 0;
         }
@@ -59,7 +59,7 @@ public class SpawnHelper {
     }
 
     public static boolean shouldDecrementWallRadius() {
-        return defencePoliticians.getSize() < 2*currentRadius;
+        return defencePoliticians.getSize() < 6*currentRadius*(directionsBlocked/4.0);
     }
 
     private static int spawnDirectionGridPol = 0;
