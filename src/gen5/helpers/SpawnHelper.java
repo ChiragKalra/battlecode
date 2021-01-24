@@ -109,6 +109,24 @@ public class SpawnHelper {
         }
         return false;
     }
+    public static boolean spawnFillerMuckraker() throws GameActionException {
+        Direction rand = directions[(int) (Math.random() * 4) * 2],
+                dir = getOptimalDirection(rand);
+        if (dir == null ) {
+            return false;
+        }
+
+        int xp = 1;
+        xp = Math.max(SpawnType.FillerMuckraker.minHp, xp);
+        xp = Math.min(SpawnType.FillerMuckraker.maxHp, xp);
+
+
+        if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, xp)) {
+            rc.buildRobot(RobotType.MUCKRAKER, dir, xp);
+            return true;
+        }
+        return false;
+    }
 
     public static boolean spawnAttackPolitician (MapLocation toAttack, int hp) throws GameActionException {
         Direction dir = getOptimalDirection(rc.getLocation().directionTo(toAttack));

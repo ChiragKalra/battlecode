@@ -47,6 +47,9 @@ public strictfp class EnlightenmentCenter {
                 case DefensePolitician:
                     spawned = spawnDefencePolitician();
                     break;
+                case FillerMuckraker:
+                    spawned = spawnFillerMuckraker();
+                    break;
                 case Slanderer:
                     spawned = spawnSlanderer();
                     break;
