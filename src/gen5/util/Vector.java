@@ -62,7 +62,7 @@ public class Vector<T> implements Iterable<T> {
     public class ArrayIterator implements Iterator<T> {
         int curr;
         ArrayIterator () {
-            curr = 0;
+            curr = -1;
         }
 
         @Override

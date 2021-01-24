@@ -4,7 +4,7 @@ import battlecode.common.*;
 
 import gen5.util.LinkedList;
 import gen5.util.SpawnType;
-import gen5.util.Vector;
+
 
 import static gen5.EnlightenmentCenter.*;
 import static gen5.RobotPlayer.*;
@@ -47,25 +47,6 @@ public class SpawnHelper {
         }
         return ans;
     }
-
-    /*private static int spawnDirectionMuck = 0;
-    public static boolean spawnMuckraker() throws GameActionException {
-        Direction got = getDirectionFromAdjacentFlags(rc.getLocation()),
-                dir = getOptimalDirection(got != null ? got : directions[(spawnDirectionMuck++)%8]);
-        if (dir == null ) {
-            return false;
-        }
-
-        int xp = (int)(rc.getInfluence()*RATIO_UNITS/4);
-        xp = Math.max(SpawnType.Muckraker.minHp, xp);
-        xp = Math.min(SpawnType.Muckraker.maxHp, xp);
-
-        if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, xp)) {
-            rc.buildRobot(RobotType.MUCKRAKER, dir, xp);
-            return true;
-        }
-        return false;
-    }*/
 
     private static int spawnDirectionGridPol = 0;
     public static boolean spawnGridPolitician() throws GameActionException {

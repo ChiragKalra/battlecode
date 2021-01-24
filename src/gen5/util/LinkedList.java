@@ -44,17 +44,23 @@ public class LinkedList<T> implements Iterable<T> {
     public class ListIterator implements Iterator<T> {
         Node curr;
         ListIterator () {
-            curr = head;
+            curr = null;
         }
 
         @Override
         public boolean hasNext() {
-            return head.next != null;
+            if (curr == null) return head != null;
+            return curr.next != null;
         }
 
         @Override
         public T next() {
-            curr = curr.next;
+            if (curr == null) {
+                curr = head.next;
+            } else {
+                curr = curr.next;
+            }
+
             return curr.data;
         }
 
