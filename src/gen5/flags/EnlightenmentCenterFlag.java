@@ -32,6 +32,8 @@ public class EnlightenmentCenterFlag {
     public static void updateFlag() throws GameActionException {
         if (shouldIncrementWallRadius()) {
             currentRadius++;
+        } else if (shouldDecrementWallRadius() && currentRadius > 6) {
+            currentRadius--;
         }
 
         int prevFlag = rc.getFlag(rc.getID());

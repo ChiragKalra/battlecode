@@ -68,7 +68,7 @@ public class DefenseHelper {
     	return ml.distanceSquaredTo(spawnerLocation) > outerRadius;
     }
 
-    public static boolean forceMove(Direction dir) throws GameActionException {
+    public static boolean forceMove (Direction dir) throws GameActionException {
     	if (rc.canMove(dir)) {
     		rc.move(dir);
     		return true;
