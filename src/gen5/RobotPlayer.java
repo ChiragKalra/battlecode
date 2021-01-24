@@ -69,7 +69,11 @@ public strictfp class RobotPlayer {
                 spawnType = SpawnType.AttackPolitician;
             }
         } else if (mType == RobotType.MUCKRAKER) {
-            spawnType = SpawnType.Muckraker;
+            if (hp >= SpawnType.FillerMuckraker.minHp) {
+                spawnType = SpawnType.FillerMuckraker;
+            } else {
+                spawnType = SpawnType.Muckraker;
+            }
         } else if (mType == RobotType.SLANDERER) {
             spawnType = SpawnType.Slanderer;
         }
@@ -81,6 +85,7 @@ public strictfp class RobotPlayer {
             if (spawnType == null) {
                 EnlightenmentCenter.init();
             } else switch (spawnType) {
+                case FillerMuckraker:
                 case DefensePolitician:
                     DefensePolitician.init();
                     break;
@@ -125,6 +130,7 @@ public strictfp class RobotPlayer {
                             AttackPolitician.move();
                         }
                         break;
+                    case FillerMuckraker:
                     case DefensePolitician:
                         if (rc.isReady()) {
                             DefensePolitician.move();
@@ -147,6 +153,7 @@ public strictfp class RobotPlayer {
                 if (spawnType == null) {
                     EnlightenmentCenterFlag.updateFlag();
                 } else switch (spawnType) {
+                    case FillerMuckraker:
                     case DefensePolitician:
                         DefensePoliticianFlag.updateFlag();
                         break;

@@ -4,6 +4,7 @@ import battlecode.common.*;
 
 import gen5.util.LinkedList;
 import gen5.util.SpawnType;
+import gen5.util.Vector;
 
 
 import static gen5.EnlightenmentCenter.*;
@@ -20,10 +21,20 @@ public class SpawnHelper {
         return (int) Math.ceil((Math.floor(func)*hp)/func);
     }
 
+    public static Vector<Direction> getWeakDirections() {
+        Vector<Direction> dirs = new Vector<>(null, 4);
+        for (int i = 0; i < 4; i++) {
+            int count = 0; // TODO add def pol count here
+            if (count < 1.25*currentRadius) {
+                dirs.add(directions[i*2+1]);
+            }
+        }
+        return dirs;
+    }
+
 
     // layerQuantity = { 0, 8, 12, 16, 20, 28, 32, 40, 44, 48, 56, 60, 68, 72, 76, 84, };
     // private static final int[] sectorQuantity = { 0, 8, 20, 36, 56, 84, 116, 156, 200, 248, 304, 364, 432, 504, 580, 664, };
-    private static final int[] roundExpanded = new int[LIMIT_WALL_RADIUS+1];
     private static int blockedRounds = 0;
     public static boolean shouldIncrementWallRadius() {
         int capacity  = 20;
@@ -39,13 +50,16 @@ public class SpawnHelper {
         } else {
             blockedRounds = 0;
         }
-        boolean ans = blockedRounds >= 10 && currentRadius<LIMIT_WALL_RADIUS &&
-                roundNumber-roundExpanded[currentRadius-1] > 6*currentRadius*capacity/20.0;
+        boolean ans = blockedRounds >= 10 && currentRadius<LIMIT_WALL_RADIUS && (
+                currentRadius < 7 || defencePoliticians.getSize() > 8*currentRadius*(directionsBlocked/4.0));
         if (ans) {
-            roundExpanded[currentRadius+1] = roundNumber;
             blockedRounds = 0;
         }
         return ans;
+    }
+
+    public static boolean shouldDecrementWallRadius() {
+        return defencePoliticians.getSize() < 6*currentRadius*(directionsBlocked/4.0);
     }
 
     private static int spawnDirectionGridPol = 0;
@@ -88,6 +102,24 @@ public class SpawnHelper {
             xp = Math.max(SpawnType.Muckraker.minHp, xp);
             xp = Math.min(SpawnType.Muckraker.maxHp, xp);
         }
+
+        if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, xp)) {
+            rc.buildRobot(RobotType.MUCKRAKER, dir, xp);
+            return true;
+        }
+        return false;
+    }
+    public static boolean spawnFillerMuckraker() throws GameActionException {
+        Direction rand = directions[(int) (Math.random() * 4) * 2],
+                dir = getOptimalDirection(rand);
+        if (dir == null ) {
+            return false;
+        }
+
+        int xp = 1;
+        xp = Math.max(SpawnType.FillerMuckraker.minHp, xp);
+        xp = Math.min(SpawnType.FillerMuckraker.maxHp, xp);
+
 
         if (rc.canBuildRobot(RobotType.MUCKRAKER, dir, xp)) {
             rc.buildRobot(RobotType.MUCKRAKER, dir, xp);
@@ -146,12 +178,17 @@ public class SpawnHelper {
     private static int spawnDirectionDefPol = 0;
     public static LinkedList<Integer> defencePoliticians = new LinkedList<>();
     public static boolean spawnDefencePolitician() throws GameActionException {
+        Vector<Direction> got = getWeakDirections();
+
         spawnDirectionDefPol = (spawnDirectionDefPol+2)%8;
         while (edgeAtDirection[spawnDirectionDefPol/2]) {
             spawnDirectionDefPol = (spawnDirectionDefPol+2)%8;
         }
 
         Direction dir = getOptimalDirection(directions[spawnDirectionDefPol]);
+        if (got.length != 0) {
+            dir = getOptimalDirection(got.get((int)(Math.random()*got.length)));
+        }
         if (dir == null ) {
             return false;
         }

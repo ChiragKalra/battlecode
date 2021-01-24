@@ -1,5 +1,7 @@
 package gen5.util;
 
+import gen5.helpers.SpawnHelper;
+
 import static gen5.RobotPlayer.*;
 
 
@@ -9,6 +11,7 @@ public enum SpawnType {
     GridPolitician( 1, 1),
     Muckraker(1, 5),
     BuffMuckraker(750,750),
+    FillerMuckraker(25,25),
     Slanderer(21, 1000);
 
     public final int minHp, maxHp;
@@ -36,6 +39,9 @@ public enum SpawnType {
                 case 7:
                 case 10:
                     if (haveWonInVotes) {
+                        return SpawnType.FillerMuckraker;
+                    }
+                    if (SpawnHelper.shouldDecrementWallRadius()) {
                         return SpawnType.DefensePolitician;
                     }
                     return SpawnType.Slanderer;
