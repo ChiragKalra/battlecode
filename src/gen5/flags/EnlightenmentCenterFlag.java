@@ -30,16 +30,15 @@ public class EnlightenmentCenterFlag {
 
     // check for flag changes and set flag
     public static void updateFlag() throws GameActionException {
-        if (shouldIncrementWallRadius()) {
-            currentRadius++;
-        } else if (shouldDecrementWallRadius() && currentRadius > 6) {
+        if (currentRadius > 6 && shouldDecrementWallRadius()) {
             currentRadius--;
+        } else if (shouldIncrementWallRadius()) {
+            currentRadius++;
         }
 
         int prevFlag = rc.getFlag(rc.getID());
         int newFlag = 0;
         newFlag += currentRadius;
-
 
         int shiftInt = 8;
         if (shiftedTunnel != Direction.CENTER) {

@@ -1,5 +1,7 @@
 package gen5.util;
 
+import battlecode.common.GameActionException;
+
 import gen5.helpers.SpawnHelper;
 
 import static gen5.RobotPlayer.*;
@@ -23,7 +25,7 @@ public enum SpawnType {
 
     private static boolean hasSpawnedBuffed = false;
     private static int muckrakersSpawned = 0;
-    public static SpawnType getOptimalType(EcInfo targetEc) {
+    public static SpawnType getOptimalType(EcInfo targetEc) throws GameActionException {
         if (roundNumber < 4) {
             if (roundNumber == 1) return SpawnType.Slanderer;
             return SpawnType.DefensePolitician;

@@ -12,6 +12,7 @@ import static gen5.helpers.DefenseHelper.*;
 import static gen5.helpers.MovementHelper.goTo;
 
 public strictfp class DefensePolitician {
+    public static int radius;
 
     public static void move() throws GameActionException {
         for (RobotInfo ri: rc.senseNearbyRobots(sensorRadius, mTeam)) {
@@ -44,7 +45,6 @@ public strictfp class DefensePolitician {
             }
         }
 
-        int radius;
         if (rc.canGetFlag(enlightenmentCenterId)) {
             radius = getRadius(rc.getFlag(enlightenmentCenterId));
         } else {
