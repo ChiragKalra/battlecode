@@ -36,7 +36,7 @@ public strictfp class Muckraker {
                 maxInd = i;
             }
         }
-        if (maxRatio <= RATIO_CROWDING) {
+        if (maxRatio == 0) {
             return null;
         }
         return directions[(maxInd+4)%8];

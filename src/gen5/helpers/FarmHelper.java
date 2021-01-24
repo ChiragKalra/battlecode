@@ -5,13 +5,45 @@ import battlecode.common.*;
 import static gen5.RobotPlayer.*;
 import static gen5.flags.EnlightenmentCenterFlag.getRadius;
 import static gen5.helpers.DefenseHelper.*;
-import static gen5.helpers.MovementHelper.directions;
+import static gen5.helpers.MovementHelper.*;
+import static gen5.util.Functions.convolveCircularly;
 
 public class FarmHelper {
 	private static Direction antiMuckDirection = null;
     private static int roundsRunning = 0;
 
-    public static Direction getAntiMuckDirection() throws GameActionException {
+    public static Direction getAntiEcOrMuckDirection() {
+        MapLocation current = rc.getLocation();
+        byte[] occupied = new byte[8];
+        int total = 0;
+        for (RobotInfo ri : rc.senseNearbyRobots(sensorRadius, enemyTeam)) {
+            if (ri.type == RobotType.MUCKRAKER || ri.type == RobotType.ENLIGHTENMENT_CENTER) {
+                occupied[directionList.indexOf(current.directionTo(ri.location))]++;
+                total++;
+            }
+        }
+
+        double[] ratios = new double[8], filter = {.2, .6, .2};
+        for (int i = 0; i < 8; i++) {
+            ratios[i] = occupied[i] / (float) total;
+        }
+        ratios = convolveCircularly(ratios, filter);
+
+        int maxInd = -1;
+        double maxRatio = 0;
+        for (int i = 0; i < 8; i++) {
+            if (ratios[i] > maxRatio) {
+                maxRatio = ratios[i];
+                maxInd = i;
+            }
+        }
+        if (maxRatio == 0) {
+            return null;
+        }
+        return directions[(maxInd+4)%8];
+    }
+
+    public static Direction getAntiMuckDirection() {
         int[] blocked = new int[8];
         boolean found = false;
         for (RobotInfo ri : rc.senseNearbyRobots(sensorRadius, enemyTeam)) {

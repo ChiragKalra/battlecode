@@ -26,26 +26,8 @@ public strictfp class Slanderer {
         if (rc.canGetFlag(enlightenmentCenterId)) {
             radius = getRadius(rc.getFlag(enlightenmentCenterId));
         } else {
-            // TODO: check for ECs, mucks nearby
-            Direction opposite = rc.getLocation().directionTo(spawnerLocation).opposite();
-            Direction oppLeft = opposite.rotateLeft();
-            Direction oppRight = opposite.rotateRight();
-            if (forceMove(opposite)) {
-                return;
-            }
-            if (forceMove(oppLeft)) {
-                return;
-            }
-            if (forceMove(oppRight)) {
-                return;
-            }
-            if (forceMove(oppLeft.rotateLeft())) {
-                return;
-            }
-            if (forceMove(oppRight.rotateRight())) {
-                return;
-            }
-
+            Direction opposite = getAntiEcOrMuckDirection();
+            MovementHelper.tryMove(opposite, false);
             return;
         }
 
