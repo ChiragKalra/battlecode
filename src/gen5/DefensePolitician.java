@@ -9,6 +9,7 @@ import static gen5.flags.EnlightenmentCenterFlag.getRadius;
 import static gen5.flags.EnlightenmentCenterFlag.getShiftDirection;
 import static gen5.helpers.AttackHelper.*;
 import static gen5.helpers.DefenseHelper.*;
+import static gen5.helpers.MovementHelper.goTo;
 
 public strictfp class DefensePolitician {
 
@@ -20,12 +21,37 @@ public strictfp class DefensePolitician {
             }
         }
 
+        // is a muckraker
+        if (spawnType != SpawnType.DefensePolitician) {
+            MapLocation locToExpose = null;
+            for (RobotInfo robot : rc.senseNearbyRobots(sensorRadius, enemyTeam)) {
+                if (robot.type.canBeExposed()) {
+                    if (robot.location.isWithinDistanceSquared(rc.getLocation(), actionRadius)) {
+                        // expose the slanderer
+                        if (rc.canExpose(robot.location)) {
+                            rc.expose(robot.location);
+                            return;
+                        }
+                    } else {
+                        locToExpose = robot.location;
+                    }
+                }
+            }
+
+            if (locToExpose != null) {
+                goTo(locToExpose);
+                return;
+            }
+        }
+
         int radius;
         if (rc.canGetFlag(enlightenmentCenterId)) {
             radius = getRadius(rc.getFlag(enlightenmentCenterId));
         } else {
-            spawnType = SpawnType.AttackPolitician;
-            AttackPolitician.move();
+            if (spawnType == SpawnType.DefensePolitician) {
+                spawnType = SpawnType.AttackPolitician;
+                AttackPolitician.move();
+            }
             return;
         }
 

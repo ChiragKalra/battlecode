@@ -7,43 +7,13 @@ import static gen5.RobotPlayer.*;
 import static gen5.flags.EnlightenmentCenterFlag.getRadius;
 import static gen5.flags.EnlightenmentCenterFlag.getShiftDirection;
 import static gen5.helpers.DefenseHelper.*;
-
+import static gen5.helpers.FarmHelper.*;
 
 public strictfp class Slanderer {
     private static final int RADIUS_CAP = 7;
 
-    private static Direction getAntiMuckDirection() {
-        // TODO: move away from muckrakers (optimise)
-        int[] dirOcc = new int[8];
-        boolean found = false;
-        for (RobotInfo ri: rc.senseNearbyRobots(sensorRadius, enemyTeam)) {
-            if (ri.type == RobotType.MUCKRAKER) {
-                found = true;
-                dirOcc[MovementHelper.directionList.indexOf(ri.location.directionTo(rc.getLocation()))]++;
-            }
-        }
-
-        int ind  = 0;
-        for (int i = 1; i < 8; i++) {
-            if (dirOcc[i] > dirOcc[ind]) {
-                ind = i;
-            }
-        }
-
-        if (found) {
-            return MovementHelper.directions[ind];
-        }
-        return null;
-    }
-
     public static void move() throws GameActionException {
         if (!rc.isReady()) {
-            return;
-        }
-
-        Direction antiMuck = getAntiMuckDirection();
-        if (antiMuck != null) {
-            MovementHelper.tryMove(antiMuck, false);
             return;
         }
 
@@ -56,6 +26,7 @@ public strictfp class Slanderer {
         if (rc.canGetFlag(enlightenmentCenterId)) {
             radius = getRadius(rc.getFlag(enlightenmentCenterId));
         } else {
+            // TODO: check for ECs, mucks nearby
             Direction opposite = rc.getLocation().directionTo(spawnerLocation).opposite();
             Direction oppLeft = opposite.rotateLeft();
             Direction oppRight = opposite.rotateRight();
@@ -78,17 +49,32 @@ public strictfp class Slanderer {
             return;
         }
 
-        // log("No muck");
-
-        if (radius > RADIUS_CAP)
-            radius = RADIUS_CAP;
         int innerRadius = radius * radius + 1;
         int outerRadius = (radius + 1) * (radius + 1) + 1;
-        // log("radius: " + radius + " " + innerRadius + " " + outerRadius);
+
+        Direction antiMuck = getAntiMuckDirection();
+        if (antiMuck != null) {
+            tryRun(antiMuck, innerRadius, outerRadius);
+            return;
+        }
 
         Direction straight = rc.getLocation().directionTo(spawnerLocation).opposite();
         Direction left = straight.rotateLeft();
         Direction right = straight.rotateRight();
+
+        if (outsideWall(rc.getLocation(), outerRadius)) {
+            if (forceMove(straight)) {
+                return;
+            }
+            if (forceMove(left)) {
+                return;
+            }
+            if (forceMove(right)) {
+                return;
+            }
+
+            return;
+        }
 
         if (onWall(rc.getLocation(), innerRadius, outerRadius)) {
             Direction opposite = rc.getLocation().directionTo(spawnerLocation);
@@ -110,46 +96,42 @@ public strictfp class Slanderer {
                 return;
             }
 
-            /*if (isTunnelPoint(rc.getLocation())) {
-                if (forceMove(straight)) {
-                    return;
-                }
-                if (forceMove(left)) {
-                    return;
-                }
-                if (forceMove(right)) {
-                    return;
-                }
-            }*/
-
             return;
         }
 
-        // log("Not on wall");
+        if (radius > RADIUS_CAP) {
+            radius = RADIUS_CAP;
+            innerRadius = radius * radius + 1;
+            outerRadius = (radius + 1) * (radius + 1) + 1;
+            if (onWall(rc.getLocation(), innerRadius, outerRadius) || outsideWall(rc.getLocation(), outerRadius)) {
+                Direction opposite = rc.getLocation().directionTo(spawnerLocation);
+                Direction oppLeft = opposite.rotateLeft();
+                Direction oppRight = opposite.rotateRight();
+                if (forceMoveWall(opposite)) {
+                    return;
+                }
+                if (forceMoveWall(oppRight)) {
+                    return;
+                }
+                if (forceMoveWall(oppLeft)) {
+                    return;
+                }
+                if (forceMoveWall(oppRight.rotateRight())) {
+                    return;
+                }
+                if (forceMoveWall(oppLeft.rotateLeft())) {
+                    return;
+                }
 
-        if (outsideWall(rc.getLocation(), outerRadius)) {
-            if (forceMove(straight)) {
                 return;
             }
-            if (forceMove(left)) {
-                return;
-            }
-            if (forceMove(right)) {
-                return;
-            }
-
-            return;
         }
-
-        // log("Not outside wall");
 
         boolean nearWall = onWall(rc.getLocation().add(straight), innerRadius, outerRadius) ||
                 onWall(rc.getLocation().add(left), innerRadius, outerRadius) ||
                 onWall(rc.getLocation().add(right), innerRadius, outerRadius);
         if (nearWall) {
             if (isTunnelPoint(rc.getLocation())) {
-                //log(rc.getLocation().x + ' ' + rc.getLocation().y);
-                //log(isTunnelPoint(rc.getLocation()));
                 for (int i = 0; i < 2; ++i) {
                     left = left.rotateLeft();
                     if (forceMoveWall(left)) {
@@ -173,12 +155,8 @@ public strictfp class Slanderer {
                 }
             }
 
-            // log("Near wall and not a tunnel point");
-
             return;
         }
-
-        // log("Not near wall");
 
         if (forceMoveWall(straight)) {
             return;
@@ -189,8 +167,6 @@ public strictfp class Slanderer {
         if (forceMoveWall(right)) {
             return;
         }
-
-        // log("Couldn't move ahead");
 
         for (int i = 0; i < 2; ++i) {
             left = left.rotateLeft();
