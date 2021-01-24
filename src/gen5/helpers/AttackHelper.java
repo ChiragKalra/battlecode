@@ -74,7 +74,7 @@ public class AttackHelper {
                     done += Math.min(ri.influence - ri.conviction + 1, each);
                 }
             }
-            double ratio = done / (double) (damage+10);
+            double ratio = done / (double) rc.getConviction();
             boolean attacking = ratio > EMP_ATTACK_THRESHOLD_RATIO * selfEmpFac;
             if (attacking && ratio > bestDamage) {
                 bestDamage = ratio;
@@ -94,16 +94,6 @@ public class AttackHelper {
 
     // returns (radius, is a muckraker adjacent)
     public static Pair<Integer, Boolean> shouldAttackDefensive () {
-        /*
-        TODO check if 3 layers on wall, dont attack
-        if (spawnerLocation != null) {
-            MapLocation now = rc.getLocation();
-            Direction toSpawn = now.directionTo(spawnerLocation);
-            for (int i = 0; i < 2; i++) {
-
-            }
-        }*/
-
         double empFac = rc.getEmpowerFactor(mTeam, 0);
         if (empFac > 10000) {
             empFac = 10000;
@@ -118,7 +108,7 @@ public class AttackHelper {
             int damage = (int) (rc.getConviction()*empFac-10),
                     each = damage/nearby.length, kills = 0, damageDone = 0;
             for (RobotInfo ri: nearby) {
-                if (ri.team != mTeam && ri.type != RobotType.ENLIGHTENMENT_CENTER) {
+                if (ri.team != mTeam && ri.type != RobotType.ENLIGHTENMENT_CENTER && ri.conviction <= rc.getConviction()*3) {
                     if (ri.conviction < each) {
                         kills++;
                         damageDone += ri.conviction + 1;
