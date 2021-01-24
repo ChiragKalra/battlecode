@@ -51,7 +51,7 @@ public class SpawnHelper {
             blockedRounds = 0;
         }
         boolean ans = blockedRounds >= 10 && currentRadius<LIMIT_WALL_RADIUS && (
-                currentRadius < 7 || defencePoliticians.getSize() > 8*currentRadius*(directionsBlocked/4.0));
+                currentRadius < 7 || defencePoliticians.getSize() > 10*currentRadius*(directionsBlocked/4.0));
         if (ans) {
             blockedRounds = 0;
         }
@@ -59,7 +59,7 @@ public class SpawnHelper {
     }
 
     public static boolean shouldDecrementWallRadius() {
-        return defencePoliticians.getSize() < 6*currentRadius*(directionsBlocked/4.0);
+        return defencePoliticians.getSize() < 7*currentRadius*(directionsBlocked/4.0);
     }
 
     private static int spawnDirectionGridPol = 0;
@@ -109,6 +109,8 @@ public class SpawnHelper {
         }
         return false;
     }
+
+
     public static boolean spawnFillerMuckraker() throws GameActionException {
         Direction rand = directions[(int) (Math.random() * 4) * 2],
                 dir = getOptimalDirection(rand);

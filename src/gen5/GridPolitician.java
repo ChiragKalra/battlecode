@@ -29,7 +29,7 @@ public strictfp class GridPolitician {
             }
         }
 
-        if (explodeRadius < 3*5 && spawnDirection != null) {
+        if (explodeRadius < 13 && spawnDirection != null) {
             if (!rc.onTheMap(rc.getLocation().add(spawnDirection))) {
                 spawnDirection = spawnDirection.rotateLeft();
             }

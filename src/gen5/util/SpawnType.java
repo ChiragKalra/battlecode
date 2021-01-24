@@ -34,13 +34,13 @@ public enum SpawnType {
                 default : return SpawnType.GridPolitician;
             }
         } else {
+            if (haveWonInVotes) {
+                return SpawnType.FillerMuckraker;
+            }
             switch (roundNumber % 11) {
                 case 2:
                 case 7:
                 case 10:
-                    if (haveWonInVotes) {
-                        return SpawnType.FillerMuckraker;
-                    }
                     if (SpawnHelper.shouldDecrementWallRadius()) {
                         return SpawnType.DefensePolitician;
                     }

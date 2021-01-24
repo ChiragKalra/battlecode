@@ -149,6 +149,9 @@ public class AttackHelper {
     private static int moves = 0;
     public static Direction getNextDirection(MapLocation attackLocation) throws GameActionException {
         if (moves > 0 && opEc != null) {
+            if (!rc.onTheMap(rc.getLocation().add(opEc))) {
+                opEc = opEc.rotateLeft();
+            }
             moves--;
             return opEc;
         }
