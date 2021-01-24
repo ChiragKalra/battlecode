@@ -16,8 +16,10 @@ public class FarmHelper {
         MapLocation current = rc.getLocation();
         byte[] occupied = new byte[8];
         int total = 0;
+        boolean found = false;
         for (RobotInfo ri : rc.senseNearbyRobots(sensorRadius, enemyTeam)) {
             if (ri.type == RobotType.MUCKRAKER || ri.type == RobotType.ENLIGHTENMENT_CENTER) {
+            	found = true;
                 occupied[directionList.indexOf(current.directionTo(ri.location))]++;
                 total++;
             }
@@ -37,7 +39,7 @@ public class FarmHelper {
                 maxInd = i;
             }
         }
-        if (maxRatio == 0) {
+        if (maxRatio == 0 || !found) {
             return null;
         }
         return directions[(maxInd+4)%8];
