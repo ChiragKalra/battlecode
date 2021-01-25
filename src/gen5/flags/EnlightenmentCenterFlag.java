@@ -1,9 +1,12 @@
 package gen5.flags;
 
+import battlecode.common.Clock;
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
+import gen5.util.Logger;
 
 import static gen5.EnlightenmentCenter.shiftedTunnel;
+import static gen5.RobotPlayer.log;
 import static gen5.RobotPlayer.rc;
 import static gen5.EnlightenmentCenter.currentRadius;
 import static gen5.helpers.SpawnHelper.*;
@@ -30,7 +33,7 @@ public class EnlightenmentCenterFlag {
 
     // check for flag changes and set flag
     public static void updateFlag() throws GameActionException {
-        if (shouldDecrementWallRadius()) {
+	    if (shouldDecrementWallRadius()) {
             currentRadius--;
         } else if (shouldIncrementWallRadius()) {
             currentRadius++;

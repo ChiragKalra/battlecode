@@ -88,6 +88,17 @@ public class SpawnHelper {
             return shouldDecrementRadius = false;
         }
 
+        for (RobotInfo ri: rc.senseNearbyRobots(RobotType.POLITICIAN.sensorRadiusSquared, mTeam)) {
+            if (ri.type == RobotType.POLITICIAN && ri.influence >= SpawnType.DefensePolitician.minHp &&
+                    ri.influence <= SpawnType.DefensePolitician.maxHp
+            ) {
+                int flag = rc.getFlag(ri.getID());
+                if (DefensePoliticianFlag.hasChangedEc(flag)) {
+                    defencePoliticians.add(ri.getID());
+                }
+            }
+        }
+
         Direction buffMuckraker = null;
         // 0 - NE, 1 - SE, 2 - SW, 3 - NW
         int[] politiciansCount = new int[4];
@@ -101,6 +112,12 @@ public class SpawnHelper {
             }
 
             int flag = rc.getFlag(id);
+
+            if (DefensePoliticianFlag.hasChangedEc(flag)) {
+                iter.remove();
+                continue;
+            }
+
             // not on wall or on tunnel point
             if (getBits(flag, 0, 0) == 0 || getBits(flag, 1, 1) == 1) {
                 continue;
@@ -113,6 +130,8 @@ public class SpawnHelper {
             }
             ++politiciansCount[getBits(flag, 3, 2)];
         }
+
+
 
         buffMuckApproachDirection = buffMuckraker;
 

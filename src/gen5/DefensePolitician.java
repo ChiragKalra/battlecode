@@ -14,6 +14,8 @@ import static gen5.helpers.MovementHelper.tryMove;
 
 public strictfp class DefensePolitician {
 
+    public static int hasChangedEc = 0;
+
     private static void approachOrEmpowerMuck (int radius) throws GameActionException {
         Direction d = getApproachDirection();
         if (d == null) {
@@ -27,9 +29,10 @@ public strictfp class DefensePolitician {
 
     public static void move() throws GameActionException {
         for (RobotInfo ri: rc.senseNearbyRobots(sensorRadius, mTeam)) {
-            if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
+            if (ri.type == RobotType.ENLIGHTENMENT_CENTER && spawnerLocation != ri.location) {
                 enlightenmentCenterId = ri.getID();
                 spawnerLocation = ri.location;
+                hasChangedEc = 2;
             }
         }
 

@@ -58,7 +58,7 @@ public enum SpawnType {
                     return Slanderer;
                 case 3:
                 case 6:
-                    if (roundNumber < 300) {
+                    if (roundNumber < 240) {
                         return Muckraker;
                     }
                     return SpawnType.GridPolitician;

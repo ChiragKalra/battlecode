@@ -151,7 +151,9 @@ public strictfp class RobotPlayer {
 
                 // update flag at the end of each round
                 if (spawnType == null) {
-                    EnlightenmentCenterFlag.updateFlag();
+                    if (rc.isReady()) {
+                        EnlightenmentCenterFlag.updateFlag();
+                    }
                 } else switch (spawnType) {
                     case FillerMuckraker:
                     case DefensePolitician:

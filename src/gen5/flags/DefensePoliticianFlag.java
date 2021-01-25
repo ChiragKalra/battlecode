@@ -4,6 +4,7 @@ import battlecode.common.*;
 import gen5.helpers.FarmHelper;
 import gen5.helpers.MovementHelper;
 
+import static gen5.DefensePolitician.hasChangedEc;
 import static gen5.RobotPlayer.*;
 import static gen5.DefensePolitician.radius;
 import static gen5.helpers.DefenseHelper.*;
@@ -20,7 +21,7 @@ import static gen5.util.Functions.setBits;
 	10	- south-west
 	11	- north-west
 
-29 		- changing EC
+19 		- changing EC
 20-23   - Buff Muck Direction
  */
 
@@ -38,6 +39,11 @@ public class DefensePoliticianFlag {
     		newFlag = setBits(newFlag, 3, 2, getQuadrant());
     	}
 
+    	if (hasChangedEc > 0) {
+    		hasChangedEc--;
+    		newFlag += 1<<19;
+		}
+
     	Direction buffMuck = FarmHelper.directionToBuffMuck();
     	int dirInt = 8;
     	if (buffMuck != null) {
@@ -49,6 +55,10 @@ public class DefensePoliticianFlag {
     		rc.setFlag(newFlag);
     	}
     }
+
+    public static boolean hasChangedEc (int flag) {
+    	return ((1 << 19) & flag) == (1 << 19);
+	}
 
     public static Direction getBuffMuckrakerDirection (int flag) {
     	int dirInt = getBits(flag, 23, 20);

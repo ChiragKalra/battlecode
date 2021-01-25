@@ -27,16 +27,6 @@ public class Functions {
         return out;
     }
 
-    public static boolean hasSimilar(Vector<MapLocation> v, MapLocation ml) {
-        for (int i = 0; i < v.length; i++) {
-            if (ml.isWithinDistanceSquared(v.get(i), 5)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
     public static int getBits(int flag, int left, int right) {
         return (flag >> right) & ((1 << (left - right + 1)) - 1);
     }
