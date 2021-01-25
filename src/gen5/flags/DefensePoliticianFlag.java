@@ -20,6 +20,7 @@ import static gen5.util.Functions.setBits;
 	10	- south-west
 	11	- north-west
 
+29 		- changing EC
 20-23   - Buff Muck Direction
  */
 

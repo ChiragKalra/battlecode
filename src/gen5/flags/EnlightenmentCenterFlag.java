@@ -30,7 +30,7 @@ public class EnlightenmentCenterFlag {
 
     // check for flag changes and set flag
     public static void updateFlag() throws GameActionException {
-        if (currentRadius > 6 && shouldDecrementWallRadius()) {
+        if (shouldDecrementWallRadius()) {
             currentRadius--;
         } else if (shouldIncrementWallRadius()) {
             currentRadius++;

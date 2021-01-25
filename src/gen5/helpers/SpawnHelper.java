@@ -3,10 +3,8 @@ package gen5.helpers;
 import battlecode.common.*;
 
 import gen5.flags.DefensePoliticianFlag;
-import gen5.util.LinkedList;
-import gen5.util.Pair;
-import gen5.util.SpawnType;
-import gen5.util.Vector;
+import gen5.util.*;
+
 import java.util.Iterator;
 
 import static gen5.EnlightenmentCenter.*;

@@ -23,13 +23,11 @@ public class LinkedList<T> implements Iterable<T> {
         size++;
         Node newNode = new Node(data);
 
-        if (head == null) {
-            head = newNode;
-        } else {
-            Node sec = head;
-            sec.prev = newNode;
-            newNode.next = sec;
+        if (head != null) {
+            head.prev = newNode;
+            newNode.next = head;
         }
+        head = newNode;
     }
 
     public int getSize() {
