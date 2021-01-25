@@ -37,7 +37,7 @@ public strictfp class EnlightenmentCenter {
         if (got != null) {
             switch (got) {
                 case BuffMuckraker:
-                    spawned = spawnMuckraker(targetEC.location, true);
+                    spawned = spawnMuckraker(targetEC == null ? null : targetEC.location, true);
                     break;
                 case AttackPolitician:
                     spawned = spawnAttackPolitician(targetEC.location, targetEC.hp);

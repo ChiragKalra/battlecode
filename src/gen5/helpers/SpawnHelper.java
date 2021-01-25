@@ -337,7 +337,8 @@ public class SpawnHelper {
         if (dir == null ) {
             return false;
         }
-        int xp = (int)(rc.getInfluence()*0.005);
+        int xp = buffMuckApproachDirection != null ?
+                SpawnType.DefensePolitician.maxHp : (int)(rc.getInfluence()*0.008);
         xp = Math.max(SpawnType.DefensePolitician.minHp, xp);
         xp = Math.min(SpawnType.DefensePolitician.maxHp, xp);
         if (rc.canBuildRobot(RobotType.POLITICIAN, dir, xp)) {
