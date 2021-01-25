@@ -1,10 +1,14 @@
 package gen5.flags;
 
 import battlecode.common.*;
+import gen5.helpers.FarmHelper;
+import gen5.helpers.MovementHelper;
 
 import static gen5.RobotPlayer.*;
 import static gen5.DefensePolitician.radius;
 import static gen5.helpers.DefenseHelper.*;
+import static gen5.util.Functions.getBits;
+import static gen5.util.Functions.setBits;
 
 /*
  # Politician Flag
@@ -15,6 +19,8 @@ import static gen5.helpers.DefenseHelper.*;
 	01	- south-east
 	10	- south-west
 	11	- north-west
+
+20-23   - Buff Muck Direction
  */
 
 public class DefensePoliticianFlag {
@@ -31,21 +37,23 @@ public class DefensePoliticianFlag {
     		newFlag = setBits(newFlag, 3, 2, getQuadrant());
     	}
 
+    	Direction buffMuck = FarmHelper.directionToBuffMuck();
+    	int dirInt = 8;
+    	if (buffMuck != null) {
+    		dirInt = MovementHelper.directionList.indexOf(buffMuck);
+		}
+    	newFlag = setBits(newFlag, 23, 20, dirInt);
+
     	if (prevFlag != newFlag) {
     		rc.setFlag(newFlag);
     	}
     }
 
-    public static int getBits(int flag, int left, int right) {
-    	return (flag >> right) & ((1 << (left - right + 1)) - 1);
-    }
-
-    public static int setBits(int flag, int left, int right, int val) {
-    	int rightBits = flag & ((1 << right) - 1);
-    	flag = ((flag >> (left + 1)) << (left + 1)) | (val << right);
-    	flag |= rightBits;
-    	return flag;
-    }
+    public static Direction getBuffMuckrakerDirection (int flag) {
+    	int dirInt = getBits(flag, 23, 20);
+    	if (dirInt == 8) return null;
+    	return MovementHelper.directions[dirInt];
+	}
 
     private static int getQuadrant() {
     	MapLocation origin = new MapLocation(spawnerLocation.x + tunnelShift.dx, spawnerLocation.y + tunnelShift.dy);

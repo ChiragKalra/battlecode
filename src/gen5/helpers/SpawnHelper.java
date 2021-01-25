@@ -2,6 +2,7 @@ package gen5.helpers;
 
 import battlecode.common.*;
 
+import gen5.flags.DefensePoliticianFlag;
 import gen5.util.LinkedList;
 import gen5.util.SpawnType;
 import gen5.util.Vector;
@@ -11,7 +12,7 @@ import static gen5.EnlightenmentCenter.*;
 import static gen5.RobotPlayer.*;
 import static gen5.helpers.GridHelper.getDirectionFromAdjacentFlags;
 import static gen5.helpers.MovementHelper.*;
-import static gen5.flags.DefensePoliticianFlag.getBits;
+import static gen5.util.Functions.getBits;
 
 public class SpawnHelper {
 
@@ -88,6 +89,7 @@ public class SpawnHelper {
             return false;
         }
 
+        Direction buffMuckraker = null;
         // 0 - NE, 1 - SE, 2 - SW, 3 - NW
         int[] politiciansCount = new int[4];
         // MapLocation origin = new MapLocation(spawnerLocation.x + shiftedTunnel.dx, spawnerLocation.y + shiftedTunnel.dy);
@@ -104,8 +106,16 @@ public class SpawnHelper {
             if (getBits(flag, 0, 0) == 0 || getBits(flag, 1, 1) == 1) {
                 continue;
             }
+            if (buffMuckraker == null) {
+                Direction got = DefensePoliticianFlag.getBuffMuckrakerDirection(flag);
+                if (got != null) {
+                    buffMuckraker = got;
+                }
+            }
             ++politiciansCount[getBits(flag, 3, 2)];
         }
+
+        buffMuckApproachDirection = buffMuckraker;
 
        /* System.out.println(currentRadius);
         for (int i = 0; i < 4; ++i)
@@ -317,7 +327,10 @@ public class SpawnHelper {
             spawnDirectionDefPol = (spawnDirectionDefPol+2)%8;
         }
 
-        Direction dir = getOptimalDirection(directions[spawnDirectionDefPol]);
+        Direction dir = getOptimalDirection (
+                buffMuckApproachDirection != null ?
+                        buffMuckApproachDirection : directions[spawnDirectionDefPol]
+        );
         if (got.length != 0) {
             dir = getOptimalDirection(got.get((int)(Math.random()*got.length)));
         }

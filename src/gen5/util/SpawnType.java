@@ -1,5 +1,6 @@
 package gen5.util;
 
+import gen5.EnlightenmentCenter;
 import gen5.helpers.SpawnHelper;
 
 import static gen5.RobotPlayer.*;
@@ -37,6 +38,13 @@ public enum SpawnType {
             if (haveWonInVotes) {
                 return SpawnType.FillerMuckraker;
             }
+            if (rc.getConviction() > 1650 && !hasSpawnedBuffed) {
+                hasSpawnedBuffed = true;
+                return SpawnType.BuffMuckraker;
+            }
+            if (EnlightenmentCenter.buffMuckApproachDirection != null) {
+                return DefensePolitician;
+            }
             switch (roundNumber % 11) {
                 case 2:
                 case 7:
@@ -53,10 +61,7 @@ public enum SpawnType {
                     return SpawnType.GridPolitician;
                 default:
                     if (targetEc != null && targetEc.enemy) {
-                        if (rc.getConviction() > 1650 && !hasSpawnedBuffed) {
-                            hasSpawnedBuffed = true;
-                            return SpawnType.BuffMuckraker;
-                        } else if (muckrakersSpawned < 15) {
+                        if (muckrakersSpawned < 10) {
                             muckrakersSpawned++;
                             return SpawnType.Muckraker;
                         }

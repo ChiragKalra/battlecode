@@ -36,4 +36,15 @@ public class Functions {
         return false;
     }
 
+
+    public static int getBits(int flag, int left, int right) {
+        return (flag >> right) & ((1 << (left - right + 1)) - 1);
+    }
+
+    public static int setBits(int flag, int left, int right, int val) {
+        int rightBits = flag & ((1 << right) - 1);
+        flag = ((flag >> (left + 1)) << (left + 1)) | (val << right);
+        flag |= rightBits;
+        return flag;
+    }
 }
