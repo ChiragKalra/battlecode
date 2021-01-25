@@ -81,6 +81,7 @@ public strictfp class DefensePolitician {
         Pair<Integer, Boolean> p = shouldAttackDefensive();
         Integer rad = p.key;
         Boolean muckrakerAdjacent = p.value;
+
         if (rad != 0 && spawnType == SpawnType.DefensePolitician) {
             // only >= third layer will explode normally (except when a muckraker is adjacent)
             if (isOutsideWall || muckrakerAdjacent) {
@@ -187,6 +188,7 @@ public strictfp class DefensePolitician {
 
         left = left.rotateLeft();
         tryMoveWall(left, outerRadius);
+
     }
 
     private static boolean isDefensePolitician(Direction dir) throws GameActionException {

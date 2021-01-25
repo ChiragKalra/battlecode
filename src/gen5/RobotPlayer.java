@@ -104,7 +104,7 @@ public strictfp class RobotPlayer {
             try {
                 roundNumber = rc.getRoundNum();
                 haveWonInVotes = rc.getTeamVotes() > GameConstants.GAME_MAX_NUMBER_OF_ROUNDS/2;
-                Logger logger = new Logger("full", true);
+                Logger logger = new Logger("full: " + (spawnType == null ? "EC" : spawnType.name()), true);
 
                 // slanderer will convert to politician in 300 rounds, watch for changes
                 if (mType != rc.getType()) {

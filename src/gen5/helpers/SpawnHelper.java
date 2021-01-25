@@ -24,8 +24,11 @@ public class SpawnHelper {
 
     public static Vector<Direction> getWeakDirections() {
         Vector<Direction> dirs = new Vector<>(null, 4);
+        if (defensePoliticiansInDirection == null) {
+            return dirs;
+        }
         for (int i = 0; i < 4; i++) {
-            int count = 0; // TODO add def pol count here
+            int count = defensePoliticiansInDirection[i];
             if (count < 1.25*currentRadius) {
                 dirs.add(directions[i*2+1]);
             }
@@ -45,6 +48,7 @@ public class SpawnHelper {
     };
 */
 
+    public static int[] defensePoliticiansInDirection = null;
     private static int blockedRounds = 0;
     public static boolean shouldIncrementWallRadius() {
         int capacity  = 20;
@@ -77,7 +81,7 @@ public class SpawnHelper {
         }
         roundCached = roundNumber;
 
-        if (currentRadius >= 16) {
+        if (currentRadius >= LIMIT_WALL_RADIUS) {
             return true;
         }
         if (currentRadius <= 6) {
@@ -86,7 +90,7 @@ public class SpawnHelper {
 
         // 0 - NE, 1 - SE, 2 - SW, 3 - NW
         int[] politiciansCount = new int[4];
-        MapLocation origin = new MapLocation(spawnerLocation.x + shiftedTunnel.dx, spawnerLocation.y + shiftedTunnel.dy);
+        // MapLocation origin = new MapLocation(spawnerLocation.x + shiftedTunnel.dx, spawnerLocation.y + shiftedTunnel.dy);
         Iterator<Integer> iter = defencePoliticians.iterator();
         while (iter.hasNext()) {
             int id = iter.next();
@@ -103,10 +107,10 @@ public class SpawnHelper {
             ++politiciansCount[getBits(flag, 3, 2)];
         }
 
-        System.out.println(currentRadius);
+       /* System.out.println(currentRadius);
         for (int i = 0; i < 4; ++i)
             System.out.println(politiciansCount[i]);
-
+*/
         shouldDecrementRadius = false;
         int each = (layerQuantity[currentRadius] - 4) / 4 + (layerQuantity[currentRadius + 1] - 4) / 4;
         // North-east
@@ -184,7 +188,7 @@ public class SpawnHelper {
                 return shouldDecrementRadius = true;
             }
         }
-
+        defensePoliticiansInDirection = politiciansCount;
         return false;
     }
 

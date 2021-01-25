@@ -1,7 +1,5 @@
 package gen5.util;
 
-import battlecode.common.GameActionException;
-
 import gen5.helpers.SpawnHelper;
 
 import static gen5.RobotPlayer.*;
@@ -25,7 +23,7 @@ public enum SpawnType {
 
     private static boolean hasSpawnedBuffed = false;
     private static int muckrakersSpawned = 0;
-    public static SpawnType getOptimalType(EcInfo targetEc) throws GameActionException {
+    public static SpawnType getOptimalType(EcInfo targetEc) {
         if (roundNumber < 4) {
             if (roundNumber == 1) return SpawnType.Slanderer;
             return SpawnType.DefensePolitician;
@@ -43,13 +41,13 @@ public enum SpawnType {
                 case 2:
                 case 7:
                 case 10:
-                    if (SpawnHelper.shouldDecrementWallRadius()) {
+                    if (SpawnHelper.getWeakDirections().length > 0) {
                         return SpawnType.DefensePolitician;
                     }
                     return SpawnType.Slanderer;
                 case 3:
                 case 6:
-                    if (Math.random() > 0.75 && roundNumber < 500) {
+                    if (roundNumber < 300) {
                         return SpawnType.Muckraker;
                     }
                     return SpawnType.GridPolitician;

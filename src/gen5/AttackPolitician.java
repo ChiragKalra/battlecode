@@ -25,7 +25,6 @@ public strictfp class AttackPolitician {
             }
         }
 
-
         int rad = shouldAttackOffensive();
         if (rad != 0) {
             rc.empower(rad);
@@ -45,6 +44,7 @@ public strictfp class AttackPolitician {
             locToEmp = spawnerLocation;
         }
 
+
         if (locToEmp != null) {
             goTo(locToEmp);
         } else {
@@ -52,7 +52,7 @@ public strictfp class AttackPolitician {
             if (got != null && got.hp >= 0) {
                 goTo(got.location);
             } else {
-                tryMove(getNextDirection(null), false);
+                tryMove(getNextDirection(), false);
             }
         }
     }

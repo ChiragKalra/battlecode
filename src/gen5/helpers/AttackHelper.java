@@ -141,7 +141,7 @@ public class AttackHelper {
 
     private static Direction opEc = null;
     private static int moves = 0;
-    public static Direction getNextDirection(MapLocation attackLocation) throws GameActionException {
+    public static Direction getNextDirection() throws GameActionException {
         if (moves > 0 && opEc != null) {
             if (!rc.onTheMap(rc.getLocation().add(opEc))) {
                 opEc = opEc.rotateLeft();
@@ -151,20 +151,19 @@ public class AttackHelper {
         }
 
         MapLocation mLoc = rc.getLocation();
-        if (attackLocation == null) {
-            for (RobotInfo ri: rc.senseNearbyRobots()) {
-                if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
-                    if (ri.team != mTeam) {
-                        return mLoc.directionTo(ri.location);
-                    } else {
-                        opEc = ri.location.directionTo(mLoc);
-                        moves = 30;
-                    }
+        for (RobotInfo ri: rc.senseNearbyRobots()) {
+            if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
+                if (ri.team != mTeam) {
+                    return mLoc.directionTo(ri.location);
+                } else {
+                    opEc = ri.location.directionTo(mLoc);
+                    moves = 30;
                 }
             }
         }
-        Direction grid = GridHelper.getDirectionFromAdjacentFlags(mLoc);
-        return grid != null ? grid : getRandomDirection();
+        opEc = getRandomDirection();
+        moves = 200;
+        return opEc;
     }
 
     public static EcInfo checkForAttackCoordinates() throws GameActionException {

@@ -1,7 +1,6 @@
 package gen5;
 
 import battlecode.common.*;
-import gen5.helpers.GridHelper;
 import gen5.util.EcInfo;
 
 import static gen5.RobotPlayer.*;
@@ -52,10 +51,18 @@ public strictfp class Muckraker {
         return null;
     }
 
+    private static Direction con = null;
+    private static int rounds = 0;
     public static Direction getNextDirection() throws GameActionException {
-        MapLocation mLoc = rc.getLocation();
-        Direction grid = GridHelper.getDirectionFromAdjacentFlags(mLoc);
-        return grid != null ? grid : getRandomDirection();
+        if (con == null || rounds == 0) {
+            con = getRandomDirection();
+            rounds = 200;
+        }
+        if (!rc.onTheMap(rc.getLocation().add(con))) {
+            con = con.rotateLeft();
+        }
+        rounds--;
+        return con;
     }
 
 
