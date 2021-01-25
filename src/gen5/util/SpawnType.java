@@ -1,5 +1,6 @@
 package gen5.util;
 
+import gen5.EnlightenmentCenter;
 import gen5.helpers.SpawnHelper;
 
 import static gen5.RobotPlayer.*;
@@ -7,7 +8,7 @@ import static gen5.RobotPlayer.*;
 
 public enum SpawnType {
     AttackPolitician( 61, 1000),
-    DefensePolitician(14, 60),
+    DefensePolitician(16, 60),
     GridPolitician( 1, 1),
     Muckraker(1, 5),
     BuffMuckraker(600,600),
@@ -28,37 +29,44 @@ public enum SpawnType {
             if (roundNumber == 1) return SpawnType.Slanderer;
             return SpawnType.DefensePolitician;
         } else if (roundNumber < 120) {
+            if (roundNumber % 40 == 0) {
+                return Muckraker;
+            }
             switch (roundNumber % 6) {
-                case 1: return SpawnType.DefensePolitician;
-                case 3: return SpawnType.Slanderer;
-                default : return SpawnType.GridPolitician;
+                case 1: return DefensePolitician;
+                case 3: return Slanderer;
+                default : return GridPolitician;
             }
         } else {
             if (haveWonInVotes) {
-                return SpawnType.FillerMuckraker;
+                return FillerMuckraker;
+            }
+            if (rc.getConviction() > 1650 && !hasSpawnedBuffed) {
+                hasSpawnedBuffed = true;
+                return BuffMuckraker;
+            }
+            if (EnlightenmentCenter.buffMuckApproachDirection != null) {
+                return DefensePolitician;
             }
             switch (roundNumber % 11) {
                 case 2:
                 case 7:
                 case 10:
                     if (SpawnHelper.getWeakDirections().length > 0) {
-                        return SpawnType.DefensePolitician;
+                        return DefensePolitician;
                     }
-                    return SpawnType.Slanderer;
+                    return Slanderer;
                 case 3:
                 case 6:
                     if (roundNumber < 300) {
-                        return SpawnType.Muckraker;
+                        return Muckraker;
                     }
                     return SpawnType.GridPolitician;
                 default:
                     if (targetEc != null && targetEc.enemy) {
-                        if (rc.getConviction() > 1650 && !hasSpawnedBuffed) {
-                            hasSpawnedBuffed = true;
-                            return SpawnType.BuffMuckraker;
-                        } else if (muckrakersSpawned < 15) {
+                        if (muckrakersSpawned < 10) {
                             muckrakersSpawned++;
-                            return SpawnType.Muckraker;
+                            return Muckraker;
                         }
                     }
                     if (targetEc != null && roundNumber < 600) {

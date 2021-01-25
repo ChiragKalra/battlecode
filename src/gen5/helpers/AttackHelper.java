@@ -111,7 +111,7 @@ public class AttackHelper {
             for (RobotInfo ri: nearby) {
                 if (
                         ri.team != mTeam && ri.type != RobotType.ENLIGHTENMENT_CENTER &&
-                                (ri.conviction <= (mHp-10)*5 || rc.getInfluence() == SpawnType.DefensePolitician.maxHp)
+                                (ri.conviction <= (mHp-10)*6 || rc.getInfluence() == SpawnType.DefensePolitician.maxHp)
                 ) {
                     if (ri.conviction < each) {
                         kills++;

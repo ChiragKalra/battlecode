@@ -37,7 +37,7 @@ public strictfp class EnlightenmentCenter {
         if (got != null) {
             switch (got) {
                 case BuffMuckraker:
-                    spawned = spawnMuckraker(targetEC.location, true);
+                    spawned = spawnMuckraker(targetEC == null ? null : targetEC.location, true);
                     break;
                 case AttackPolitician:
                     spawned = spawnAttackPolitician(targetEC.location, targetEC.hp);
@@ -171,8 +171,8 @@ public strictfp class EnlightenmentCenter {
             RATIO_UNITS += RATIO_BID;
         } else if (rc.getRoundNum() >= 150 && rc.canBid(bet)) {
             rc.bid(bet);
-        } else if (rc.canBid(1)){
-            rc.bid(1);
+        } else if (rc.canBid(2)){
+            rc.bid(2);
         }
 
         EcInfo got = checkForAttackCoordinates();
