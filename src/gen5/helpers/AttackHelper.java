@@ -4,6 +4,7 @@ import battlecode.common.*;
 import gen5.flags.GridPoliticianFlag;
 import gen5.util.EcInfo;
 import gen5.util.Pair;
+import gen5.util.SpawnType;
 
 import java.util.HashMap;
 
@@ -106,9 +107,12 @@ public class AttackHelper {
             RobotInfo[] nearby = rc.senseNearbyRobots(rad);
             if (nearby.length == 0) continue;
             int damage = (int) (rc.getConviction()*empFac-10),
-                    each = damage/nearby.length, kills = 0, damageDone = 0;
+                    each = damage/nearby.length, kills = 0, damageDone = 0, mHp = rc.getConviction();
             for (RobotInfo ri: nearby) {
-                if (ri.team != mTeam && ri.type != RobotType.ENLIGHTENMENT_CENTER && ri.conviction <= rc.getConviction()*3) {
+                if (
+                        ri.team != mTeam && ri.type != RobotType.ENLIGHTENMENT_CENTER &&
+                                (ri.conviction <= (mHp-10)*5 || rc.getInfluence() == SpawnType.DefensePolitician.maxHp)
+                ) {
                     if (ri.conviction < each) {
                         kills++;
                         damageDone += ri.conviction + 1;

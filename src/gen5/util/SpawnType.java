@@ -2,7 +2,6 @@ package gen5.util;
 
 import battlecode.common.GameActionException;
 
-import gen5.EnlightenmentCenter;
 import gen5.helpers.SpawnHelper;
 
 import static gen5.RobotPlayer.*;
@@ -10,7 +9,7 @@ import static gen5.RobotPlayer.*;
 
 public enum SpawnType {
     AttackPolitician( 61, 1000),
-    DefensePolitician(18, 60),
+    DefensePolitician(14, 60),
     GridPolitician( 1, 1),
     Muckraker(1, 5),
     BuffMuckraker(600,600),

@@ -38,11 +38,12 @@ public class SpawnHelper {
             0, 8, 12, 16, 20, 28, 32, 40, 44, 48, 56, 60, 68, 72, 76, 84, 88, 96,
             100, 104, 112, 116, 124, 128, 132, 140, 144, 152, 156, 164, 168, 172, 180,
     };
-
+/*
     private static final int[] sectorQuantity = {
             0, 8, 20, 36, 56, 84, 116, 156, 200, 248, 304, 364, 432, 504, 580, 664, 752, 848, 948,
             1052, 1164, 1280, 1404, 1532, 1664, 1804, 1948, 2100, 2256, 2420, 2588, 2760, 2940,
-     };
+    };
+*/
 
     private static int blockedRounds = 0;
     public static boolean shouldIncrementWallRadius() {
@@ -121,7 +122,7 @@ public class SpawnHelper {
             if (politiciansCount[0] < required) {
                 return shouldDecrementRadius = true;
             }
-        } else if (!edgeAtDirection[0] && !edgeAtDirection[1]) {
+        } else if (!edgeAtDirection[0]) {
             if (politiciansCount[0] < each) {
                 return shouldDecrementRadius = true;
             }
@@ -140,7 +141,7 @@ public class SpawnHelper {
             if (politiciansCount[1] < required) {
                 return shouldDecrementRadius = true;
             }
-        } else if (!edgeAtDirection[2] && !edgeAtDirection[1]) {
+        } else if (!edgeAtDirection[2]) {
             if (politiciansCount[1] < each) {
                 return shouldDecrementRadius = true;
             }
@@ -159,7 +160,7 @@ public class SpawnHelper {
             if (politiciansCount[2] < required) {
                 return shouldDecrementRadius = true;
             }
-        } else if (!edgeAtDirection[2] && !edgeAtDirection[3]) {
+        } else if (!edgeAtDirection[2]) {
             if (politiciansCount[2] < each) {
                 return shouldDecrementRadius = true;
             }
@@ -178,7 +179,7 @@ public class SpawnHelper {
             if (politiciansCount[3] < required) {
                 return shouldDecrementRadius = true;
             }
-        } else if (!edgeAtDirection[0] && !edgeAtDirection[3]) {
+        } else if (!edgeAtDirection[0]) {
             if (politiciansCount[3] < each) {
                 return shouldDecrementRadius = true;
             }

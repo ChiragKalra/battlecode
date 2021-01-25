@@ -10,8 +10,19 @@ import static gen5.flags.EnlightenmentCenterFlag.getShiftDirection;
 import static gen5.helpers.AttackHelper.*;
 import static gen5.helpers.DefenseHelper.*;
 import static gen5.helpers.MovementHelper.goTo;
+import static gen5.helpers.MovementHelper.tryMove;
 
 public strictfp class DefensePolitician {
+
+    private static void approachOrEmpowerMuck (int radius) throws GameActionException {
+        Direction d = getApproachDirection();
+        if (d == null) {
+            rc.empower(radius);
+        } else {
+            tryMove(d, true);
+        }
+    }
+
     public static int radius;
 
     public static void move() throws GameActionException {
@@ -73,7 +84,7 @@ public strictfp class DefensePolitician {
         if (rad != 0 && spawnType == SpawnType.DefensePolitician) {
             // only >= third layer will explode normally (except when a muckraker is adjacent)
             if (isOutsideWall || muckrakerAdjacent) {
-                rc.empower(rad);
+                approachOrEmpowerMuck(rad);
                 return;
             }
 
@@ -83,13 +94,13 @@ public strictfp class DefensePolitician {
                 int defensePoliticianCount = (isDefensePolitician(straight) ? 1 : 0) + (isDefensePolitician(left) ? 1 : 0) +
                                                 (isDefensePolitician(right) ? 1 : 0);
                 if (defensePoliticianCount < 2) {
-                    rc.empower(rad);
+                    approachOrEmpowerMuck(rad);
                 }
                 return;
             }
 
             // politicians inside the wall will explode
-            rc.empower(rad);
+            approachOrEmpowerMuck(rad);
             return;
         }
 

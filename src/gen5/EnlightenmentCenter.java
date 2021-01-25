@@ -28,6 +28,7 @@ public strictfp class EnlightenmentCenter {
     public static int[] edgeDistance = new int[4];
     public static Direction shiftedTunnel = Direction.CENTER;
     public static EcInfo targetEC;
+    public static Direction buffMuckApproachDirection = null;
 
 
     private static boolean spawnOptimal() throws GameActionException {
@@ -159,62 +160,7 @@ public strictfp class EnlightenmentCenter {
 
     }
 
-
-    private static MapLocation[] relativeLocations;
-    private static int cachedRadius = 0, ptr = 0;
-
-    public static MapLocation[] getCircumferencePoints (MapLocation center, int radiusSquared) {
-        int rad = (int) Math.sqrt(radiusSquared);
-        if (relativeLocations == null || cachedRadius != radiusSquared) {
-            relativeLocations = new MapLocation[300];
-            ptr = 0;
-            for (int x = 1; x <= rad; x++) {
-                int limY = (int) Math.sqrt(radiusSquared - x*x);
-                relativeLocations[ptr++] = new MapLocation(x, limY);
-                relativeLocations[ptr++] = new MapLocation(x, -limY);
-                relativeLocations[ptr++] = new MapLocation(-x, limY);
-                relativeLocations[ptr++] = new MapLocation(-x, -limY);
-
-                int c = radiusSquared - (x*x + 2*x + 1);
-                for (int y = 1-limY; y*y > c && y < 0; y++) {
-                    relativeLocations[ptr++] = new MapLocation(x, y);
-                    relativeLocations[ptr++] = new MapLocation(x, -y);
-                    relativeLocations[ptr++] = new MapLocation(-x, y);
-                    relativeLocations[ptr++] = new MapLocation(-x, -y);
-                }
-            }
-            relativeLocations[ptr++] = new MapLocation(rad, 0);
-            relativeLocations[ptr++] = new MapLocation(-rad, 0);
-            relativeLocations[ptr++] = new MapLocation(0, rad);
-            relativeLocations[ptr++] = new MapLocation(0, -rad);
-            cachedRadius = radiusSquared;
-        }
-        MapLocation[] ret = new MapLocation[ptr];
-        for (int i = 0; i < ptr; i++) {
-            ret[i] = new MapLocation(center.x + relativeLocations[i].x, center.y + relativeLocations[i].y);
-        }
-        return ret;
-    }
-
-
     public static void move() throws GameActionException {
-         if (roundNumber == 1) {
-            StringBuilder sb = new StringBuilder("{ ");
-            StringBuilder sbp = new StringBuilder("{ ");
-            int sum = 0;
-            for (int i = 1; i <= 32; i++) {
-                int len = getCircumferencePoints(rc.getLocation(), i * i + 1).length;
-                sb.append(len).append(", ");
-                sum += len;
-                sbp.append(sum).append(", ");
-            }
-            sb.append("}");
-            sbp.append("}");
-            log (sb.toString());
-            log (sbp.toString());
-        }
-
-
         if (rc.isReady()) {
             spawnOptimal();
         }
