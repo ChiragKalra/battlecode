@@ -13,7 +13,7 @@ public strictfp class Muckraker {
     private static Direction getAntiCrowdingDirection(MapLocation current) {
         byte[] occupied = new byte[8];
         int total = 0;
-        for (RobotInfo ri : rc.senseNearbyRobots(sensorRadius, mTeam)) {
+        for (RobotInfo ri : rc.senseNearbyRobots(actionRadius, mTeam)) {
             if (ri.type == RobotType.MUCKRAKER) {
                 occupied[directionList.indexOf(current.directionTo(ri.location))]++;
                 total++;
