@@ -106,12 +106,14 @@ public class SpawnHelper {
         Iterator<Integer> iter = defencePoliticians.iterator();
         while (iter.hasNext()) {
             int id = iter.next();
+            // log(Integer.toString(id));
             if (!rc.canGetFlag(id)) {
                 iter.remove();
                 continue;
             }
 
             int flag = rc.getFlag(id);
+            // log(Integer.toBinaryString(flag));
 
             if (DefensePoliticianFlag.hasChangedEc(flag)) {
                 iter.remove();
@@ -131,26 +133,27 @@ public class SpawnHelper {
             ++politiciansCount[getBits(flag, 3, 2)];
         }
 
-
-
         buffMuckApproachDirection = buffMuckraker;
 
-       /* System.out.println(currentRadius);
-        for (int i = 0; i < 4; ++i)
-            System.out.println(politiciansCount[i]);
-*/
         shouldDecrementRadius = false;
-        int each = (layerQuantity[currentRadius] - 4) / 4 + (layerQuantity[currentRadius + 1] - 4) / 4;
+        int each = (layerQuantity[currentRadius] - 4) / 4;
+        // String s = "";
+        // for (int i = 0; i < 4; ++i) {
+        //     s += Integer.toString(politiciansCount[i]);
+        //     s += " ";
+        // }
+        // log(s + " " + Integer.toString(currentRadius) + " " + Integer.toString(each));
+
         // North-east
         if (edgeAtDirection[0] && !edgeAtDirection[1]) {
             int edgeDist = edgeDistance[0] - shiftedTunnel.dy;
-            int required = edgeDist * 2;
+            int required = edgeDist;
             if (politiciansCount[0] < required) {
                 return shouldDecrementRadius = true;
             }
         } else if (!edgeAtDirection[0] && edgeAtDirection[1]) {
             int edgeDist = edgeDistance[1] - shiftedTunnel.dx;
-            int required = edgeDist * 2;
+            int required = edgeDist;
             if (politiciansCount[0] < required) {
                 return shouldDecrementRadius = true;
             }
@@ -163,13 +166,13 @@ public class SpawnHelper {
         // South-east
         if (edgeAtDirection[2] && !edgeAtDirection[1]) {
             int edgeDist = edgeDistance[2] + shiftedTunnel.dy;
-            int required = edgeDist * 2;
+            int required = edgeDist;
             if (politiciansCount[1] < required) {
                 return shouldDecrementRadius = true;
             }
         } else if (!edgeAtDirection[2] && edgeAtDirection[1]) {
             int edgeDist = edgeDistance[1] - shiftedTunnel.dx;
-            int required = edgeDist * 2;
+            int required = edgeDist;
             if (politiciansCount[1] < required) {
                 return shouldDecrementRadius = true;
             }
@@ -182,13 +185,13 @@ public class SpawnHelper {
         // South-west
         if (edgeAtDirection[2] && !edgeAtDirection[3]) {
             int edgeDist = edgeDistance[2] + shiftedTunnel.dy;
-            int required = edgeDist * 2;
+            int required = edgeDist;
             if (politiciansCount[2] < required) {
                 return shouldDecrementRadius = true;
             }
         } else if (!edgeAtDirection[2] && edgeAtDirection[3]) {
             int edgeDist = edgeDistance[3] + shiftedTunnel.dx;
-            int required = edgeDist * 2;
+            int required = edgeDist;
             if (politiciansCount[2] < required) {
                 return shouldDecrementRadius = true;
             }
@@ -201,13 +204,13 @@ public class SpawnHelper {
         // North-west
         if (edgeAtDirection[0] && !edgeAtDirection[3]) {
             int edgeDist = edgeDistance[0] - shiftedTunnel.dy;
-            int required = edgeDist * 2;
+            int required = edgeDist;
             if (politiciansCount[3] < required) {
                 return shouldDecrementRadius = true;
             }
         } else if (!edgeAtDirection[0] && edgeAtDirection[3]) {
             int edgeDist = edgeDistance[3] + shiftedTunnel.dx;
-            int required = edgeDist * 2;
+            int required = edgeDist;
             if (politiciansCount[3] < required) {
                 return shouldDecrementRadius = true;
             }

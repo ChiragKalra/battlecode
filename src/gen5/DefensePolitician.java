@@ -78,8 +78,9 @@ public strictfp class DefensePolitician {
         Direction left = straight.rotateLeft();
         Direction right = straight.rotateRight();
 
-        boolean onInnerWall = isWallOfRadius(spawnerLocation, rc.getLocation(), innerRadius);
-        boolean onOuterWall = isWallOfRadius(spawnerLocation, rc.getLocation(), outerRadius);
+        MapLocation center = new MapLocation(spawnerLocation.x + tunnelShift.dx, spawnerLocation.y + tunnelShift.dy);
+        boolean onInnerWall = isWallOfRadius(center, rc.getLocation(), innerRadius);
+        boolean onOuterWall = isWallOfRadius(center, rc.getLocation(), outerRadius);
         boolean isOnWall = onInnerWall || onOuterWall;
         boolean isOutsideWall = outsideWall(rc.getLocation(), outerRadius);
 

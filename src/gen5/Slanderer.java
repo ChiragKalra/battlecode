@@ -31,6 +31,9 @@ public strictfp class Slanderer {
                 MovementHelper.tryMove(opposite, false);
                 return;
             }
+            if (spawnerLocation == null) {
+                return;
+            }
 
             opposite = rc.getLocation().directionTo(spawnerLocation).opposite();
             Direction oppLeft = opposite.rotateLeft();
