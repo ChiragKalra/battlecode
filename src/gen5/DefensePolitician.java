@@ -9,8 +9,7 @@ import static gen5.RobotPlayer.*;
 import static gen5.flags.EnlightenmentCenterFlag.*;
 import static gen5.helpers.AttackHelper.*;
 import static gen5.helpers.DefenseHelper.*;
-import static gen5.helpers.MovementHelper.goTo;
-import static gen5.helpers.MovementHelper.tryMove;
+import static gen5.helpers.MovementHelper.*;
 
 public strictfp class DefensePolitician {
 
@@ -63,8 +62,16 @@ public strictfp class DefensePolitician {
         if (rc.canGetFlag(enlightenmentCenterId)) {
             int flag = rc.getFlag(enlightenmentCenterId);
             radius = getRadius(flag);
-            Direction got = getWeakWallDirection(flag);
-            if (got != null) {
+
+            MapLocation now = rc.getLocation();
+            Direction got = getWeakWallDirection(flag),
+                    quadrant = (new MapLocation(0,0)).directionTo(
+                            new MapLocation(
+                                    spawnerLocation.x < now.x ? 1 : -1,
+                                    spawnerLocation.y < now.y ? 1 : -1
+                                    )
+                    );
+            if (got != null && !got.equals(quadrant)) {
                 goTo(spawnerLocation.translate(got.dx * radius, got.dy * radius));
                 return;
             }
