@@ -74,13 +74,19 @@ public class SpawnHelper {
 
     private static int roundCached = 0;
     private static boolean shouldDecrementRadius = false;
-    public static int[] less = null;
     public static boolean shouldDecrementWallRadius() throws GameActionException {
         // return defencePoliticians.getSize() < 7*currentRadius*(directionsBlocked/4.0);
         if (roundCached == roundNumber) {
             return shouldDecrementRadius;
         }
         roundCached = roundNumber;
+
+        if (currentRadius >= LIMIT_WALL_RADIUS) {
+            return shouldDecrementRadius = true;
+        }
+        if (currentRadius <= 6) {
+            return shouldDecrementRadius = false;
+        }
 
         for (RobotInfo ri: rc.senseNearbyRobots(RobotType.POLITICIAN.sensorRadiusSquared, mTeam)) {
             if (ri.type == RobotType.POLITICIAN && ri.influence >= SpawnType.DefensePolitician.minHp &&
@@ -131,27 +137,23 @@ public class SpawnHelper {
 
         shouldDecrementRadius = false;
         int each = (layerQuantity[currentRadius] - 4) / 4;
-        less = new int[4];
 
         // North-east
         if (edgeAtDirection[0] && !edgeAtDirection[1]) {
             int edgeDist = edgeDistance[0] - shiftedTunnel.dy;
             int required = edgeDist;
-            less[0] = required - politiciansCount[0];
             if (politiciansCount[0] < required) {
-                shouldDecrementRadius = true;
+                return shouldDecrementRadius = true;
             }
         } else if (!edgeAtDirection[0] && edgeAtDirection[1]) {
             int edgeDist = edgeDistance[1] - shiftedTunnel.dx;
             int required = edgeDist;
-            less[0] = required - politiciansCount[0];
             if (politiciansCount[0] < required) {
-                shouldDecrementRadius = true;
+                return shouldDecrementRadius = true;
             }
         } else if (!edgeAtDirection[0]) {
-            less[0] = each - politiciansCount[0];
             if (politiciansCount[0] < each) {
-                shouldDecrementRadius = true;
+                return shouldDecrementRadius = true;
             }
         }
 
@@ -159,21 +161,18 @@ public class SpawnHelper {
         if (edgeAtDirection[2] && !edgeAtDirection[1]) {
             int edgeDist = edgeDistance[2] + shiftedTunnel.dy;
             int required = edgeDist;
-            less[1] = required - politiciansCount[1];
             if (politiciansCount[1] < required) {
-                shouldDecrementRadius = true;
+                return shouldDecrementRadius = true;
             }
         } else if (!edgeAtDirection[2] && edgeAtDirection[1]) {
             int edgeDist = edgeDistance[1] - shiftedTunnel.dx;
             int required = edgeDist;
-            less[1] = required - politiciansCount[1];
             if (politiciansCount[1] < required) {
-                shouldDecrementRadius = true;
+                return shouldDecrementRadius = true;
             }
         } else if (!edgeAtDirection[2]) {
-            less[1] = each - politiciansCount[1];
             if (politiciansCount[1] < each) {
-                shouldDecrementRadius = true;
+                return shouldDecrementRadius = true;
             }
         }
 
@@ -181,21 +180,18 @@ public class SpawnHelper {
         if (edgeAtDirection[2] && !edgeAtDirection[3]) {
             int edgeDist = edgeDistance[2] + shiftedTunnel.dy;
             int required = edgeDist;
-            less[2] = required - politiciansCount[2];
             if (politiciansCount[2] < required) {
-                shouldDecrementRadius = true;
+                return shouldDecrementRadius = true;
             }
         } else if (!edgeAtDirection[2] && edgeAtDirection[3]) {
             int edgeDist = edgeDistance[3] + shiftedTunnel.dx;
             int required = edgeDist;
-            less[2] = required - politiciansCount[2];
             if (politiciansCount[2] < required) {
-                shouldDecrementRadius = true;
+                return shouldDecrementRadius = true;
             }
         } else if (!edgeAtDirection[2]) {
-            less[2] = each - politiciansCount[2];
             if (politiciansCount[2] < each) {
-                shouldDecrementRadius = true;
+                return shouldDecrementRadius = true;
             }
         }
 
@@ -203,33 +199,22 @@ public class SpawnHelper {
         if (edgeAtDirection[0] && !edgeAtDirection[3]) {
             int edgeDist = edgeDistance[0] - shiftedTunnel.dy;
             int required = edgeDist;
-            less[3] = required - politiciansCount[3];
             if (politiciansCount[3] < required) {
-                shouldDecrementRadius = true;
+                return shouldDecrementRadius = true;
             }
         } else if (!edgeAtDirection[0] && edgeAtDirection[3]) {
             int edgeDist = edgeDistance[3] + shiftedTunnel.dx;
             int required = edgeDist;
-            less[3] = required - politiciansCount[3];
             if (politiciansCount[3] < required) {
-                shouldDecrementRadius = true;
+                return shouldDecrementRadius = true;
             }
         } else if (!edgeAtDirection[0]) {
-            less[3] = each - politiciansCount[3];
             if (politiciansCount[3] < each) {
-                shouldDecrementRadius = true;
+                return shouldDecrementRadius = true;
             }
         }
-
         defensePoliticiansInDirection = politiciansCount;
-
-        if (currentRadius >= LIMIT_WALL_RADIUS) {
-            shouldDecrementRadius = true;
-        } else if (currentRadius <= 6) {
-            shouldDecrementRadius = false;
-        }
-
-        return shouldDecrementRadius;
+        return false;
     }
 
     private static int spawnDirectionGridPol = 0;
@@ -423,4 +408,5 @@ public class SpawnHelper {
         }
         return null;
     }
+
 }

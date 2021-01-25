@@ -10,7 +10,6 @@ import static gen5.flags.EnlightenmentCenterFlag.*;
 import static gen5.helpers.AttackHelper.*;
 import static gen5.helpers.DefenseHelper.*;
 import static gen5.helpers.MovementHelper.*;
-import static gen5.util.Functions.getBits;
 
 public strictfp class DefensePolitician {
 
@@ -112,7 +111,6 @@ public strictfp class DefensePolitician {
             return;
         }
 
-
         if (buffMuckrakerDirection != null) {
             goTo(
                 spawnerLocation.translate(
@@ -121,50 +119,6 @@ public strictfp class DefensePolitician {
                 )
             );
             return;
-        }
-
-        if (getBits(flag, 10, 10) == 1) {
-            MapLocation now = rc.getLocation();
-            int weakQuadrant = getBits(flag, 12, 11);
-            int strongQuadrant = getBits(flag, 14, 13);
-            int quadrant;
-            if (spawnerLocation.x < now.x) {
-                if (spawnerLocation.y < now.y) {
-                    quadrant = 0;
-                } else {
-                    quadrant = 1;
-                }
-            } else {
-                if (spawnerLocation.y < now.y) {
-                    quadrant = 3;
-                } else {
-                    quadrant = 2;
-                }
-            }
-             // = (new MapLocation(0,0)).directionTo(
-             //                new MapLocation(
-             //                        spawnerLocation.x < now.x ? 1 : -1,
-             //                        spawnerLocation.y < now.y ? 1 : -1
-             //                        )
-             //        );
-            // if (got != null && !got.equals(quadrant)) {
-            //     goTo(spawnerLocation.translate(got.dx * radius, got.dy * radius));
-            //     return;
-            // }
-
-            Direction got = Direction.NORTHEAST;
-            if (quadrant == 1) {
-                got = Direction.SOUTHEAST;
-            } else if (quadrant == 2) {
-                got = Direction.SOUTHWEST;
-            } else if (quadrant == 3) {
-                got = Direction.NORTHWEST;
-            }
-
-            if (quadrant != weakQuadrant) {
-                goTo(spawnerLocation.translate(got.dx * 4, got.dy * 4));
-                return;
-            }
         }
 
         if (isOnWall) {
