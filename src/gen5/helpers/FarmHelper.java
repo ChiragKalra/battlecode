@@ -10,7 +10,7 @@ import static gen5.util.Functions.convolveCircularly;
 
 public class FarmHelper {
 	private static Direction antiMuckDirection = null;
-    private static int roundsRunning = 0;
+    private static int roundStarted = 0;
 
     public static Direction getAntiEcOrMuckDirection() {
         MapLocation current = rc.getLocation();
@@ -60,9 +60,8 @@ public class FarmHelper {
 
         if (!found) {
             if (antiMuckDirection != null) {
-                if (roundsRunning >= 6) {
+                if (roundNumber - roundStarted > 15) {
                     antiMuckDirection = null;
-                    roundsRunning = 0;
                     return null;
                 }
                 return antiMuckDirection;
@@ -80,7 +79,7 @@ public class FarmHelper {
             }
         }
 
-        roundsRunning = 0;
+        roundStarted = roundNumber;
         return antiMuckDirection;
     }
 
@@ -98,14 +97,6 @@ public class FarmHelper {
             rc.move(dir.rotateLeft());
         } else if (right > 0 && right >= straight && right >= left) {
             rc.move(dir.rotateRight());
-        } else {
-        	return;
-        }
-
-        ++roundsRunning;
-        if (roundsRunning >= 6) {
-        	roundsRunning = 0;
-        	antiMuckDirection = null;
         }
     }
 }

@@ -82,10 +82,10 @@ public class SpawnHelper {
         roundCached = roundNumber;
 
         if (currentRadius >= LIMIT_WALL_RADIUS) {
-            return true;
+            return shouldDecrementRadius = true;
         }
         if (currentRadius <= 6) {
-            return false;
+            return shouldDecrementRadius = false;
         }
 
         // 0 - NE, 1 - SE, 2 - SW, 3 - NW
