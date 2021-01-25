@@ -29,6 +29,9 @@ public class DefenseHelper {
 		// check if it's a grid location, allow the grid pols to occupy
 		if (GridHelper.formsGrid()) return true;
 
+		if (spawnerLocation == null) {
+			return false;
+		}
 		return ml.x == spawnerLocation.x + tunnelShift.dx || ml.y == spawnerLocation.y + tunnelShift.dy;
 	}
 
@@ -53,11 +56,17 @@ public class DefenseHelper {
     	return false;
     }
 
-	public static boolean onWall(MapLocation ml, int innerRadius, int outerRadius)  {
+	public static boolean onWall(MapLocation ml, int innerRadius, int outerRadius) {
+		if (spawnerLocation == null) {
+			return false;
+		}
 		return isWallOfRadius(spawnerLocation, ml, innerRadius) || isWallOfRadius(spawnerLocation, ml, outerRadius);
 	}
 
 	public static boolean isWallOfRadius(MapLocation center, MapLocation ml, int rs) {
+		if (center == null || ml == null) {
+			return false;
+		}
 		if (!center.isWithinDistanceSquared(ml, rs)) return false;
 		int x = Math.abs(ml.x-center.x), y = (int) Math.sqrt(rs-x*x);
 		int abs = Math.abs(ml.y - center.y);
@@ -66,6 +75,9 @@ public class DefenseHelper {
 	}
 
     public static boolean outsideWall(MapLocation ml, int outerRadius) {
+    	if (spawnerLocation == null) {
+    		return false;
+    	}
     	return ml.distanceSquaredTo(spawnerLocation) > outerRadius;
     }
 

@@ -67,6 +67,9 @@ public class DefensePoliticianFlag {
 	}
 
     private static int getQuadrant() {
+    	if (spawnerLocation == null) {
+    		return 0;
+    	}
     	MapLocation origin = new MapLocation(spawnerLocation.x + tunnelShift.dx, spawnerLocation.y + tunnelShift.dy);
     	if (rc.getLocation().y > origin.y) {
     		return rc.getLocation().x > origin.x ? 0 : 3;
