@@ -17,10 +17,10 @@ public strictfp class Slanderer {
             return;
         }
 
-        if (spawnerLocation == null) {
-            MovementHelper.tryMove(MovementHelper.getRandomDirection(), false);
-            return;
-        }
+        // if (spawnerLocation == null) {
+        //     MovementHelper.tryMove(MovementHelper.getRandomDirection(), false);
+        //     return;
+        // }
 
         int radius;
         if (rc.canGetFlag(enlightenmentCenterId)) {
