@@ -1,22 +1,24 @@
 package gen5.flags;
 
-import battlecode.common.Clock;
 import battlecode.common.Direction;
 import battlecode.common.GameActionException;
-import gen5.util.Logger;
+import gen5.helpers.MovementHelper;
 
-import static gen5.EnlightenmentCenter.shiftedTunnel;
-import static gen5.RobotPlayer.log;
+import static gen5.EnlightenmentCenter.*;
 import static gen5.RobotPlayer.rc;
-import static gen5.EnlightenmentCenter.currentRadius;
-import static gen5.helpers.SpawnHelper.*;
-import static gen5.helpers.MovementHelper.*;
+import static gen5.helpers.MovementHelper.directionList;
+import static gen5.helpers.MovementHelper.directions;
+import static gen5.helpers.SpawnHelper.shouldDecrementWallRadius;
+import static gen5.helpers.SpawnHelper.shouldIncrementWallRadius;
+import static gen5.util.Functions.getBits;
+import static gen5.util.Functions.setBits;
 
 /*
  # EC flag
  0-5	- wall radius
  6-9    - tunnel reference shift direction
- 9-23	- vacant
+ 10-20  - Vacant
+ 20-23	- Buff Muck Direction
  */
 
 public class EnlightenmentCenterFlag {
@@ -30,6 +32,12 @@ public class EnlightenmentCenterFlag {
 	    if (dirInt == 8) return Direction.CENTER;
 		return directions[dirInt];
 	}
+
+    public static Direction getBuffMuckrakerDirection (int flag) {
+        int dirInt = getBits(flag, 23, 20);
+        if (dirInt == 0) return null;
+        return MovementHelper.directions[dirInt-1];
+    }
 
     // check for flag changes and set flag
     public static void updateFlag() throws GameActionException {
@@ -48,6 +56,13 @@ public class EnlightenmentCenterFlag {
             shiftInt = directionList.indexOf(shiftedTunnel);
         }
         newFlag += shiftInt << 6;
+
+
+        int dirInt = 0;
+        if (buffMuckApproachDirection != null) {
+            dirInt = MovementHelper.directionList.indexOf(buffMuckApproachDirection) + 1;
+        }
+        newFlag = setBits(newFlag, 23, 20, dirInt);
 
         if (prevFlag != newFlag) {
             rc.setFlag(newFlag);

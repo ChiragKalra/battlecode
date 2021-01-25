@@ -226,7 +226,7 @@ public class SpawnHelper {
         while (edgeAtDirection[spawnDirectionGridPol/2]) {
             spawnDirectionGridPol = (spawnDirectionGridPol+2)%8;
         }
-        Direction got = getDirectionFromAdjacentFlags(rc.getLocation()),
+        Direction got = getDirectionFromAdjacentFlags(rc.getLocation(), rc.senseNearbyRobots(sensorRadius, mTeam)),
                 dir = getOptimalDirection(got != null ? got : directions[spawnDirectionGridPol]);
         if (dir == null ) {
             return false;

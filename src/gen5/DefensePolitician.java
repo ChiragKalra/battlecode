@@ -1,6 +1,7 @@
 package gen5;
 
 import battlecode.common.*;
+import gen5.flags.EnlightenmentCenterFlag;
 import gen5.util.Pair;
 import gen5.util.SpawnType;
 
@@ -15,6 +16,7 @@ import static gen5.helpers.MovementHelper.tryMove;
 public strictfp class DefensePolitician {
 
     public static int hasChangedEc = 0;
+    public static Direction buffMuckrakerDirection = null;
 
     private static void approachOrEmpowerMuck (int radius) throws GameActionException {
         Direction d = getApproachDirection();
@@ -25,7 +27,7 @@ public strictfp class DefensePolitician {
         }
     }
 
-    public static int radius;
+    public static int radius = 3;
 
     public static void move() throws GameActionException {
         for (RobotInfo ri: rc.senseNearbyRobots(sensorRadius, mTeam)) {
@@ -105,6 +107,17 @@ public strictfp class DefensePolitician {
 
             // politicians inside the wall will explode
             approachOrEmpowerMuck(rad);
+            return;
+        }
+
+
+        if (buffMuckrakerDirection != null) {
+            goTo(
+                spawnerLocation.translate(
+                    buffMuckrakerDirection.dx*(radius+1),
+                    buffMuckrakerDirection.dy*(radius+1)
+                )
+            );
             return;
         }
 
@@ -210,7 +223,9 @@ public strictfp class DefensePolitician {
 
     public static void init() throws GameActionException {
         if (rc.canGetFlag(enlightenmentCenterId)) {
-            tunnelShift = getShiftDirection(rc.getFlag(enlightenmentCenterId));
+            int flag = rc.getFlag(enlightenmentCenterId);
+            tunnelShift = getShiftDirection(flag);
+            buffMuckrakerDirection = EnlightenmentCenterFlag.getBuffMuckrakerDirection(flag);
         }
     }
 }

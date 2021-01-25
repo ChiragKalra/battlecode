@@ -29,6 +29,8 @@ public strictfp class GridPolitician {
             }
         }
 
+        RobotInfo[] fellow = rc.senseNearbyRobots(sensorRadius, mTeam);
+
         if (explodeRadius < 13 && spawnDirection != null) {
             if (!rc.onTheMap(rc.getLocation().add(spawnDirection))) {
                 spawnDirection = spawnDirection.rotateLeft();
@@ -40,7 +42,7 @@ public strictfp class GridPolitician {
             if (dir != null) {
                 tryMove(dir, true);
             } else {
-                dir = getNextDirection();
+                dir = getNextDirection(fellow);
                 if (dir != null) {
                     tryMove(dir, true);
                 }

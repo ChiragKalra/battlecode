@@ -50,7 +50,7 @@ public class GridHelper {
      *      3. no vacancies (select one random direction out of adjacent muckrakers)
      *
      */
-    public static Direction getGridDirectionForFlag() throws GameActionException {
+    public static Direction getGridDirectionForFlag(RobotInfo[] fellow) throws GameActionException {
         MapLocation current = rc.getLocation();
 
         // find adjacent vacancies
@@ -66,7 +66,7 @@ public class GridHelper {
         }
 
         // select random direction out of adjacent muckrakers
-        return getDirectionFromAdjacentFlags(current);
+        return getDirectionFromAdjacentFlags(current, fellow);
     }
 
     // check if current position is valid for grid formation
@@ -121,10 +121,9 @@ public class GridHelper {
      */
     private static Direction lastAdjFlag = null;
     private static int lastChange = 0;
-    public static Direction getNextDirection() throws GameActionException {
+    public static Direction getNextDirection(RobotInfo[] fellow) throws GameActionException {
         // direct away from ECs to not absorb damage by pols
         ArrayList<Direction> selected = new ArrayList<>();
-        RobotInfo[] fellow = rc.senseNearbyRobots(sensorRadius, mTeam);
         for (RobotInfo ri : fellow) {
             if (ri.type == RobotType.POLITICIAN && rc.canGetFlag(ri.getID())) {
                 int flag = rc.getFlag(ri.getID());
@@ -150,9 +149,8 @@ public class GridHelper {
     }
 
     // select random direction out of adjacent muckrakers
-    public static Direction getDirectionFromAdjacentFlags(MapLocation now) throws GameActionException {
+    public static Direction getDirectionFromAdjacentFlags(MapLocation now, RobotInfo[] nearby) throws GameActionException {
         ArrayList<Direction> selected = new ArrayList<>();
-        RobotInfo[] nearby = rc.senseNearbyRobots(sensorRadius, mTeam);
         for (RobotInfo ri: nearby) {
             int flag = rc.getFlag(ri.getID());
             if (ri.type == RobotType.POLITICIAN && isPlaced(flag)) {
@@ -207,7 +205,7 @@ public class GridHelper {
 
         //check in all 4 directions
         for (RobotInfo ri: rc.senseNearbyRobots(sensorRadius, mTeam)) {
-            if (ri.type == RobotType.POLITICIAN) {
+            if (ri.type == RobotType.POLITICIAN && rc.canGetFlag(ri.getID())) {
                 int flag = rc.getFlag(ri.getID());
                 if (isBroadcastingEC(flag)) {
                     MapLocation got = GridPoliticianFlag.getRelLocFromFlag(flag);

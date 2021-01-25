@@ -45,9 +45,9 @@ public class DefensePoliticianFlag {
 		}
 
     	Direction buffMuck = FarmHelper.directionToBuffMuck();
-    	int dirInt = 8;
+    	int dirInt = 0;
     	if (buffMuck != null) {
-    		dirInt = MovementHelper.directionList.indexOf(buffMuck);
+    		dirInt = MovementHelper.directionList.indexOf(buffMuck)+1;
 		}
     	newFlag = setBits(newFlag, 23, 20, dirInt);
 
@@ -62,8 +62,8 @@ public class DefensePoliticianFlag {
 
     public static Direction getBuffMuckrakerDirection (int flag) {
     	int dirInt = getBits(flag, 23, 20);
-    	if (dirInt == 8) return null;
-    	return MovementHelper.directions[dirInt];
+    	if (dirInt == 0) return null;
+    	return MovementHelper.directions[dirInt-1];
 	}
 
     private static int getQuadrant() {

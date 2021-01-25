@@ -74,7 +74,7 @@ public class GridPoliticianFlag {
         // set vacant grid location direction
         if (placed) {
             newFlag += 1;
-            Direction direction = getGridDirectionForFlag();
+            Direction direction = getGridDirectionForFlag(rc.senseNearbyRobots(sensorRadius, mTeam));
             if (direction != null) {
                 int threeBit = directionList.indexOf(direction);
                 newFlag += threeBit<<1;
