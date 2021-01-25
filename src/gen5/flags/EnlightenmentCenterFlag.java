@@ -17,7 +17,10 @@ import static gen5.util.Functions.setBits;
  # EC flag
  0-5	- wall radius
  6-9    - tunnel reference shift direction
- 10-20  - Vacant
+ 10     - whether wall is weak
+ 11-12  - quadrant where wall is weak
+ 13-14  - strong quadrant
+ 15-20  - Vacant
  20-23	- Buff Muck Direction
  */
 
@@ -51,6 +54,8 @@ public class EnlightenmentCenterFlag {
         int newFlag = 0;
         newFlag += currentRadius;
 
+        newFlag = setWeakWallDirection(newFlag);
+
         int shiftInt = 8;
         if (shiftedTunnel != Direction.CENTER) {
             shiftInt = directionList.indexOf(shiftedTunnel);
@@ -67,5 +72,39 @@ public class EnlightenmentCenterFlag {
         if (prevFlag != newFlag) {
             rc.setFlag(newFlag);
         }
+    }
+
+    public static int roundDetected = 0;
+    public static int strongQuadrant = -1;
+    public static Direction setWeakWallDirection(int flag) {
+        int minQuadrant = 0, maxQuadrant = 0;
+        int maxLess = -1000;
+        int maxExtra = 1000;
+        for (int i = 0; i < 4; ++i) {
+            if (less[i] > maxLess) {
+                if (minQuadrant == strongQuadrant && roundNumber - roundDetected > 50) {
+                    maxLess = less[i];
+                    minQuadrant = i;
+                } else if (minQuadrant != strongQuadrant) {
+                    maxLess = less[i];
+                    minQuadrant = i;
+                }
+            }
+            if (less[i] < maxExtra) {
+                maxExtra = less[i];
+                maxQuadrant = i;
+            }
+        }
+
+        if (less[minQuadrant] < 5) {
+            return flag = setBits(flag, 10, 10, 0);
+        }
+        
+        roundDetected = roundNumber;
+        strongQuadrant = maxQuadrant;
+        flag = setBits(flag, 10, 10, 1);
+        flag = setBits(flag, 12, 11, minQuadrant);
+        flag = setBits(flag, 14, 13, maxQuadrant);
+        return flag;
     }
 }
