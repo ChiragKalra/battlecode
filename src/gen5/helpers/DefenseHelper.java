@@ -1,9 +1,6 @@
 package gen5.helpers;
 
 import battlecode.common.*;
-import gen5.EnlightenmentCenter;
-import gen5.Muckraker;
-import gen5.util.Vector;
 
 import static gen5.RobotPlayer.*;
 
@@ -80,6 +77,7 @@ public class DefenseHelper {
     }
 
     public static Direction getApproachDirection () {
+		boolean detectedSlanderer = false;
 		int minHp = rc.getConviction(), friendRad = actionRadius+1, enemyRadius = actionRadius+1;
 		MapLocation current = rc.getLocation(), average = new MapLocation(0,0);
 		for (RobotInfo ri: rc.senseNearbyRobots(sensorRadius)) {
@@ -87,16 +85,22 @@ public class DefenseHelper {
 				if (ri.team == enemyTeam) {
 					enemyRadius = Math.min(current.distanceSquaredTo(ri.location), enemyRadius);
 					average = average.translate(ri.location.x-current.x, ri.location.y-current.y);
-					if (ri.location.isAdjacentTo(current)) {
+					if (ri.location.isWithinDistanceSquared(current, 1)) {
 						return null;
 					}
 				} else {
+					if (!detectedSlanderer) {
+						detectedSlanderer = ri.type == RobotType.SLANDERER;
+					}
 					friendRad = Math.min(current.distanceSquaredTo(ri.location), friendRad);
 					if (ri.type == RobotType.POLITICIAN) {
 						minHp = Math.min(minHp, ri.getConviction());
 					}
 				}
 			}
+		}
+		if (!detectedSlanderer) {
+			return null;
 		}
 		if (minHp != rc.getConviction()) {
 			return null;
