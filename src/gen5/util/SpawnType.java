@@ -2,6 +2,7 @@ package gen5.util;
 
 import battlecode.common.GameActionException;
 
+import gen5.EnlightenmentCenter;
 import gen5.helpers.SpawnHelper;
 
 import static gen5.RobotPlayer.*;
@@ -12,7 +13,7 @@ public enum SpawnType {
     DefensePolitician(18, 60),
     GridPolitician( 1, 1),
     Muckraker(1, 5),
-    BuffMuckraker(750,750),
+    BuffMuckraker(600,600),
     FillerMuckraker(25,25),
     Slanderer(21, 1000);
 
@@ -55,7 +56,7 @@ public enum SpawnType {
                     return SpawnType.GridPolitician;
                 default:
                     if (targetEc != null && targetEc.enemy) {
-                        if (rc.getConviction() > 3000 && !hasSpawnedBuffed) {
+                        if (rc.getConviction() > 1650 && !hasSpawnedBuffed) {
                             hasSpawnedBuffed = true;
                             return SpawnType.BuffMuckraker;
                         } else if (muckrakersSpawned < 15) {

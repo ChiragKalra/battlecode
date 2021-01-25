@@ -56,7 +56,7 @@ public class LinkedList<T> implements Iterable<T> {
         @Override
         public T next() {
             if (curr == null) {
-                curr = head.next;
+                curr = head;
             } else {
                 curr = curr.next;
             }
