@@ -59,6 +59,8 @@ public strictfp class Slanderer {
 
         Direction antiMuck = getAntiMuckDirection();
         if (antiMuck != null) {
+            // log(Integer.toString(roundNumber));
+            // log(antiMuck.toString());
             tryRun(antiMuck, innerRadius, outerRadius);
             return;
         }
