@@ -6,8 +6,7 @@ import gen5.util.Pair;
 import gen5.util.SpawnType;
 
 import static gen5.RobotPlayer.*;
-import static gen5.flags.EnlightenmentCenterFlag.getRadius;
-import static gen5.flags.EnlightenmentCenterFlag.getShiftDirection;
+import static gen5.flags.EnlightenmentCenterFlag.*;
 import static gen5.helpers.AttackHelper.*;
 import static gen5.helpers.DefenseHelper.*;
 import static gen5.helpers.MovementHelper.goTo;
@@ -62,7 +61,13 @@ public strictfp class DefensePolitician {
         }
 
         if (rc.canGetFlag(enlightenmentCenterId)) {
-            radius = getRadius(rc.getFlag(enlightenmentCenterId));
+            int flag = rc.getFlag(enlightenmentCenterId);
+            radius = getRadius(flag);
+            Direction got = getWeakWallDirection(flag);
+            if (got != null) {
+                goTo(spawnerLocation.translate(got.dx * radius, got.dy * radius));
+                return;
+            }
         } else {
             if (spawnType == SpawnType.DefensePolitician) {
                 spawnType = SpawnType.AttackPolitician;

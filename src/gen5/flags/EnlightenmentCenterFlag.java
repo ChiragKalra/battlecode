@@ -39,6 +39,17 @@ public class EnlightenmentCenterFlag {
         return MovementHelper.directions[dirInt-1];
     }
 
+    /*
+    * TODO
+    *  @return
+    *       null if no weak direction
+    *
+    *
+    * */
+    public static Direction getWeakWallDirection (int flag) {
+	    return null;
+    }
+
     // check for flag changes and set flag
     public static void updateFlag() throws GameActionException {
 	    if (shouldDecrementWallRadius()) {
