@@ -151,7 +151,7 @@ public strictfp class RobotPlayer {
 
                 // update flag at the end of each round
                 if (spawnType == null) {
-                    if (rc.isReady()) {
+                    if (rc.getRoundNum() % 2 == 1) {
                         EnlightenmentCenterFlag.updateFlag();
                     }
                 } else switch (spawnType) {
@@ -163,7 +163,9 @@ public strictfp class RobotPlayer {
                         GridPoliticianFlag.updateFlag();
                 }
 
-                logger.flush();
+                if (mType != RobotType.ENLIGHTENMENT_CENTER) {
+                    logger.flush();
+                }
 
 
                 if (roundNumber == rc.getRoundNum()) {

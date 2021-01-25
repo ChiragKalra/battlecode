@@ -59,12 +59,6 @@ public class GridHelper {
             return vacancy;
         }
 
-        // avoid crowding if any
-        Direction antiCrowd = getAntiCrowdingDirection(current);
-        if (antiCrowd != null) {
-            return antiCrowd;
-        }
-
         // select random direction out of adjacent muckrakers
         return getDirectionFromAdjacentFlags(current, fellow);
     }
@@ -152,12 +146,14 @@ public class GridHelper {
     public static Direction getDirectionFromAdjacentFlags(MapLocation now, RobotInfo[] nearby) throws GameActionException {
         ArrayList<Direction> selected = new ArrayList<>();
         for (RobotInfo ri: nearby) {
-            int flag = rc.getFlag(ri.getID());
-            if (ri.type == RobotType.POLITICIAN && isPlaced(flag)) {
-                Direction dir = getDirection(rc.getFlag(rc.getID()));
-                if (dir != null) {
-                    Direction sum = vectorAddition(dir, now.directionTo(ri.location));
-                    selected.add(sum == Direction.CENTER ? dir : sum);
+            if (rc.canGetFlag(ri.getID())) {
+                int flag = rc.getFlag(ri.getID());
+                if (ri.type == RobotType.POLITICIAN && isPlaced(flag)) {
+                    Direction dir = getDirection(rc.getFlag(rc.getID()));
+                    if (dir != null) {
+                        Direction sum = vectorAddition(dir, now.directionTo(ri.location));
+                        selected.add(sum == Direction.CENTER ? dir : sum);
+                    }
                 }
             }
         }

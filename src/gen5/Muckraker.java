@@ -10,7 +10,6 @@ import static gen5.util.Functions.convolveCircularly;
 
 public strictfp class Muckraker {
 
-
     private static Direction getAntiCrowdingDirection(MapLocation current) {
         byte[] occupied = new byte[8];
         int total = 0;
@@ -56,7 +55,7 @@ public strictfp class Muckraker {
     public static Direction getNextDirection() throws GameActionException {
         if (con == null || rounds == 0) {
             con = getRandomDirection();
-            rounds = 200;
+            rounds = 100;
         }
         if (!rc.onTheMap(rc.getLocation().add(con))) {
             con = con.rotateLeft();

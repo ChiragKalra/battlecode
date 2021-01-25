@@ -2,6 +2,7 @@ package gen5.flags;
 
 import battlecode.common.*;
 import gen5.util.EcInfo;
+import gen5.util.Logger;
 
 import static gen5.GridPolitician.placed;
 import static gen5.RobotPlayer.*;
