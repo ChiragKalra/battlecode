@@ -4,6 +4,7 @@ import battlecode.common.*;
 
 import gen5.flags.DefensePoliticianFlag;
 import gen5.util.LinkedList;
+import gen5.util.Pair;
 import gen5.util.SpawnType;
 import gen5.util.Vector;
 import java.util.Iterator;
@@ -287,6 +288,19 @@ public class SpawnHelper {
         return false;
     }
 
+    private static Pair<Direction, Boolean> getEnemyEcOrMuck () {
+        boolean muck = false;
+        Direction direction = null;
+        for (RobotInfo ri: rc.senseNearbyRobots(sensorRadius, enemyTeam)) {
+            if (ri.type == RobotType.MUCKRAKER) {
+                muck = true;
+            } else if (ri.type == RobotType.ENLIGHTENMENT_CENTER) {
+                direction = ri.location.directionTo(spawnerLocation);
+            }
+        }
+        return new Pair<>(direction, muck);
+    }
+
     private static final int slanMinXp = slandererHPFloor(SpawnType.Slanderer.minHp),
             slanMaxXp = slandererHPFloor(SpawnType.Slanderer.maxHp);
     public static boolean spawnSlanderer() throws GameActionException {
@@ -302,8 +316,17 @@ public class SpawnHelper {
         if (dir == null) {
             dir = directions[(int) (Math.random() * 4) * 2 + 1];
         }
+
+        Pair<Direction, Boolean> got = getEnemyEcOrMuck();
+        if (got.value) {
+            return false;
+        }
+        if (got.key != null) {
+            dir = got.key;
+        }
+
         dir = getOptimalDirection(dir);
-        if (dir == null || rc.senseNearbyRobots(sensorRadius, enemyTeam).length>0) {
+        if (dir == null) {
             return false;
         }
         int xp = slandererHPFloor(rc.getInfluence());

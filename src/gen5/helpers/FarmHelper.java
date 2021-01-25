@@ -3,11 +3,9 @@ package gen5.helpers;
 import battlecode.common.*;
 
 import static gen5.RobotPlayer.*;
-import static gen5.flags.EnlightenmentCenterFlag.getRadius;
 import static gen5.helpers.DefenseHelper.*;
 import static gen5.helpers.MovementHelper.*;
 import static gen5.util.Functions.convolveCircularly;
-import static gen5.util.Functions.setBits;
 
 public class FarmHelper {
 	private static Direction antiMuckDirection = null;
@@ -111,7 +109,7 @@ public class FarmHelper {
     }
 
     public static Direction directionToBuffMuck () {
-        int threshold = roundNumber/15 + 10;
+        int threshold = roundNumber/30 + 10;
         Direction dir = null;
         for (RobotInfo ri : rc.senseNearbyRobots(sensorRadius, enemyTeam)) {
             if (ri.type == RobotType.MUCKRAKER && ri.conviction >= threshold) {
