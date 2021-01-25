@@ -60,7 +60,9 @@ public class DefenseHelper {
 		if (spawnerLocation == null) {
 			return false;
 		}
-		return isWallOfRadius(spawnerLocation, ml, innerRadius) || isWallOfRadius(spawnerLocation, ml, outerRadius);
+
+		MapLocation center = new MapLocation(spawnerLocation.x + tunnelShift.dx, spawnerLocation.y + tunnelShift.dy);
+		return isWallOfRadius(center, ml, innerRadius) || isWallOfRadius(center, ml, outerRadius);
 	}
 
 	public static boolean isWallOfRadius(MapLocation center, MapLocation ml, int rs) {
@@ -78,7 +80,9 @@ public class DefenseHelper {
     	if (spawnerLocation == null) {
     		return false;
     	}
-    	return ml.distanceSquaredTo(spawnerLocation) > outerRadius;
+
+    	MapLocation center = new MapLocation(spawnerLocation.x + tunnelShift.dx, spawnerLocation.y + tunnelShift.dy);
+    	return ml.distanceSquaredTo(center) > outerRadius;
     }
 
     public static boolean forceMove (Direction dir) throws GameActionException {
